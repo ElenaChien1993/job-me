@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 import firebase from '../utils/firebase';
+import useUpdateEffect from '../hooks/useUpdateEffect';
 
 const NoteDetails = () => {
   const [details, setDetails] = useState(null);
@@ -16,15 +17,23 @@ const NoteDetails = () => {
       });
   }, []);
 
+  useUpdateEffect(() => {
+    firebase.getRecommandedUsers('company').then(snaps => {
+      snaps.forEach(doc => console.log(doc.data()));
+    });
+  }, details);
+
   return (
     <>
       <h1>NoteDetails</h1>
-      {details && (<ul>
-        <li>產品：{details.product}</li>
-        <li>薪資：{`${details.salary.range} K / ${details.salary.type}`}</li>
-      </ul>)}
+      {details && (
+        <ul>
+          <li>產品：{details.product}</li>
+          <li>薪資：{`${details.salary.range} K / ${details.salary.type}`}</li>
+        </ul>
+      )}
     </>
-    );
+  );
 };
 
 export default NoteDetails;

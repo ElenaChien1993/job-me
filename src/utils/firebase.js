@@ -14,6 +14,9 @@ import {
   getDoc,
   getDocs,
   collection,
+  collectionGroup,
+  where,
+  query,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -38,7 +41,9 @@ const firebase = {
     return docsSnap;
   },
   async getNoteDetails(uid, noteId) {
-    const docsSnap = await getDocs(collection(db, `users/${uid}/notes/${noteId}/details`));
+    const docsSnap = await getDocs(
+      collection(db, `users/${uid}/notes/${noteId}/details`)
+    );
     return docsSnap;
   },
   checklogin(callback) {
@@ -46,6 +51,17 @@ const firebase = {
   },
   signOut() {
     return signOut(auth);
+  },
+  async getRecommandedUsers(company) {
+    const museums = query(
+      collectionGroup(db, 'notes'),
+      where('company_name', '==', company, where('is_share', '==', true))
+    );
+    const querySnapshot = await getDocs(museums);
+    return querySnapshot;
+    // querySnapshot.forEach(doc => {
+    //   console.log(doc.id, ' => ', doc.data());
+    // });
   },
   createUserWithEmailAndPassword,
   auth,
