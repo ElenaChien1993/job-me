@@ -1,19 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useOutletContext } from "react-router-dom";
 
 import firebase from '../utils/firebase';
 import Note from '../components/Note';
 
 const Notes = () => {
-  const [notes, setNotes] = useState([]);
-
-  useEffect(() => {
-    firebase.getNotes('UQjB80NDcqNauWxuSKl2y7VQg5J3').then(snaps => {
-      snaps.forEach(doc => {
-        console.log(doc.data());
-        setNotes(prev => [...prev, doc.data()]);
-      });
-    });
-  }, []);
+  const [notes] = useOutletContext();
 
   return (
     <>

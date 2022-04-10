@@ -41,7 +41,18 @@ const firebase = {
     const docsSnap = await getDocs(collection(db, `users/${uid}/notes/${noteId}/details`));
     return docsSnap;
   },
-  
+  checklogin(callback) {
+    onAuthStateChanged(auth, callback);
+  },
+  signOut() {
+    return signOut(auth);
+  },
+  createUserWithEmailAndPassword,
+  auth,
+  signInWithEmailAndPassword,
+  db,
+  doc,
+  setDoc,
 };
 
 export default firebase;
