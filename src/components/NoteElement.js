@@ -62,7 +62,8 @@ const Tag = styled.div`
 `;
 
 const NoteElement = ({ note }) => {
-
+  console.log('NoteEl render');
+  
   return (
     <Container>
       <ImageWrapper />

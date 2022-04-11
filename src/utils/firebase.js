@@ -38,8 +38,16 @@ const storage = getStorage(app);
 
 const firebase = {
   async getNote(uid, docId) {
-    const docSnap = await getDoc(doc(db, 'users', uid, 'notes', docId));
-    return docSnap;
+    try {
+      const docSnap = await getDoc(doc(db, 'users', uid, 'notes', docId));
+      if (docSnap.exists()) {
+        return docSnap;
+      } else {
+        console.log("No such document!");
+      }
+    } catch (err) {
+      console.log(err);
+    }
   },
   async getNotes(uid) {
     const docsSnap = await getDocs(collection(db, `users/${uid}/notes`));

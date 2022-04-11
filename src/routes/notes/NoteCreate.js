@@ -141,7 +141,7 @@ const NoteCreate = () => {
     setJobStatus(event.target.value);
   };
 
-  const handleCheckboxChange = (prop) => (event) => {
+  const handleCheckboxChange = () => {
     setChecked(!checked);
   };
 
@@ -200,7 +200,7 @@ const NoteCreate = () => {
             <CheckBox
               type="checkbox"
               checked={checked}
-              onChange={handleCheckboxChange('is_share')}
+              onChange={handleCheckboxChange}
             />
             <p>我願意和其他會員交流此公司的準備經驗</p>
           </CheckBoxWrapper>
