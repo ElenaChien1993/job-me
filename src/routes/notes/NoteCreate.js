@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
@@ -62,9 +64,9 @@ const RadioInput = styled.input`
 const TagButton = styled.label`
   width: 90px;
   height: 35px;
-  background: ${props => props.checked ? '#306172' : '#E3E3E3'};
+  background: ${(props) => (props.checked ? '#306172' : '#E3E3E3')};
   border-radius: 20px;
-  color: ${props => props.checked ? 'white' : '#707070'};
+  color: ${(props) => (props.checked ? 'white' : '#707070')};
   font-size: 16px;
   line-height: 22px;
   margin-right: 15px;
@@ -106,6 +108,7 @@ const NoteCreate = () => {
   const [jobStatus, setJobStatus] = useState('未申請');
   const [checked, setChecked] = useState(true);
   const user = firebase.auth.currentUser;
+  const navigate = useNavigate();
   const statusArray = [
     '未申請',
     '已申請',
@@ -143,11 +146,11 @@ const NoteCreate = () => {
   };
 
   const createNote = () => {
-    const noteData = {...data, status: jobStatus}
-    firebase.setNote(user.uid, noteData);
+    const noteDataBrief = { ...data, status: jobStatus };
+    firebase.setNoteBrief(user.uid, noteDataBrief).then((id) => {
+      navigate(`/notes/details/${id}`);
+    });
   };
-
-  console.log(user.uid);
 
   return (
     <Container>
@@ -181,7 +184,13 @@ const NoteCreate = () => {
                       onChange={handleStatusSelect}
                       checked={jobStatus === status}
                     />
-                    <TagButton checked={jobStatus === status} key={`label${i}`} htmlFor={`radio-${i}`}>{status}</TagButton>
+                    <TagButton
+                      checked={jobStatus === status}
+                      key={`label${i}`}
+                      htmlFor={`radio-${i}`}
+                    >
+                      {status}
+                    </TagButton>
                   </>
                 );
               })}
@@ -197,6 +206,7 @@ const NoteCreate = () => {
           </CheckBoxWrapper>
         </StyledForm>
         <CreateButton onClick={createNote}>直接創建</CreateButton>
+        <CreateButton onClick={createNote}>下一頁</CreateButton>
       </RightWrapper>
     </Container>
   );

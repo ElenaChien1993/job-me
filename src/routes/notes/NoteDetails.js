@@ -1,31 +1,35 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
+import NoteElement from '../../components/NoteElement';
 import firebase from '../../utils/firebase';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
 
 const NoteDetails = () => {
+  const [brief, setBrief] = useState(null);
   const [details, setDetails] = useState(null);
   let params = useParams();
   const noteId = params.noteId;
+  const user = firebase.auth.currentUser;
 
   useEffect(() => {
-    firebase
-      .getNoteDetails('UQjB80NDcqNauWxuSKl2y7VQg5J3', noteId)
-      .then(snap => {
-        snap.forEach(doc => setDetails(doc.data()));
-      });
+    firebase.getNote(user.uid, noteId).then((snap) => {
+      setBrief(snap.data());
+    });
+    firebase.getNoteDetails(noteId).then((snap) => {
+      setDetails(snap.data());
+    });
   }, []);
 
   useUpdateEffect(() => {
-    firebase.getRecommendedUsers('company').then(snaps => {
-      snaps.forEach(doc => console.log(doc.data()));
+    firebase.getRecommendedUsers('company').then((snaps) => {
+      snaps.forEach((doc) => console.log(doc.data()));
     });
   }, details);
 
   return (
     <>
-      <h1>NoteDetails</h1>
+      {brief && <NoteElement note={brief} />}
       {details && (
         <ul>
           <li>產品：{details.product}</li>

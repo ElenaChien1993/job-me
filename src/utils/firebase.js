@@ -37,20 +37,23 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 const firebase = {
+  async getNote(uid, docId) {
+    const docSnap = await getDoc(doc(db, 'users', uid, 'notes', docId));
+    return docSnap;
+  },
   async getNotes(uid) {
     const docsSnap = await getDocs(collection(db, `users/${uid}/notes`));
     return docsSnap;
   },
-  async getNoteDetails(uid, noteId) {
-    const docsSnap = await getDocs(
-      collection(db, `users/${uid}/notes/${noteId}/details`)
-    );
-    return docsSnap;
+  async getNoteDetails(noteId) {
+    const docSnap = await getDoc(doc(db, 'details', noteId));
+    return docSnap;
   },
-  async setNote(uid, data) {
+  async setNoteBrief(uid, data) {
     const newDocRef = doc(collection(db, `users/${uid}/notes`));
     try {
       await setDoc(newDocRef, { ...data, note_id: newDocRef.id });
+      return newDocRef.id;
     } catch (err) {
       console.log(err);
     }
