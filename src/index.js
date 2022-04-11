@@ -5,19 +5,24 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import firebase from './utils/firebase';
 import Layout from './routes/Layout';
-import Notes from './routes/Notes';
-import NoteDetails from './routes/NoteDetails';
-import NoteCreate from './routes/NoteCreate';
-import Practice from './routes/Practice';
-import PracticeSetting from './routes/PracticeSetting';
-import PracticeStart from './routes/PracticeStart';
+import PrivateRoute from './routes/PrivateRoute';
+import Notes from './routes/notes/Notes';
+import NoteDetails from './routes/notes/NoteDetails';
+import NoteCreate from './routes/notes/NoteCreate';
+import Practice from './routes/practice/Practice';
+import PracticeSetting from './routes/practice/PracticeSetting';
+import PracticeStart from './routes/practice/PracticeStart';
 import Login from './routes/Login';
+import Profile from './routes/profile/Profile';
+import Messages from './routes/Messages';
+import GlobalStyle from './components/GlobalStyle';
 
 const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [isLogIn, setIsLogIn] = useState(false);
 
   useEffect(() => {
-    firebase.checklogin(user => {
+    firebase.checklogin((user) => {
       if (user) {
         console.log(user);
         setIsLogIn(true);
@@ -25,23 +30,16 @@ const App = () => {
         console.log('signed out');
         setIsLogIn(false);
       }
+      setIsLoading(false);
     });
   }, []);
 
   return (
     <BrowserRouter>
-      <Routes>
+      <GlobalStyle />
+      {!isLoading && (<Routes>
         <Route path="/" element={<Layout isLogIn={isLogIn} />}>
-          <Route
-            index
-            element={
-              isLogIn ? (
-                <Navigate to="/notes" />
-              ) : (
-                <Navigate to="/login" state={{ from: '/notes' }} />
-              )
-            }
-          />
+          <Route index element={<Navigate to="/notes" />} />
           <Route path="notes">
             <Route
               index
@@ -61,17 +59,19 @@ const App = () => {
 
           <Route path="practice">
             <Route index element={<Practice />} />
-            <Route path="setting" element={<PracticeSetting />} />
+            <Route path="setting">
+              <Route path=":noteId" element={<PracticeSetting />} />
+            </Route>
             <Route path="start" element={<PracticeStart />} />
           </Route>
 
-          {/* <Route path="profile" element={<Profile />}>
+          <Route path="profile" element={<Profile />}>
             <Route path=":uid" element={<Profile />}/>
-            <Route path="records" element={<Records />}/>
+            {/* <Route path="records" element={<Records />}/> */}
           </Route> 
 
           <Route path="messages" element={<Messages />} />
-          <Route path="*" element={<NotFound />}/> */}
+          {/* <Route path="*" element={<NotFound />}/> */}
           <Route
             path="login"
             element={
@@ -83,7 +83,7 @@ const App = () => {
             }
           />
         </Route>
-      </Routes>
+      </Routes>)}
     </BrowserRouter>
   );
 };

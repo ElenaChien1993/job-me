@@ -1,3 +1,4 @@
+import { SendTwoTone } from '@mui/icons-material';
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -46,22 +47,28 @@ const firebase = {
     );
     return docsSnap;
   },
+  async setNote(uid, data) {
+    const newDocRef = doc(collection(db, `users/${uid}/notes`));
+    try {
+      await setDoc(newDocRef, { ...data, note_id: newDocRef.id });
+    } catch (err) {
+      console.log(err);
+    }
+  },
   checklogin(callback) {
     onAuthStateChanged(auth, callback);
   },
   signOut() {
     return signOut(auth);
   },
-  async getRecommandedUsers(company) {
+  async getRecommendedUsers(company) {
     const museums = query(
       collectionGroup(db, 'notes'),
-      where('company_name', '==', company, where('is_share', '==', true))
+      where('company_name', '==', company),
+      where('is_share', '==', true)
     );
     const querySnapshot = await getDocs(museums);
     return querySnapshot;
-    // querySnapshot.forEach(doc => {
-    //   console.log(doc.id, ' => ', doc.data());
-    // });
   },
   createUserWithEmailAndPassword,
   auth,

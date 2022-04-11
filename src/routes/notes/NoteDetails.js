@@ -1,8 +1,8 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-import firebase from '../utils/firebase';
-import useUpdateEffect from '../hooks/useUpdateEffect';
+import firebase from '../../utils/firebase';
+import useUpdateEffect from '../../hooks/useUpdateEffect';
 
 const NoteDetails = () => {
   const [details, setDetails] = useState(null);
@@ -18,7 +18,7 @@ const NoteDetails = () => {
   }, []);
 
   useUpdateEffect(() => {
-    firebase.getRecommandedUsers('company').then(snaps => {
+    firebase.getRecommendedUsers('company').then(snaps => {
       snaps.forEach(doc => console.log(doc.data()));
     });
   }, details);

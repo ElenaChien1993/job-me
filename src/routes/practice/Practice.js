@@ -1,6 +1,6 @@
 import { useOutletContext } from 'react-router-dom';
 
-import Note from '../components/Note';
+import Note from '../../components/Note';
 
 const Practice = () => {
   const [notes] = useOutletContext();

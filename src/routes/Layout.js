@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
+import ResponsiveAppBar from '../components/Nav';
 
 const Container = styled.div`
   margin: 0 auto;
@@ -10,8 +11,32 @@ const Container = styled.div`
   width: 80%;
 `;
 
-const Layout = ({ isLogin }) => {
-  const [notes, setNotes] = useState([]);
+const StyledNav = styled.nav`
+  width: 100vw;
+  height: 70px;
+  background-color: #306172;
+`
+
+const Ul = styled.ul`
+  display: flex;
+  height: 70px;
+  align-items: center;
+`
+
+const NavItem = styled.li`
+  font-size: 20px;
+  color: white;
+  margin: 10px 20px;
+`
+
+const Logout = styled.button`
+  color: white;
+  background-color: #306172;
+  margin-left: auto; 
+  margin-right: 20px;
+`
+
+const Nav = ({ isLogin }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -25,6 +50,22 @@ const Layout = ({ isLogin }) => {
       });
   };
 
+  return (
+    <StyledNav>
+      <Ul>
+        <NavItem><Link to="/notes">Notes</Link></NavItem>
+        <NavItem><Link to="/practice">Practice</Link></NavItem>
+        <NavItem><Link to="/profile">Profile</Link></NavItem>
+        <NavItem><Link to="/messages">Messages</Link></NavItem>
+        {!isLogin && (<Logout onClick={handleLogout}>Log out</Logout>)}
+      </Ul>
+    </StyledNav>
+  )
+}
+
+const Layout = ({ isLogin }) => {
+  const [notes, setNotes] = useState([]);
+
   useEffect(() => {
     firebase.getNotes('UQjB80NDcqNauWxuSKl2y7VQg5J3').then(snaps => {
       snaps.forEach(doc => {
@@ -34,18 +75,12 @@ const Layout = ({ isLogin }) => {
   }, []);
 
   return (
-    <Container>
-      <nav>
-        <ul>
-          <li><Link to="/notes">Notes</Link></li>
-          <li><Link to="/practice">Practice</Link></li>
-          <li><Link to="/profile">Profile</Link></li>
-          {!isLogin && (<button onClick={handleLogout}>Log out</button>)}
-        </ul>
-
-      </nav>
-      <Outlet context={[notes]}/>
-    </Container>
+    <>
+      <Nav isLogin={isLogin}/>
+      <Container>
+        <Outlet context={[notes]}/>
+      </Container>
+    </>
   )
 }
 
