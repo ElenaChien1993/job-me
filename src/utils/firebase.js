@@ -18,6 +18,7 @@ import {
   collectionGroup,
   where,
   query,
+  onSnapshot,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -43,7 +44,7 @@ const firebase = {
       if (docSnap.exists()) {
         return docSnap;
       } else {
-        console.log("No such document!");
+        console.log('No such document!');
       }
     } catch (err) {
       console.log(err);
@@ -68,15 +69,15 @@ const firebase = {
   },
   async setNoteDetails(noteId, data) {
     try {
-      await setDoc(doc(db, "details", noteId), data);
+      await setDoc(doc(db, 'details', noteId), data);
     } catch (err) {
       console.log(err);
     }
   },
   async updateNoteBrief(uid, noteId, key, data) {
     try {
-      await updateDoc(doc(db, "users", uid, "notes", noteId), {
-        [key]: data
+      await updateDoc(doc(db, 'users', uid, 'notes', noteId), {
+        [key]: data,
       });
     } catch (err) {
       console.log(err);
@@ -84,12 +85,18 @@ const firebase = {
   },
   async updateNoteDetails(noteId, key, data) {
     try {
-      await updateDoc(doc(db, "details", noteId), {
-        [key]: data
+      await updateDoc(doc(db, 'details', noteId), {
+        [key]: data,
       });
     } catch (err) {
       console.log(err);
     }
+  },
+  listenDetailsChange(noteId) {
+    onSnapshot(doc(db, 'details', noteId), async doc => {
+      console.log('infirebase.js' ,doc.data());
+      return doc.data()
+    });
   },
   checklogin(callback) {
     onAuthStateChanged(auth, callback);

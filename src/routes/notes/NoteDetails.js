@@ -6,13 +6,15 @@ import {
   EditableTextarea,
   EditablePreview,
   Select,
+  IconButton,
 } from '@chakra-ui/react';
+import { SmallCloseIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import NoteElement from '../../components/NoteElement';
 import firebase from '../../utils/firebase';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
-import EditableText from '../../components/EditableText';
+import AddField from '../../components/AddField';
 
 const Container = styled.div`
   display: flex;
@@ -70,8 +72,17 @@ const StyledLink = styled.a`
   text-decoration: underline;
 `;
 
+const DeleteButton = styled(IconButton)`
+  && {
+    display: none;
+  }
+`;
+
 const StyledListItem = styled.li`
   margin-bottom: 10px;
+  &:hover ${DeleteButton} {
+    display: block;
+  }
 `;
 
 const StyledSalaryWrapper = styled.div`
@@ -86,12 +97,6 @@ const StyledEditable = styled(Editable)`
   }
 `;
 
-// const StyledSelect = styled(Select)`
-//   && {
-//     width: 10%;
-//   }
-// `
-
 const NoteDetails = () => {
   const [brief, setBrief] = useState();
   const [details, setDetails] = useState();
@@ -101,12 +106,14 @@ const NoteDetails = () => {
   const user = firebase.auth.currentUser;
 
   useEffect(() => {
-    firebase.getNote(user.uid, noteId).then((snap) => {
+    firebase.getNote(user.uid, noteId).then(snap => {
       setBrief(snap.data());
     });
-    firebase.getNoteDetails(noteId).then((snap) => {
+    firebase.getNoteDetails(noteId).then(snap => {
       setDetails(snap.data());
     });
+    firebase.listenDetailsChange(noteId)
+
   }, []);
 
   useUpdateEffect(() => {
@@ -125,7 +132,7 @@ const NoteDetails = () => {
         : item
     );
 
-    setDetails((prev) => {
+    setDetails(prev => {
       return { ...prev, requirements: updatedChecked };
     });
   };
@@ -140,28 +147,38 @@ const NoteDetails = () => {
         : item
     );
 
-    setDetails((prev) => {
+    setDetails(prev => {
       return { ...prev, bonus: updatedChecked };
     });
   };
 
   const editNoteDetails = (e, key) => {
     if (e.target.value === details[key]) return;
-    setDetails((prev) => {
-      return { ...prev, [key]: e.target.value };
-    });
     firebase.updateNoteDetails(noteId, key, e.target.value);
   };
 
   const handleSalaryChange = (e, key) => {
     const updated = { ...details.salary, [key]: e.target.value };
-    setDetails((prev) => {
-      return { ...prev, salary: { ...prev.salary, [key]: e.target.value } };
-    });
     firebase.updateNoteDetails(noteId, 'salary', updated);
   };
 
-  console.log(details);
+  const handleResponsibilitiesInputChange = (e, index) => {
+    const update = details.responsibilities.map((item, i) =>
+      i === index ? e.target.value : item
+    );
+    if (JSON.stringify(update) === JSON.stringify(details.responsibilities))
+      return;
+    firebase.updateNoteDetails(noteId, 'responsibilities', update);
+  };
+
+  const handleDelete = (i, objectKey) => {
+    console.log(i);
+    const newData = details[objectKey].filter((_, index) => index !== i);
+    console.log(newData);
+    firebase.updateNoteDetails(noteId, objectKey, newData);
+  };
+
+  console.log('state', details);
 
   return (
     <>
@@ -173,7 +190,7 @@ const NoteDetails = () => {
             <Title>公司主要產品 / 服務</Title>
             <Editable defaultValue={details.product}>
               <EditablePreview />
-              <EditableInput onSubmit={(e) => editNoteDetails(e, 'product')} />
+              <EditableInput onBlur={e => editNoteDetails(e, 'product')} />
             </Editable>
           </FieldWrapper>
           <FieldWrapper>
@@ -181,9 +198,7 @@ const NoteDetails = () => {
             <StyledSalaryWrapper>
               <StyledEditable defaultValue={details.salary.range}>
                 <EditablePreview />
-                <EditableInput
-                  onSubmit={(e) => handleSalaryChange(e, 'range')}
-                />
+                <EditableInput onBlur={e => handleSalaryChange(e, 'range')} />
               </StyledEditable>
               <Content> K </Content>
               <Select
@@ -191,7 +206,7 @@ const NoteDetails = () => {
                 isFullWidth={false}
                 maxWidth="100px"
                 // placeholder={details.salary.type}
-                onSubmit={(e) => handleSalaryChange(e, 'type')}
+                onBlur={e => handleSalaryChange(e, 'type')}
               >
                 <option value="年薪">年薪</option>
                 <option value="月薪">月薪</option>
@@ -200,18 +215,33 @@ const NoteDetails = () => {
           </FieldWrapper>
           <FieldWrapper>
             <Title>工作內容</Title>
-            <EditableText
-              prev={details.responsibilities}
-              noteId={noteId}
-              setDetails={setDetails}
-              details={details}
-              objectKey="responsibilities"
-            />
-            {/* <Content>
+            <Content>
               {details.responsibilities.map((item, i) => {
-                return <StyledListItem key={i}>{item}</StyledListItem>;
+                return (
+                  <Editable defaultValue={item} key={i}>
+                    <StyledListItem>
+                      <EditablePreview />
+                      <EditableInput
+                        onBlur={e => handleResponsibilitiesInputChange(e, i)}
+                      />
+                      <DeleteButton
+                        w={4}
+                        h={4}
+                        ml={5}
+                        aria-label="delete item"
+                        icon={<SmallCloseIcon />}
+                        onClick={() => handleDelete(i, 'responsibilities')}
+                      />
+                    </StyledListItem>
+                  </Editable>
+                );
               })}
-            </Content> */}
+            </Content>
+            <AddField
+              setter={setDetails}
+              objectKey="responsibilities"
+              newValue={'新欄位'}
+            />
           </FieldWrapper>
           <FieldWrapper>
             <Title>必備技能</Title>
