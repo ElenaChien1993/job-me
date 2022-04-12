@@ -73,6 +73,24 @@ const firebase = {
       console.log(err);
     }
   },
+  async updateNoteBrief(uid, noteId, key, data) {
+    try {
+      await updateDoc(doc(db, "users", uid, "notes", noteId), {
+        [key]: data
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  async updateNoteDetails(noteId, key, data) {
+    try {
+      await updateDoc(doc(db, "details", noteId), {
+        [key]: data
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  },
   checklogin(callback) {
     onAuthStateChanged(auth, callback);
   },

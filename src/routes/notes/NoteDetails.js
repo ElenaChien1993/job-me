@@ -1,10 +1,18 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import {
+  Editable,
+  EditableInput,
+  EditableTextarea,
+  EditablePreview,
+  Select,
+} from '@chakra-ui/react';
 import styled from 'styled-components';
 
 import NoteElement from '../../components/NoteElement';
 import firebase from '../../utils/firebase';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
+import EditableText from '../../components/EditableText';
 
 const Container = styled.div`
   display: flex;
@@ -35,6 +43,7 @@ const Title = styled.p`
 
 const Content = styled.div`
   font-size: 16px;
+  margin-right: 10px;
 `;
 
 const CheckBoxWrapper = styled.div`
@@ -65,21 +74,37 @@ const StyledListItem = styled.li`
   margin-bottom: 10px;
 `;
 
+const StyledSalaryWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledEditable = styled(Editable)`
+  && {
+    width: 10%;
+    margin-right: 10px;
+  }
+`;
+
+// const StyledSelect = styled(Select)`
+//   && {
+//     width: 10%;
+//   }
+// `
+
 const NoteDetails = () => {
   const [brief, setBrief] = useState();
   const [details, setDetails] = useState();
-  const [requirementsChecked, setRequirementsChecked] = useState([]);
-  const [bonusChecked, setBonusChecked] = useState([]);
+
   let params = useParams();
   const noteId = params.noteId;
   const user = firebase.auth.currentUser;
 
   useEffect(() => {
-    firebase.getNote(user.uid, noteId).then(snap => {
+    firebase.getNote(user.uid, noteId).then((snap) => {
       setBrief(snap.data());
     });
-    firebase.getNoteDetails(noteId).then(snap => {
-      console.log(snap.data());
+    firebase.getNoteDetails(noteId).then((snap) => {
       setDetails(snap.data());
     });
   }, []);
@@ -88,29 +113,55 @@ const NoteDetails = () => {
     // firebase.getRecommendedUsers('company').then(snaps => {
     //   snaps.forEach(doc => console.log(doc.data()));
     // });
-
-    const checked = details.requirements.map(item => item.is_qualified);
-    setRequirementsChecked(checked);
-
-    const checkedBonus = details.bonus.map(item => item.is_qualified);
-    setBonusChecked(checkedBonus);
   }, details);
 
   const handleRequirementsChange = (item, itemIndex) => {
-    const updatedChecked = requirementsChecked.map((item, index) =>
-      index === itemIndex ? !item : item
+    const updatedChecked = details.requirements.map((item, index) =>
+      index === itemIndex
+        ? {
+            ...item,
+            is_qualified: !item.is_qualified,
+          }
+        : item
     );
 
-    setRequirementsChecked(updatedChecked);
+    setDetails((prev) => {
+      return { ...prev, requirements: updatedChecked };
+    });
   };
 
   const handleBonusChange = (item, itemIndex) => {
-    const updatedChecked = bonusChecked.map((item, index) =>
-      index === itemIndex ? !item : item
+    const updatedChecked = details.bonus.map((item, index) =>
+      index === itemIndex
+        ? {
+            ...item,
+            is_qualified: !item.is_qualified,
+          }
+        : item
     );
 
-    setBonusChecked(updatedChecked);
+    setDetails((prev) => {
+      return { ...prev, bonus: updatedChecked };
+    });
   };
+
+  const editNoteDetails = (e, key) => {
+    if (e.target.value === details[key]) return;
+    setDetails((prev) => {
+      return { ...prev, [key]: e.target.value };
+    });
+    firebase.updateNoteDetails(noteId, key, e.target.value);
+  };
+
+  const handleSalaryChange = (e, key) => {
+    const updated = { ...details.salary, [key]: e.target.value };
+    setDetails((prev) => {
+      return { ...prev, salary: { ...prev.salary, [key]: e.target.value } };
+    });
+    firebase.updateNoteDetails(noteId, 'salary', updated);
+  };
+
+  console.log(details);
 
   return (
     <>
@@ -120,19 +171,47 @@ const NoteDetails = () => {
           <SectionTitle>詳細資料</SectionTitle>
           <FieldWrapper>
             <Title>公司主要產品 / 服務</Title>
-            <Content>{details.product}</Content>
+            <Editable defaultValue={details.product}>
+              <EditablePreview />
+              <EditableInput onSubmit={(e) => editNoteDetails(e, 'product')} />
+            </Editable>
           </FieldWrapper>
           <FieldWrapper>
             <Title>薪資範圍</Title>
-            <Content>{`${details.salary.range} K / ${details.salary.type}`}</Content>
+            <StyledSalaryWrapper>
+              <StyledEditable defaultValue={details.salary.range}>
+                <EditablePreview />
+                <EditableInput
+                  onSubmit={(e) => handleSalaryChange(e, 'range')}
+                />
+              </StyledEditable>
+              <Content> K </Content>
+              <Select
+                variant="outline"
+                isFullWidth={false}
+                maxWidth="100px"
+                // placeholder={details.salary.type}
+                onSubmit={(e) => handleSalaryChange(e, 'type')}
+              >
+                <option value="年薪">年薪</option>
+                <option value="月薪">月薪</option>
+              </Select>
+            </StyledSalaryWrapper>
           </FieldWrapper>
           <FieldWrapper>
             <Title>工作內容</Title>
-            <Content>
+            <EditableText
+              prev={details.responsibilities}
+              noteId={noteId}
+              setDetails={setDetails}
+              details={details}
+              objectKey="responsibilities"
+            />
+            {/* <Content>
               {details.responsibilities.map((item, i) => {
                 return <StyledListItem key={i}>{item}</StyledListItem>;
               })}
-            </Content>
+            </Content> */}
           </FieldWrapper>
           <FieldWrapper>
             <Title>必備技能</Title>
@@ -141,7 +220,7 @@ const NoteDetails = () => {
                 <CheckBoxWrapper key={i}>
                   <CheckBox
                     type="checkbox"
-                    checked={requirementsChecked[i]}
+                    checked={details.requirements[i].is_qualified}
                     onChange={() => handleRequirementsChange(item, i)}
                   />
                   <p>{item.description}</p>
@@ -156,7 +235,7 @@ const NoteDetails = () => {
                 <CheckBoxWrapper key={i}>
                   <CheckBox
                     type="checkbox"
-                    checked={bonusChecked[i]}
+                    checked={details.bonus[i].is_qualified}
                     onChange={() => handleBonusChange(item, i)}
                   />
                   <p>{item.description}</p>

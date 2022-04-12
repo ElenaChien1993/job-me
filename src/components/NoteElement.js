@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -61,7 +62,7 @@ const Tag = styled.div`
   margin-right: 14px;
 `;
 
-const NoteElement = ({ note }) => {
+const NoteElement = React.memo(function NoteElement({ note }) {
   console.log('NoteEl render');
   
   return (
@@ -79,6 +80,6 @@ const NoteElement = ({ note }) => {
       </TagsWrapper>
     </Container>
   );
-};
+});
 
 export default NoteElement;
