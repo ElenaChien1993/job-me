@@ -66,6 +66,13 @@ const firebase = {
       console.log(err);
     }
   },
+  async setNoteDetails(noteId, data) {
+    try {
+      await setDoc(doc(db, "details", noteId), data);
+    } catch (err) {
+      console.log(err);
+    }
+  },
   checklogin(callback) {
     onAuthStateChanged(auth, callback);
   },

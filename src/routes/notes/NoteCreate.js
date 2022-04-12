@@ -22,10 +22,10 @@ const NoteCreate = () => {
       type: '',
     },
     responsibilities: [],
-    requirements: [],
-    bonus: [],
-    questions: [],
-    attached_files: [],
+    requirements: [{is_qualified: false, description: ''}],
+    bonus: [{is_qualified: false, description: ''}],
+    questions: [{question: '', answer: ''}],
+    attached_files: [{file_name: '', file_link: ''}],
     more_notes: [],
     other: '',
   });
@@ -76,6 +76,7 @@ const NoteCreate = () => {
                 prevStep={prevStep}
                 handleChange={handleChange}
                 values={values}
+                setValues={setValues}
               />
             );
           case 4:
@@ -84,6 +85,7 @@ const NoteCreate = () => {
                 prevStep={prevStep}
                 handleChange={handleChange}
                 values={values}
+                setValues={setValues}
               />
             );
           default:

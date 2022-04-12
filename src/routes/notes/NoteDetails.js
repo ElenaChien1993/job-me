@@ -89,10 +89,10 @@ const NoteDetails = () => {
     //   snaps.forEach(doc => console.log(doc.data()));
     // });
 
-    const checked = details.requirements.map(item => item.is_qulified);
+    const checked = details.requirements.map(item => item.is_qualified);
     setRequirementsChecked(checked);
 
-    const checkedBonus = details.bonus.map(item => item.is_qulified);
+    const checkedBonus = details.bonus.map(item => item.is_qualified);
     setBonusChecked(checkedBonus);
   }, details);
 
@@ -202,7 +202,7 @@ const NoteDetails = () => {
             <Title>面試前筆記區</Title>
             <Content>
               <div>想問公司的問題</div>
-              {details.more_notes[0].question_for_company.map((q, i) => {
+              {details.more_notes[0]?.question_for_company?.map((q, i) => {
                 return <p key={i}>{q}</p>;
               })}
             </Content>

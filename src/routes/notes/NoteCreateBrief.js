@@ -1,3 +1,4 @@
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@chakra-ui/react';
 
@@ -155,22 +156,22 @@ const NoteCreateBrief = ({ nextStep, handleChange, values, setValues }) => {
         <StyledForm>
           <InputWrap>
             <label>公司名稱</label>
-            <StyledInput size="sm" onChange={handleChange('company_name')} />
+            <StyledInput size="sm" defaultValue={values.company_name} onChange={handleChange('company_name')} />
           </InputWrap>
           <InputWrap>
             <label>應徵職務</label>
-            <StyledInput size="sm" onChange={handleChange('job_title')} />
+            <StyledInput size="sm" defaultValue={values.job_title} onChange={handleChange('job_title')} />
           </InputWrap>
           <InputWrap>
             <label>公司地點</label>
-            <StyledInput size="sm" onChange={handleChange('address')} />
+            <StyledInput size="sm" defaultValue={values.address} onChange={handleChange('address')} />
           </InputWrap>
           <div>
             <p>目前對於此公司的求職狀態</p>
             <TagsWrapper>
               {statusArray.map((status, i) => {
                 return (
-                  <>
+                  <React.Fragment key={i}>
                     <RadioInput
                       type="radio"
                       id={`radio-${i}`}
@@ -187,7 +188,7 @@ const NoteCreateBrief = ({ nextStep, handleChange, values, setValues }) => {
                     >
                       {status}
                     </TagButton>
-                  </>
+                  </React.Fragment>
                 );
               })}
             </TagsWrapper>
@@ -202,6 +203,7 @@ const NoteCreateBrief = ({ nextStep, handleChange, values, setValues }) => {
             </label>
             <StyledInput
               size="sm"
+              defaultValue={values.tags.join(',')}
               placeholder="請以「,」隔開每個標籤"
               onChange={handleTagsChange}
             />
