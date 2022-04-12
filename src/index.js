@@ -2,6 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ChakraProvider } from '@chakra-ui/react'
 
 import firebase from './utils/firebase';
 import Layout from './routes/Layout';
@@ -35,56 +36,58 @@ const App = () => {
   }, []);
 
   return (
-    <BrowserRouter>
-      <GlobalStyle />
-      {!isLoading && (<Routes>
-        <Route path="/" element={<Layout isLogIn={isLogIn} />}>
-          <Route index element={<Navigate to="/notes" />} />
-          <Route path="notes">
+    <ChakraProvider>
+      <BrowserRouter>
+        <GlobalStyle />
+        {!isLoading && (<Routes>
+          <Route path="/" element={<Layout isLogIn={isLogIn} />}>
+            <Route index element={<Navigate to="/notes" />} />
+            <Route path="notes">
+              <Route
+                index
+                element={
+                  isLogIn ? (
+                    <Notes />
+                  ) : (
+                    <Navigate to="/login" state={{ from: '/notes' }} />
+                  )
+                }
+              />
+              <Route path="details">
+                <Route path=":noteId" element={<NoteDetails />} />
+              </Route>
+              <Route path="create" element={<NoteCreate />} />
+            </Route>
+
+            <Route path="practice">
+              <Route index element={<Practice />} />
+              <Route path="setting">
+                <Route path=":noteId" element={<PracticeSetting />} />
+              </Route>
+              <Route path="start" element={<PracticeStart />} />
+            </Route>
+
+            <Route path="profile" element={<Profile />}>
+              <Route path=":uid" element={<Profile />}/>
+              {/* <Route path="records" element={<Records />}/> */}
+            </Route> 
+
+            <Route path="messages" element={<Messages />} />
+            {/* <Route path="*" element={<NotFound />}/> */}
             <Route
-              index
+              path="login"
               element={
                 isLogIn ? (
-                  <Notes />
+                  <Navigate to="/notes" />
                 ) : (
-                  <Navigate to="/login" state={{ from: '/notes' }} />
+                  <Login setIsLogIn={setIsLogIn} />
                 )
               }
             />
-            <Route path="details">
-              <Route path=":noteId" element={<NoteDetails />} />
-            </Route>
-            <Route path="create" element={<NoteCreate />} />
           </Route>
-
-          <Route path="practice">
-            <Route index element={<Practice />} />
-            <Route path="setting">
-              <Route path=":noteId" element={<PracticeSetting />} />
-            </Route>
-            <Route path="start" element={<PracticeStart />} />
-          </Route>
-
-          <Route path="profile" element={<Profile />}>
-            <Route path=":uid" element={<Profile />}/>
-            {/* <Route path="records" element={<Records />}/> */}
-          </Route> 
-
-          <Route path="messages" element={<Messages />} />
-          {/* <Route path="*" element={<NotFound />}/> */}
-          <Route
-            path="login"
-            element={
-              isLogIn ? (
-                <Navigate to="/notes" />
-              ) : (
-                <Login setIsLogIn={setIsLogIn} />
-              )
-            }
-          />
-        </Route>
-      </Routes>)}
-    </BrowserRouter>
+        </Routes>)}
+      </BrowserRouter>
+    </ChakraProvider>
   );
 };
 

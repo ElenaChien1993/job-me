@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Input } from '@chakra-ui/react';
 
 import styled from 'styled-components';
 
@@ -23,8 +23,8 @@ const LeftWrapper = styled.div`
 `;
 
 const RightWrapper = styled.div`
-  width: 55%;
-  margin-left: auto;
+  width: 65%;
+  margin-left: 350px;
   padding: 40px 44px 30px;
 `;
 
@@ -41,12 +41,11 @@ const InputWrap = styled.div`
     line-height: 24px;
     font-weight: 500;
   }
-  & input {
-    width: 100%;
-    border: solid 1px #cccccc;
-    height: 40px;
-    font-size: 20px;
-    padding-left: 5px;
+`;
+
+const StyledInput = styled(Input)`
+  && {
+    border-radius: 10px;
   }
 `;
 
@@ -103,10 +102,13 @@ const CreateButton = styled.button`
   cursor: pointer;
 `;
 
-const NoteCreateBrief = ({ nextStep, handleChange, values }) => {
-  // const [data, setData] = useState({});
-  // const [jobStatus, setJobStatus] = useState('未申請');
-  const [checked, setChecked] = useState(true);
+const SideNote = styled.span`
+  color: #999999;
+  margin-right: 5px;
+  font-size: 15px;
+`;
+
+const NoteCreateBrief = ({ nextStep, handleChange, values, setValues }) => {
   const user = firebase.auth.currentUser;
   const navigate = useNavigate();
   const statusArray = [
@@ -118,19 +120,31 @@ const NoteCreateBrief = ({ nextStep, handleChange, values }) => {
     '等待中',
   ];
 
-  // const handleStatusSelect = (event) => {
-  //   setJobStatus(event.target.value);
-  // };
-
-  // const handleCheckboxChange = () => {
-  //   setChecked(!checked);
-  // };
+  const handleCheckboxChange = () => {
+    setValues((prev) => {
+      return { ...prev, is_share: !values.is_share };
+    });
+  };
 
   const createNote = () => {
     const { company_name, address, is_share, tags, status, job_title } = values;
-    const noteDataBrief = { company_name, address, is_share, tags, status, job_title };
+    const noteDataBrief = {
+      company_name,
+      address,
+      is_share,
+      tags,
+      status,
+      job_title,
+    };
     firebase.setNoteBrief(user.uid, noteDataBrief).then((id) => {
       navigate(`/notes/details/${id}`);
+    });
+  };
+
+  const handleTagsChange = (e) => {
+    const tagsArray = e.target.value.split(',', 5);
+    setValues((prev) => {
+      return { ...prev, tags: tagsArray };
     });
   };
 
@@ -141,15 +155,15 @@ const NoteCreateBrief = ({ nextStep, handleChange, values }) => {
         <StyledForm>
           <InputWrap>
             <label>公司名稱</label>
-            <input type="text" onChange={handleChange('company_name')} />
+            <StyledInput size="sm" onChange={handleChange('company_name')} />
           </InputWrap>
           <InputWrap>
             <label>應徵職務</label>
-            <input type="email" onChange={handleChange('job_title')} />
+            <StyledInput size="sm" onChange={handleChange('job_title')} />
           </InputWrap>
           <InputWrap>
             <label>公司地點</label>
-            <input type="text" onChange={handleChange('address')} />
+            <StyledInput size="sm" onChange={handleChange('address')} />
           </InputWrap>
           <div>
             <p>目前對於此公司的求職狀態</p>
@@ -178,17 +192,31 @@ const NoteCreateBrief = ({ nextStep, handleChange, values }) => {
               })}
             </TagsWrapper>
           </div>
+          <InputWrap>
+            <label>
+              標籤
+              <SideNote>
+                {' '}
+                Ex: 新創 / React / 最想要.....等自訂標籤以利搜尋（上限為 5 個）
+              </SideNote>
+            </label>
+            <StyledInput
+              size="sm"
+              placeholder="請以「,」隔開每個標籤"
+              onChange={handleTagsChange}
+            />
+          </InputWrap>
           <CheckBoxWrapper>
             <CheckBox
               type="checkbox"
               checked={values.is_share}
-              onChange={handleChange('is_share')}
+              onChange={handleCheckboxChange}
             />
             <p>我願意和其他會員交流此公司的準備經驗</p>
           </CheckBoxWrapper>
         </StyledForm>
         <CreateButton onClick={createNote}>直接創建</CreateButton>
-        <CreateButton onClick={createNote}>下一頁</CreateButton>
+        <CreateButton onClick={nextStep}>下一頁</CreateButton>
       </RightWrapper>
     </Container>
   );

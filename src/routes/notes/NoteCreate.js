@@ -12,7 +12,7 @@ const NoteCreate = () => {
     job_title: '',
     is_share: true,
     address: '',
-    status: '',
+    status: '未申請',
     tags: [],
     product: '',
     job_link: '',
@@ -56,6 +56,7 @@ const NoteCreate = () => {
                 nextStep={nextStep}
                 handleChange={handleChange}
                 values={values}
+                setValues={setValues}
               />
             );
           case 2:
@@ -65,6 +66,7 @@ const NoteCreate = () => {
                 prevStep={prevStep}
                 handleChange={handleChange}
                 values={values}
+                setValues={setValues}
               />
             );
           case 3:
