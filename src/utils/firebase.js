@@ -1,4 +1,3 @@
-import { SendTwoTone } from '@mui/icons-material';
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -6,6 +5,7 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
+  updateProfile,
 } from 'firebase/auth';
 import {
   getFirestore,
@@ -94,21 +94,39 @@ const firebase = {
   checklogin(callback) {
     onAuthStateChanged(auth, callback);
   },
+  async signUp(uid, email) {
+    try {
+      await setDoc(doc(db, 'users', uid), { display_name: email });
+    } catch (err) {
+      console.log(err);
+    }
+  },
   signOut() {
     return signOut(auth);
   },
+  updateUser(name) {
+    updateProfile(auth.currentUser, {
+      displayName: name,
+    })
+      .then(() => {
+        console.log('updated');
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  },
   async getRecommendedUsers(company, uid) {
-    const museums = query(
+    const members = query(
       collectionGroup(db, 'notes'),
       where('company_name', '==', company),
       where('is_share', '==', true)
     );
-    const querySnapshot = await getDocs(museums);
+    const querySnapshot = await getDocs(members);
     let data = [];
-    querySnapshot.forEach((doc) => {
-      data.push(doc.data())
-    })
-    const filteredData = data.filter((item) => item.creator !== uid);
+    querySnapshot.forEach(doc => {
+      data.push(doc.data());
+    });
+    const filteredData = data.filter(item => item.creator !== uid);
     return filteredData;
   },
   createUserWithEmailAndPassword,

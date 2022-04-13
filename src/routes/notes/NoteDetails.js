@@ -9,6 +9,7 @@ import {
   Select,
   IconButton,
   Button,
+  useDisclosure,
 } from '@chakra-ui/react';
 import {
   SmallCloseIcon,
@@ -21,10 +22,10 @@ import styled from 'styled-components';
 
 import NoteElement from '../../components/NoteElement';
 import firebase from '../../utils/firebase';
-import useUpdateEffect from '../../hooks/useUpdateEffect';
 import AddField from '../../components/AddField';
 import EditFiles from '../../components/EditFiles';
 import EditorArea from '../../components/Editor';
+import RecommendModal from '../../components/RecommendModal';
 
 const Container = styled.div`
   display: flex;
@@ -128,19 +129,22 @@ const NoteDetails = () => {
   const [brief, setBrief] = useState();
   const [details, setDetails] = useState();
   const [isFilesEditing, setIsFilesEditing] = useState(false);
+  const [recommend, setRecommend] = useState([]);
 
+  const { onOpen, isOpen, onClose } = useDisclosure({ id: 'recommend' });
   let params = useParams();
   const noteId = params.noteId;
   const user = firebase.auth.currentUser;
+  console.log(user)
 
   useEffect(() => {
-    firebase.getNote(user.uid, noteId).then((snap) => {
+    firebase.getNote(user.uid, noteId).then(snap => {
       setBrief(snap.data());
     });
-    firebase.getNoteDetails(noteId).then((snap) => {
+    firebase.getNoteDetails(noteId).then(snap => {
       setDetails(snap.data());
     });
-    firebase.listenDetailsChange(noteId, (doc) => {
+    firebase.listenDetailsChange(noteId, doc => {
       setDetails(doc.data());
     });
   }, []);
@@ -177,7 +181,7 @@ const NoteDetails = () => {
     return updatedChecked;
   };
 
-  const onBlurSubmit = (objectKey) => {
+  const onBlurSubmit = objectKey => {
     firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
   };
 
@@ -191,7 +195,7 @@ const NoteDetails = () => {
   const handleArrayInputChange = (e, index, objectKey) => {
     const update = getArrayChangedValue(e.target.value, index, objectKey);
 
-    setDetails((prev) => {
+    setDetails(prev => {
       return { ...prev, [objectKey]: update };
     });
   };
@@ -204,7 +208,7 @@ const NoteDetails = () => {
       objectKey,
       targetKey
     );
-    setDetails((prev) => {
+    setDetails(prev => {
       return { ...prev, [objectKey]: update };
     });
   };
@@ -222,7 +226,7 @@ const NoteDetails = () => {
   };
 
   const handleInputSalaryChange = (e, type) => {
-    setDetails((prev) => {
+    setDetails(prev => {
       return { ...prev, salary: { ...details.salary, [type]: e.target.value } };
     });
   };
@@ -238,13 +242,21 @@ const NoteDetails = () => {
 
   const showConnectModal = () => {
     console.log('show');
-    firebase.getRecommendedUsers(brief.company_name, user.uid).then(members => console.log(members))
+    firebase
+      .getRecommendedUsers(brief.company_name, user.uid)
+      .then(members => {
+        console.log(members)
+        setRecommend(members);
+        onOpen();
+      });
   };
 
   console.log('state', details);
 
   return (
     <>
+      {/* <Button onClick={onOpen}>Open Modal</Button> */}
+      <RecommendModal isOpen={isOpen} onClose={onClose} recommend={recommend}/>
       <ButtonWrapper>
         <Link to="/notes">
           <Button
@@ -280,28 +292,30 @@ const NoteDetails = () => {
           <SectionTitle>詳細資料</SectionTitle>
           <FieldWrapper>
             <Title>公司主要產品 / 服務</Title>
-            <Editable value={details.product}>
+            <Editable value={details.product === '' && '尚未填寫資料'}>
               <EditablePreview />
               <EditableInput
-                onChange={(e) =>
-                  setDetails((prev) => {
+                onChange={e =>
+                  setDetails(prev => {
                     return { ...prev, product: e.target.value };
                   })
                 }
                 onBlur={() => onBlurSubmit('product')}
-                onKeyDown={(e) => handlePressEnter(e, 'product')}
+                onKeyDown={e => handlePressEnter(e, 'product')}
               />
             </Editable>
           </FieldWrapper>
           <FieldWrapper>
             <Title>薪資範圍</Title>
             <StyledSalaryWrapper>
-              <StyledEditable value={details.salary.range}>
+              <StyledEditable
+                value={details.salary.range === '' && '尚未填寫資料'}
+              >
                 <EditablePreview />
                 <EditableInput
-                  onChange={(e) => handleInputSalaryChange(e, 'range')}
+                  onChange={e => handleInputSalaryChange(e, 'range')}
                   onBlur={() => onBlurSubmit('salary')}
-                  onKeyDown={(e) => handlePressEnter(e, 'salary')}
+                  onKeyDown={e => handlePressEnter(e, 'salary')}
                 />
               </StyledEditable>
               <Content> K </Content>
@@ -309,7 +323,7 @@ const NoteDetails = () => {
                 variant="outline"
                 isFullWidth={false}
                 maxWidth="100px"
-                onChange={(e) => handleInputSalaryChange(e, 'type')}
+                onChange={e => handleInputSalaryChange(e, 'type')}
                 onBlur={() => onBlurSubmit('salary')}
               >
                 <option value="年薪">年薪</option>
@@ -322,17 +336,15 @@ const NoteDetails = () => {
             <Content>
               {details.responsibilities.map((item, i) => {
                 return (
-                  <Editable value={item} key={i}>
+                  <Editable value={item === '' && '尚未填寫資料'} key={i}>
                     <StyledListItem>
                       <EditablePreview />
                       <EditableInput
-                        onChange={(e) =>
+                        onChange={e =>
                           handleArrayInputChange(e, i, 'responsibilities')
                         }
                         onBlur={() => onBlurSubmit('responsibilities')}
-                        onKeyDown={(e) =>
-                          handlePressEnter(e, 'responsibilities')
-                        }
+                        onKeyDown={e => handlePressEnter(e, 'responsibilities')}
                       />
                       <DeleteButton
                         w={4}
@@ -363,10 +375,10 @@ const NoteDetails = () => {
                     checked={details.requirements[i].is_qualified}
                     onChange={() => handleCheckboxChange(i, 'requirements')}
                   />
-                  <Editable value={item.description}>
+                  <Editable value={item.description === '' && '尚未填寫資料'}>
                     <EditablePreview />
                     <EditableInput
-                      onChange={(e) =>
+                      onChange={e =>
                         handleMapArrayInputChange(
                           e,
                           i,
@@ -375,7 +387,7 @@ const NoteDetails = () => {
                         )
                       }
                       onBlur={() => onBlurSubmit('requirements')}
-                      onKeyDown={(e) => handlePressEnter(e, 'requirements')}
+                      onKeyDown={e => handlePressEnter(e, 'requirements')}
                     />
                   </Editable>
                   <DeleteButton
@@ -408,14 +420,14 @@ const NoteDetails = () => {
                     checked={details.bonus[i].is_qualified}
                     onChange={() => handleCheckboxChange(i, 'bonus')}
                   />
-                  <Editable value={item.description}>
+                  <Editable value={item.description === '' && '尚未填寫資料'}>
                     <EditablePreview />
                     <EditableInput
-                      onChange={(e) =>
+                      onChange={e =>
                         handleMapArrayInputChange(e, i, 'bonus', 'description')
                       }
                       onBlur={() => onBlurSubmit('bonus')}
-                      onKeyDown={(e) => handlePressEnter(e, 'bonus')}
+                      onKeyDown={e => handlePressEnter(e, 'bonus')}
                     />
                   </Editable>
                   <DeleteButton
@@ -507,11 +519,11 @@ const NoteDetails = () => {
               {details.questions.map((q, i) => {
                 return (
                   <QuestionWrapper key={i}>
-                    <Editable value={q.question}>
+                    <Editable value={q.question === '' && '尚未填寫資料'}>
                       <StyledListItem>
                         <EditablePreview />
                         <EditableInput
-                          onChange={(e) =>
+                          onChange={e =>
                             handleMapArrayInputChange(
                               e,
                               i,
@@ -520,7 +532,7 @@ const NoteDetails = () => {
                             )
                           }
                           onBlur={() => onBlurSubmit('questions')}
-                          onKeyDown={(e) => handlePressEnter(e, 'questions')}
+                          onKeyDown={e => handlePressEnter(e, 'questions')}
                         />
                         <DeleteButton
                           w={4}
@@ -535,11 +547,11 @@ const NoteDetails = () => {
                     <Editable value={q.answer || '請輸入練習回答'}>
                       <EditablePreview />
                       <EditableTextarea
-                        onChange={(e) =>
+                        onChange={e =>
                           handleMapArrayInputChange(e, i, 'questions', 'answer')
                         }
                         onBlur={() => onBlurSubmit('questions')}
-                        onKeyDown={(e) => handlePressEnter(e, 'questions')}
+                        onKeyDown={e => handlePressEnter(e, 'questions')}
                       />
                     </Editable>
                   </QuestionWrapper>
@@ -558,7 +570,7 @@ const NoteDetails = () => {
           <FieldWrapper>
             <Title>面試前筆記區</Title>
             <Content>
-              <div>想問公司的問題</div>
+              <div>Ex: 想問公司的問題？</div>
               <EditorArea
                 noteId={noteId}
                 details={details}

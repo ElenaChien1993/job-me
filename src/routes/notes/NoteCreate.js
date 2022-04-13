@@ -22,13 +22,38 @@ const NoteCreate = () => {
       type: '',
     },
     responsibilities: [],
-    requirements: [{is_qualified: false, description: ''}],
-    bonus: [{is_qualified: false, description: ''}],
-    questions: [{question: '', answer: ''}],
-    attached_files: [{file_name: '', file_link: ''}],
+    requirements: [{ is_qualified: false, description: '' }],
+    bonus: [{ is_qualified: false, description: '' }],
+    questions: [{ question: '', answer: '' }],
+    attached_files: [{ file_name: '', file_link: '' }],
     more_notes: [],
     other: '',
   });
+
+  const {
+    company_name,
+    address,
+    is_share,
+    tags,
+    status,
+    job_title,
+    ...noteDetails
+  } = values;
+
+  const {
+    product,
+    job_link,
+    resume_link,
+    salary,
+    responsibilities,
+    requirements,
+    bonus,
+    questions,
+    attached_files,
+    more_notes,
+    other,
+    ...noteDataBrief
+  } = values;
 
   const nextStep = () => {
     setStep(prev => prev + 1);
@@ -44,7 +69,7 @@ const NoteCreate = () => {
     });
   };
 
-  console.log(values)
+  console.log(values);
 
   return (
     <>
@@ -55,6 +80,8 @@ const NoteCreate = () => {
               <NoteCreateBrief
                 nextStep={nextStep}
                 handleChange={handleChange}
+                noteDataBrief={noteDataBrief}
+                noteDetails={noteDetails}
                 values={values}
                 setValues={setValues}
               />
@@ -85,6 +112,8 @@ const NoteCreate = () => {
                 prevStep={prevStep}
                 handleChange={handleChange}
                 values={values}
+                noteDataBrief={noteDataBrief}
+                noteDetails={noteDetails}
                 setValues={setValues}
               />
             );

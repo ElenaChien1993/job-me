@@ -50,7 +50,7 @@ const StyledButton = styled.button`
 
 const EditorArea = ({ noteId, details, objectKey }) => {
   const [editorState, setEditorState] = useState(() =>
-    details[objectKey] === ''
+    details[objectKey] === '' || !details[objectKey]
       ? EditorState.createEmpty()
       : EditorState.createWithContent(convertFromRaw(JSON.parse(details[objectKey])))
   );

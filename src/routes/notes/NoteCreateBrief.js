@@ -64,9 +64,9 @@ const RadioInput = styled.input`
 const TagButton = styled.label`
   width: 90px;
   height: 35px;
-  background: ${(props) => (props.checked ? '#306172' : '#E3E3E3')};
+  background: ${props => (props.checked ? '#306172' : '#E3E3E3')};
   border-radius: 20px;
-  color: ${(props) => (props.checked ? 'white' : '#707070')};
+  color: ${props => (props.checked ? 'white' : '#707070')};
   font-size: 16px;
   line-height: 22px;
   margin-right: 15px;
@@ -109,7 +109,14 @@ const SideNote = styled.span`
   font-size: 15px;
 `;
 
-const NoteCreateBrief = ({ nextStep, handleChange, values, setValues }) => {
+const NoteCreateBrief = ({
+  nextStep,
+  handleChange,
+  values,
+  setValues,
+  noteDataBrief,
+  noteDetails,
+}) => {
   const user = firebase.auth.currentUser;
   const navigate = useNavigate();
   const statusArray = [
@@ -122,30 +129,24 @@ const NoteCreateBrief = ({ nextStep, handleChange, values, setValues }) => {
   ];
 
   const handleCheckboxChange = () => {
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, is_share: !values.is_share };
     });
   };
 
   const createNote = () => {
-    const { company_name, address, is_share, tags, status, job_title } = values;
-    const noteDataBrief = {
-      company_name,
-      address,
-      is_share,
-      tags,
-      status,
-      job_title,
-      creator: user.uid
-    };
-    firebase.setNoteBrief(user.uid, noteDataBrief).then((id) => {
-      navigate(`/notes/details/${id}`);
-    });
+    firebase
+      .setNoteBrief(user.uid, { ...noteDataBrief, creator: user.uid, creator_name: user.displayName || '未提供名字' })
+      .then(id => {
+        firebase.setNoteDetails(id, noteDetails).then(() => {
+          navigate(`/notes/details/${id}`);
+        });
+      });
   };
 
-  const handleTagsChange = (e) => {
+  const handleTagsChange = e => {
     const tagsArray = e.target.value.split(',', 5);
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, tags: tagsArray };
     });
   };
@@ -157,15 +158,27 @@ const NoteCreateBrief = ({ nextStep, handleChange, values, setValues }) => {
         <StyledForm>
           <InputWrap>
             <label>公司名稱</label>
-            <StyledInput size="sm" defaultValue={values.company_name} onChange={handleChange('company_name')} />
+            <StyledInput
+              size="sm"
+              defaultValue={values.company_name}
+              onChange={handleChange('company_name')}
+            />
           </InputWrap>
           <InputWrap>
             <label>應徵職務</label>
-            <StyledInput size="sm" defaultValue={values.job_title} onChange={handleChange('job_title')} />
+            <StyledInput
+              size="sm"
+              defaultValue={values.job_title}
+              onChange={handleChange('job_title')}
+            />
           </InputWrap>
           <InputWrap>
             <label>公司地點</label>
-            <StyledInput size="sm" defaultValue={values.address} onChange={handleChange('address')} />
+            <StyledInput
+              size="sm"
+              defaultValue={values.address}
+              onChange={handleChange('address')}
+            />
           </InputWrap>
           <div>
             <p>目前對於此公司的求職狀態</p>

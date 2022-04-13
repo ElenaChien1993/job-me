@@ -1,18 +1,4 @@
 import { useState } from 'react';
-// import Box from '@mui/material/Box';
-// import IconButton from '@mui/material/IconButton';
-// import Input from '@mui/material/Input';
-// import TextField from '@mui/material/TextField';
-// import FormControl from '@mui/material/FormControl';
-// // import InputLabel from '@mui/material/InputLabel';
-// import InputAdornment from '@mui/material/InputAdornment';
-// import Visibility from '@mui/icons-material/Visibility';
-// import VisibilityOff from '@mui/icons-material/VisibilityOff';
-// import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-// import Stack from '@mui/material/Stack';
-// import Button from '@mui/material/Button';
-// import EmailIcon from '@mui/icons-material/Email';
-// import LockIcon from '@mui/icons-material/Lock';
 import styled from 'styled-components';
 
 import firebase from // createUserWithEmailAndPassword,
@@ -64,30 +50,17 @@ const Login = () => {
     createUserWithEmailAndPassword,
     auth,
     signInWithEmailAndPassword,
-    db,
-    doc,
-    setDoc,
   } = firebase;
 
   let { from } = location.state || { from: { pathname: '/' } };
-
-  const createUserDatabase = async (uid, email) => {
-    try {
-      await setDoc(doc(db, 'users', uid), { display_name: email});
-      console.log('ok');
-    } catch (e) {
-      alert('Error adding document: ', e);
-      console.log(e);
-    }
-  };
 
   const handleSignUp = () => {
     createUserWithEmailAndPassword(auth, values.email, values.password)
       .then(userCredential => {
         // Signed in
         const user = userCredential.user;
-        console.log(user);
-        createUserDatabase(user.uid, user.email);
+        firebase.updateUser(values.name);
+        firebase.signUp(user.uid, user.email);
         alert('註冊成功！');
         navigate(from);
       })
@@ -148,6 +121,7 @@ const Login = () => {
     <Container>
       <StyledBox>
         {/* <AccountCircleIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} /> */}
+        <label htmlFor="Name">Name</label>
         <input
           sx={{ width: '218px' }}
           id="Name"
@@ -159,6 +133,7 @@ const Login = () => {
       </StyledBox>
       <StyledBox>
         {/* <EmailIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} /> */}
+        <label htmlFor="Email">Email</label>
         <input
           sx={{ width: '218px' }}
           id="Email"

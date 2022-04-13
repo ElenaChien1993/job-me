@@ -9,7 +9,7 @@ import {
   Select,
   IconButton,
 } from '@chakra-ui/react';
-import { SmallCloseIcon, EditIcon, CheckCircleIcon } from '@chakra-ui/icons';
+import { EditIcon, CheckCircleIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
@@ -110,19 +110,6 @@ const Tag = styled.div`
   font-weight: 700;
   font-size: 16px;
   margin-right: 14px;
-`;
-
-const StyledTagPreview = styled(EditablePreview)`
-  && {
-    padding: 13px 24px;
-    height: 40px;
-    background: #d5f4f7;
-    border-radius: 6px;
-    color: #306172;
-    font-weight: 700;
-    font-size: 16px;
-    margin-right: 14px;
-  }
 `;
 
 const StyledInput = styled(Input)`
