@@ -1,6 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
+import styled from 'styled-components';
 
 import NoteElement from "./NoteElement";
+
+const StyledNote = styled(NoteElement)`
+  cursor: pointer;
+`
 
 const Note = ({ note }) => {
   const { pathname } = useLocation();
@@ -13,7 +18,7 @@ const Note = ({ note }) => {
           : `/practice/setting/${note.note_id}`
       }
     >
-      <NoteElement note={note}/>
+      <StyledNote note={note} editable={false}/>
     </Link>
   );
 };

@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Editable,
   EditableInput,
@@ -16,6 +16,7 @@ import firebase from '../../utils/firebase';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
 import AddField from '../../components/AddField';
 import EditFiles from '../../components/EditFiles';
+import EditorArea from '../../components/Editor';
 
 const Container = styled.div`
   display: flex;
@@ -98,6 +99,13 @@ const StyledEditable = styled(Editable)`
   && {
     width: 10%;
     margin-right: 10px;
+  }
+`;
+
+const QuestionWrapper = styled.div`
+  margin-bottom: 15px;
+  &:hover ${DeleteButton} {
+    display: block;
   }
 `;
 
@@ -223,7 +231,7 @@ const NoteDetails = () => {
 
   return (
     <>
-      {brief && <NoteElement note={brief} />}
+      {brief && <NoteElement uid={user.uid} noteId={noteId} note={brief} setNote={setBrief} editable />}
       {details && (
         <Container>
           <SectionTitle>詳細資料</SectionTitle>
@@ -259,7 +267,6 @@ const NoteDetails = () => {
                 isFullWidth={false}
                 maxWidth="100px"
                 onChange={(e) => handleInputSalaryChange(e, 'type')}
-                // placeholder={details.salary.type}
                 onBlur={() => onBlurSubmit('salary')}
               >
                 <option value="年薪">年薪</option>
@@ -446,6 +453,7 @@ const NoteDetails = () => {
           </FieldWrapper>
           <FieldWrapper>
             <Title>其他備註</Title>
+            <EditorArea noteId={noteId} details={details} objectKey="other" />
             <Content>{details.others}</Content>
           </FieldWrapper>
           <Line />
@@ -454,26 +462,82 @@ const NoteDetails = () => {
             <Title>面試題目猜題</Title>
             <Content>
               {details.questions.map((q, i) => {
-                return <StyledListItem key={i}>{q.question}</StyledListItem>;
+                return (
+                  <QuestionWrapper key={i}>
+                    <Editable value={q.question}>
+                      <StyledListItem>
+                        <EditablePreview />
+                        <EditableInput
+                          onChange={(e) =>
+                            handleMapArrayInputChange(
+                              e,
+                              i,
+                              'questions',
+                              'question'
+                            )
+                          }
+                          onBlur={() => onBlurSubmit('questions')}
+                          onKeyDown={(e) => handlePressEnter(e, 'questions')}
+                        />
+                        <DeleteButton
+                          w={4}
+                          h={4}
+                          ml={5}
+                          aria-label="delete item"
+                          icon={<SmallCloseIcon />}
+                          onClick={() => handleDelete(i, 'questions')}
+                        />
+                      </StyledListItem>
+                    </Editable>
+                    <Editable value={q.answer || '請輸入練習回答'}>
+                      <EditablePreview />
+                      <EditableTextarea
+                        onChange={(e) =>
+                          handleMapArrayInputChange(e, i, 'questions', 'answer')
+                        }
+                        onBlur={() => onBlurSubmit('questions')}
+                        onKeyDown={(e) => handlePressEnter(e, 'questions')}
+                      />
+                    </Editable>
+                  </QuestionWrapper>
+                );
               })}
+              <AddField
+                setter={setDetails}
+                objectKey="questions"
+                newValue={{
+                  question: '新欄位，請點擊編輯',
+                  answer: '請輸入練習回答',
+                }}
+              />
             </Content>
           </FieldWrapper>
           <FieldWrapper>
             <Title>面試前筆記區</Title>
             <Content>
               <div>想問公司的問題</div>
-              {details.more_notes[0]?.question_for_company?.map((q, i) => {
-                return <p key={i}>{q}</p>;
-              })}
+              <EditorArea
+                noteId={noteId}
+                details={details}
+                objectKey="before_note"
+              />
             </Content>
           </FieldWrapper>
           <FieldWrapper>
             <Title>面試中筆記區</Title>
-            <Content>{details.more_notes[1]}</Content>
+            <EditorArea
+              noteId={noteId}
+              details={details}
+              objectKey="ing_note"
+            />
           </FieldWrapper>
           <FieldWrapper>
             <Title>面試後心得區</Title>
-            <Content>{details.more_notes[2]}</Content>
+            <EditorArea
+              noteId={noteId}
+              details={details}
+              objectKey="after_note"
+            />
           </FieldWrapper>
         </Container>
       )}

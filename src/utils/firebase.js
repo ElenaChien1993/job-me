@@ -74,11 +74,9 @@ const firebase = {
       console.log(err);
     }
   },
-  async updateNoteBrief(uid, noteId, key, data) {
+  async updateNoteBrief(uid, noteId, data) {
     try {
-      await updateDoc(doc(db, 'users', uid, 'notes', noteId), {
-        [key]: data,
-      });
+      await updateDoc(doc(db, 'users', uid, 'notes', noteId), data);
     } catch (err) {
       console.log(err);
     }
