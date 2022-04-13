@@ -1,25 +1,58 @@
 import { Link, useLocation } from 'react-router-dom';
+import { IconButton } from '@chakra-ui/react';
+import { DeleteIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
-import NoteElement from "./NoteElement";
+import firebase from '../utils/firebase';
+import NoteElement from './NoteElement';
+
+const Container = styled.div`
+  position: relative;
+`;
+
+const DeleteButton = styled(IconButton)`
+  && {
+    position: absolute;
+    top: 75px;
+    right: 50px;
+    cursor: pointer;
+  }
+`;
 
 const StyledNote = styled(NoteElement)`
   cursor: pointer;
-`
+`;
 
-const Note = ({ note }) => {
+const Note = ({ note, notes, setNotes }) => {
   const { pathname } = useLocation();
+  const user = firebase.auth.currentUser;
+
+  const handleDeleteNote = () => {
+    console.log(note.note_id);
+    firebase.deleteNote(user.uid, note.note_id);
+    const update = notes.filter(item => item.note_id !== note.note_id);
+    setNotes(update);
+  };
 
   return (
-    <Link
-      to={
-        pathname === '/notes'
-          ? `/notes/details/${note.note_id}`
-          : `/practice/setting/${note.note_id}`
-      }
-    >
-      <StyledNote note={note} editable={false}/>
-    </Link>
+    <Container>
+      <Link
+        to={
+          pathname === '/notes'
+            ? `/notes/details/${note.note_id}`
+            : `/practice/setting/${note.note_id}`
+        }
+      >
+        <StyledNote note={note} editable={false} />
+      </Link>
+      {pathname === '/notes' && (
+        <DeleteButton
+          onClick={handleDeleteNote}
+          aria-label="Delete note"
+          icon={<DeleteIcon />}
+        />
+      )}
+    </Container>
   );
 };
 

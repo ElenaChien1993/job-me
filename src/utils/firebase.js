@@ -19,6 +19,7 @@ import {
   where,
   query,
   onSnapshot,
+  deleteDoc,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -84,6 +85,13 @@ const firebase = {
   async updateNoteDetails(noteId, data) {
     try {
       await updateDoc(doc(db, 'details', noteId), data);
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  async deleteNote(uid, noteId) {
+    try {
+      await deleteDoc(doc(db, 'users', uid, 'notes', noteId));
     } catch (err) {
       console.log(err);
     }
