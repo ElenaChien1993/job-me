@@ -8,7 +8,7 @@ const StyledAddButton = styled.button`
   cursor: pointer;
 `;
 
-const AddField = ({setter, newValue, objectKey}) => {
+const AddField = ({setter, objectKey, newValue}) => {
   const handleAddField = (e) => {
     e.preventDefault();
     setter((prev) => {

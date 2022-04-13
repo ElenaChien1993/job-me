@@ -83,20 +83,15 @@ const firebase = {
       console.log(err);
     }
   },
-  async updateNoteDetails(noteId, key, data) {
+  async updateNoteDetails(noteId, data) {
     try {
-      await updateDoc(doc(db, 'details', noteId), {
-        [key]: data,
-      });
+      await updateDoc(doc(db, 'details', noteId), data);
     } catch (err) {
       console.log(err);
     }
   },
-  listenDetailsChange(noteId) {
-    onSnapshot(doc(db, 'details', noteId), async doc => {
-      console.log('infirebase.js' ,doc.data());
-      return doc.data()
-    });
+  listenDetailsChange(noteId, callback) {
+    onSnapshot(doc(db, 'details', noteId), callback);
   },
   checklogin(callback) {
     onAuthStateChanged(auth, callback);
@@ -119,6 +114,7 @@ const firebase = {
   db,
   doc,
   setDoc,
+  onSnapshot,
 };
 
 export default firebase;

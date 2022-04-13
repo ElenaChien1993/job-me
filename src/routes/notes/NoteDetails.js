@@ -8,13 +8,14 @@ import {
   Select,
   IconButton,
 } from '@chakra-ui/react';
-import { SmallCloseIcon } from '@chakra-ui/icons';
+import { SmallCloseIcon, EditIcon, CheckCircleIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import NoteElement from '../../components/NoteElement';
 import firebase from '../../utils/firebase';
 import useUpdateEffect from '../../hooks/useUpdateEffect';
 import AddField from '../../components/AddField';
+import EditFiles from '../../components/EditFiles';
 
 const Container = styled.div`
   display: flex;
@@ -23,6 +24,12 @@ const Container = styled.div`
   background: white;
   padding: 20px 40px 0;
   margin-bottom: 60px;
+`;
+
+const DeleteButton = styled(IconButton)`
+  && {
+    display: none;
+  }
 `;
 
 const FieldWrapper = styled.div`
@@ -51,6 +58,9 @@ const Content = styled.div`
 const CheckBoxWrapper = styled.div`
   display: flex;
   margin-bottom: 10px;
+  &:hover ${DeleteButton} {
+    display: block;
+  }
 `;
 
 const CheckBox = styled.input`
@@ -70,12 +80,6 @@ const Line = styled.div`
 const StyledLink = styled.a`
   color: black;
   text-decoration: underline;
-`;
-
-const DeleteButton = styled(IconButton)`
-  && {
-    display: none;
-  }
 `;
 
 const StyledListItem = styled.li`
@@ -100,20 +104,22 @@ const StyledEditable = styled(Editable)`
 const NoteDetails = () => {
   const [brief, setBrief] = useState();
   const [details, setDetails] = useState();
+  const [isFilesEditing, setIsFilesEditing] = useState(false);
 
   let params = useParams();
   const noteId = params.noteId;
   const user = firebase.auth.currentUser;
 
   useEffect(() => {
-    firebase.getNote(user.uid, noteId).then(snap => {
+    firebase.getNote(user.uid, noteId).then((snap) => {
       setBrief(snap.data());
     });
-    firebase.getNoteDetails(noteId).then(snap => {
+    firebase.getNoteDetails(noteId).then((snap) => {
       setDetails(snap.data());
     });
-    firebase.listenDetailsChange(noteId)
-
+    firebase.listenDetailsChange(noteId, (doc) => {
+      setDetails(doc.data());
+    });
   }, []);
 
   useUpdateEffect(() => {
@@ -122,60 +128,95 @@ const NoteDetails = () => {
     // });
   }, details);
 
-  const handleRequirementsChange = (item, itemIndex) => {
-    const updatedChecked = details.requirements.map((item, index) =>
-      index === itemIndex
+  // ------- Helper Function
+  const getArrayChangedValue = (value, index, objectKey) => {
+    const update = details[objectKey].map((item, i) =>
+      index === i ? value : item
+    );
+    return update;
+  };
+
+  const getObjectInArrayChangedValue = (value, index, objectKey, targetKey) => {
+    const update = details[objectKey].map((item, i) =>
+      index === i
+        ? {
+            ...item,
+            [targetKey]: value,
+          }
+        : item
+    );
+    return update;
+  };
+
+  const getCheckboxChangedValue = (index, objectKey) => {
+    const updatedChecked = details[objectKey].map((item, i) =>
+      index === i
         ? {
             ...item,
             is_qualified: !item.is_qualified,
           }
         : item
     );
+    return updatedChecked;
+  };
 
-    setDetails(prev => {
-      return { ...prev, requirements: updatedChecked };
+  const onBlurSubmit = (objectKey) => {
+    firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
+  };
+
+  const handlePressEnter = (e, objectKey) => {
+    if (e.keyCode === 13) {
+      firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
+    }
+  };
+
+  //-------- Handle Array of Strings
+  const handleArrayInputChange = (e, index, objectKey) => {
+    const update = getArrayChangedValue(e.target.value, index, objectKey);
+
+    setDetails((prev) => {
+      return { ...prev, [objectKey]: update };
     });
   };
 
-  const handleBonusChange = (item, itemIndex) => {
-    const updatedChecked = details.bonus.map((item, index) =>
-      index === itemIndex
-        ? {
-            ...item,
-            is_qualified: !item.is_qualified,
-          }
-        : item
+  // ------- Handle Array of Maps
+  const handleMapArrayInputChange = (e, index, objectKey, targetKey) => {
+    const update = getObjectInArrayChangedValue(
+      e.target.value,
+      index,
+      objectKey,
+      targetKey
     );
-
-    setDetails(prev => {
-      return { ...prev, bonus: updatedChecked };
+    setDetails((prev) => {
+      return { ...prev, [objectKey]: update };
     });
   };
 
-  const editNoteDetails = (e, key) => {
-    if (e.target.value === details[key]) return;
-    firebase.updateNoteDetails(noteId, key, e.target.value);
-  };
+  // ------- Handle Checkbox
+  const handleCheckboxChange = (itemIndex, objectKey) => {
+    const updatedChecked = getCheckboxChangedValue(itemIndex, objectKey);
 
-  const handleSalaryChange = (e, key) => {
-    const updated = { ...details.salary, [key]: e.target.value };
-    firebase.updateNoteDetails(noteId, 'salary', updated);
-  };
-
-  const handleResponsibilitiesInputChange = (e, index) => {
-    const update = details.responsibilities.map((item, i) =>
-      i === index ? e.target.value : item
-    );
-    if (JSON.stringify(update) === JSON.stringify(details.responsibilities))
-      return;
-    firebase.updateNoteDetails(noteId, 'responsibilities', update);
+    firebase.updateNoteDetails(noteId, { [objectKey]: updatedChecked });
   };
 
   const handleDelete = (i, objectKey) => {
-    console.log(i);
     const newData = details[objectKey].filter((_, index) => index !== i);
-    console.log(newData);
-    firebase.updateNoteDetails(noteId, objectKey, newData);
+    firebase.updateNoteDetails(noteId, { [objectKey]: newData });
+  };
+
+  const handleInputSalaryChange = (e, type) => {
+    setDetails((prev) => {
+      return { ...prev, salary: { ...details.salary, [type]: e.target.value } };
+    });
+  };
+
+  const handleFilesSubmit = () => {
+    firebase.updateNoteDetails(noteId, {
+      job_link: details.job_link,
+      resume_link: details.resume_link,
+      attached_files: details.attached_files,
+    });
+    setIsFilesEditing(false);
   };
 
   console.log('state', details);
@@ -188,25 +229,38 @@ const NoteDetails = () => {
           <SectionTitle>詳細資料</SectionTitle>
           <FieldWrapper>
             <Title>公司主要產品 / 服務</Title>
-            <Editable defaultValue={details.product}>
+            <Editable value={details.product}>
               <EditablePreview />
-              <EditableInput onBlur={e => editNoteDetails(e, 'product')} />
+              <EditableInput
+                onChange={(e) =>
+                  setDetails((prev) => {
+                    return { ...prev, product: e.target.value };
+                  })
+                }
+                onBlur={() => onBlurSubmit('product')}
+                onKeyDown={(e) => handlePressEnter(e, 'product')}
+              />
             </Editable>
           </FieldWrapper>
           <FieldWrapper>
             <Title>薪資範圍</Title>
             <StyledSalaryWrapper>
-              <StyledEditable defaultValue={details.salary.range}>
+              <StyledEditable value={details.salary.range}>
                 <EditablePreview />
-                <EditableInput onBlur={e => handleSalaryChange(e, 'range')} />
+                <EditableInput
+                  onChange={(e) => handleInputSalaryChange(e, 'range')}
+                  onBlur={() => onBlurSubmit('salary')}
+                  onKeyDown={(e) => handlePressEnter(e, 'salary')}
+                />
               </StyledEditable>
               <Content> K </Content>
               <Select
                 variant="outline"
                 isFullWidth={false}
                 maxWidth="100px"
+                onChange={(e) => handleInputSalaryChange(e, 'type')}
                 // placeholder={details.salary.type}
-                onBlur={e => handleSalaryChange(e, 'type')}
+                onBlur={() => onBlurSubmit('salary')}
               >
                 <option value="年薪">年薪</option>
                 <option value="月薪">月薪</option>
@@ -218,11 +272,17 @@ const NoteDetails = () => {
             <Content>
               {details.responsibilities.map((item, i) => {
                 return (
-                  <Editable defaultValue={item} key={i}>
+                  <Editable value={item} key={i}>
                     <StyledListItem>
                       <EditablePreview />
                       <EditableInput
-                        onBlur={e => handleResponsibilitiesInputChange(e, i)}
+                        onChange={(e) =>
+                          handleArrayInputChange(e, i, 'responsibilities')
+                        }
+                        onBlur={() => onBlurSubmit('responsibilities')}
+                        onKeyDown={(e) =>
+                          handlePressEnter(e, 'responsibilities')
+                        }
                       />
                       <DeleteButton
                         w={4}
@@ -240,7 +300,7 @@ const NoteDetails = () => {
             <AddField
               setter={setDetails}
               objectKey="responsibilities"
-              newValue={'新欄位'}
+              newValue={'新欄位，請點擊編輯'}
             />
           </FieldWrapper>
           <FieldWrapper>
@@ -251,12 +311,42 @@ const NoteDetails = () => {
                   <CheckBox
                     type="checkbox"
                     checked={details.requirements[i].is_qualified}
-                    onChange={() => handleRequirementsChange(item, i)}
+                    onChange={() => handleCheckboxChange(i, 'requirements')}
                   />
-                  <p>{item.description}</p>
+                  <Editable value={item.description}>
+                    <EditablePreview />
+                    <EditableInput
+                      onChange={(e) =>
+                        handleMapArrayInputChange(
+                          e,
+                          i,
+                          'requirements',
+                          'description'
+                        )
+                      }
+                      onBlur={() => onBlurSubmit('requirements')}
+                      onKeyDown={(e) => handlePressEnter(e, 'requirements')}
+                    />
+                  </Editable>
+                  <DeleteButton
+                    w={4}
+                    h={4}
+                    ml={5}
+                    aria-label="delete item"
+                    icon={<SmallCloseIcon />}
+                    onClick={() => handleDelete(i, 'requirements')}
+                  />
                 </CheckBoxWrapper>
               );
             })}
+            <AddField
+              setter={setDetails}
+              objectKey="requirements"
+              newValue={{
+                description: '新欄位，請點擊編輯',
+                is_qualified: false,
+              }}
+            />
           </FieldWrapper>
           <FieldWrapper>
             <Title>加分項目</Title>
@@ -266,32 +356,93 @@ const NoteDetails = () => {
                   <CheckBox
                     type="checkbox"
                     checked={details.bonus[i].is_qualified}
-                    onChange={() => handleBonusChange(item, i)}
+                    onChange={() => handleCheckboxChange(i, 'bonus')}
                   />
-                  <p>{item.description}</p>
+                  <Editable value={item.description}>
+                    <EditablePreview />
+                    <EditableInput
+                      onChange={(e) =>
+                        handleMapArrayInputChange(e, i, 'bonus', 'description')
+                      }
+                      onBlur={() => onBlurSubmit('bonus')}
+                      onKeyDown={(e) => handlePressEnter(e, 'bonus')}
+                    />
+                  </Editable>
+                  <DeleteButton
+                    w={4}
+                    h={4}
+                    ml={5}
+                    aria-label="delete item"
+                    icon={<SmallCloseIcon />}
+                    onClick={() => handleDelete(i, 'bonus')}
+                  />
                 </CheckBoxWrapper>
               );
             })}
+            <AddField
+              setter={setDetails}
+              objectKey="bonus"
+              newValue={{
+                description: '新欄位，請點擊編輯',
+                is_qualified: false,
+              }}
+            />
           </FieldWrapper>
           <FieldWrapper>
             <Title>相關準備資料連結</Title>
-            <Content>
-              <StyledListItem>
-                <StyledLink href={details.job_link}>職缺連結</StyledLink>
-              </StyledListItem>
-              <StyledListItem>
-                <StyledLink href={details.resume_link}>我的履歷連結</StyledLink>
-              </StyledListItem>
-              {details.attached_files.map((file, i) => {
-                return (
-                  <StyledListItem key={i}>
-                    <StyledLink href={file.file_link}>
-                      {file.file_name}
-                    </StyledLink>
-                  </StyledListItem>
-                );
-              })}
-            </Content>
+            {!isFilesEditing ? (
+              <Content>
+                <IconButton
+                  size="sm"
+                  onClick={() => setIsFilesEditing(true)}
+                  icon={<EditIcon />}
+                />
+                <StyledListItem>
+                  <StyledLink href={details.job_link} target="_blank">
+                    職缺連結
+                  </StyledLink>
+                </StyledListItem>
+                <StyledListItem>
+                  <StyledLink href={details.resume_link} target="_blank">
+                    我的履歷連結
+                  </StyledLink>
+                </StyledListItem>
+                {details.attached_files.map((file, i) => {
+                  return (
+                    <StyledListItem key={i}>
+                      <StyledLink href={file.file_link} target="_blank">
+                        {file.file_name}
+                      </StyledLink>
+                      <DeleteButton
+                        w={4}
+                        h={4}
+                        ml={5}
+                        aria-label="delete item"
+                        icon={<SmallCloseIcon />}
+                        onClick={() => handleDelete(i, 'attached_files')}
+                      />
+                    </StyledListItem>
+                  );
+                })}
+              </Content>
+            ) : (
+              <>
+                <IconButton
+                  size="sm"
+                  onClick={handleFilesSubmit}
+                  icon={<CheckCircleIcon />}
+                />
+                <EditFiles details={details} setDetails={setDetails} />
+                <AddField
+                  setter={setDetails}
+                  objectKey="attached_files"
+                  newValue={{
+                    file_name: '請輸入檔案名稱',
+                    file_link: '請輸入檔案連結',
+                  }}
+                />
+              </>
+            )}
           </FieldWrapper>
           <FieldWrapper>
             <Title>其他備註</Title>
