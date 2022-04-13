@@ -97,14 +97,19 @@ const firebase = {
   signOut() {
     return signOut(auth);
   },
-  async getRecommendedUsers(company) {
+  async getRecommendedUsers(company, uid) {
     const museums = query(
       collectionGroup(db, 'notes'),
       where('company_name', '==', company),
       where('is_share', '==', true)
     );
     const querySnapshot = await getDocs(museums);
-    return querySnapshot;
+    let data = [];
+    querySnapshot.forEach((doc) => {
+      data.push(doc.data())
+    })
+    const filteredData = data.filter((item) => item.creator !== uid);
+    return filteredData;
   },
   createUserWithEmailAndPassword,
   auth,

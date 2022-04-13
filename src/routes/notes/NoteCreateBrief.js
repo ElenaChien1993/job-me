@@ -136,6 +136,7 @@ const NoteCreateBrief = ({ nextStep, handleChange, values, setValues }) => {
       tags,
       status,
       job_title,
+      creator: user.uid
     };
     firebase.setNoteBrief(user.uid, noteDataBrief).then((id) => {
       navigate(`/notes/details/${id}`);

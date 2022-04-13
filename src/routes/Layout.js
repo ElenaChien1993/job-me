@@ -65,9 +65,10 @@ const Nav = ({ isLogin }) => {
 
 const Layout = ({ isLogin }) => {
   const [notes, setNotes] = useState([]);
+  const user = firebase.auth.currentUser;
 
   useEffect(() => {
-    firebase.getNotes('UQjB80NDcqNauWxuSKl2y7VQg5J3').then(snaps => {
+    firebase.getNotes(user.uid).then(snaps => {
       snaps.forEach(doc => {
         setNotes(prev => [...prev, doc.data()]);
       });

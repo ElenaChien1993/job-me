@@ -1,18 +1,18 @@
 import { useState } from 'react';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import Input from '@mui/material/Input';
-import TextField from '@mui/material/TextField';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import InputAdornment from '@mui/material/InputAdornment';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
+// import Box from '@mui/material/Box';
+// import IconButton from '@mui/material/IconButton';
+// import Input from '@mui/material/Input';
+// import TextField from '@mui/material/TextField';
+// import FormControl from '@mui/material/FormControl';
+// // import InputLabel from '@mui/material/InputLabel';
+// import InputAdornment from '@mui/material/InputAdornment';
+// import Visibility from '@mui/icons-material/Visibility';
+// import VisibilityOff from '@mui/icons-material/VisibilityOff';
+// import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+// import Stack from '@mui/material/Stack';
+// import Button from '@mui/material/Button';
+// import EmailIcon from '@mui/icons-material/Email';
+// import LockIcon from '@mui/icons-material/Lock';
 import styled from 'styled-components';
 
 import firebase from // createUserWithEmailAndPassword,
@@ -34,7 +34,7 @@ const Container = styled.div`
   border-radius: 10px;
 `;
 
-const StyledBox = styled(Box)`
+const StyledBox = styled.div`
   && {
     display: flex;
     align-items: flex-end;
@@ -43,7 +43,7 @@ const StyledBox = styled(Box)`
   }
 `;
 
-const StyledStack = styled(Stack)`
+const StyledStack = styled.div`
   && {
     margin: 30px 0;
     justify-content: space-around;
@@ -147,8 +147,8 @@ const Login = () => {
   return (
     <Container>
       <StyledBox>
-        <AccountCircleIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
-        <TextField
+        {/* <AccountCircleIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} /> */}
+        <input
           sx={{ width: '218px' }}
           id="Name"
           label="Name"
@@ -158,8 +158,8 @@ const Login = () => {
         />
       </StyledBox>
       <StyledBox>
-        <EmailIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
-        <TextField
+        {/* <EmailIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} /> */}
+        <input
           sx={{ width: '218px' }}
           id="Email"
           label="Email"
@@ -169,35 +169,24 @@ const Login = () => {
         />
       </StyledBox>
       <StyledBox>
-        <LockIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
-        <FormControl variant="standard">
-          <InputLabel htmlFor="password">Password</InputLabel>
-          <Input
+        {/* <LockIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} /> */}
+        {/* <FormControl variant="standard"> */}
+          <label htmlFor="password">Password</label>
+          <input
             id="password"
             type={values.showPassword ? 'text' : 'password'}
             value={values.password}
             onChange={handleChange('password')}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                >
-                  {values.showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            }
           />
-        </FormControl>
+        {/* </FormControl> */}
       </StyledBox>
       <StyledStack spacing={2} direction="row">
-        <Button variant="contained" onClick={handleSignUp}>
+        <button variant="contained" onClick={handleSignUp}>
           Sign Up
-        </Button>
-        <Button variant="outlined" onClick={handleSignIn}>
+        </button>
+        <button variant="outlined" onClick={handleSignIn}>
           Sign In
-        </Button>
+        </button>
       </StyledStack>
     </Container>
   );

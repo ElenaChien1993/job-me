@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Editable,
   EditableInput,
@@ -7,8 +8,15 @@ import {
   EditablePreview,
   Select,
   IconButton,
+  Button,
 } from '@chakra-ui/react';
-import { SmallCloseIcon, EditIcon, CheckCircleIcon } from '@chakra-ui/icons';
+import {
+  SmallCloseIcon,
+  EditIcon,
+  CheckCircleIcon,
+  ChevronLeftIcon,
+  AtSignIcon,
+} from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import NoteElement from '../../components/NoteElement';
@@ -31,6 +39,13 @@ const DeleteButton = styled(IconButton)`
   && {
     display: none;
   }
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
 `;
 
 const FieldWrapper = styled.div`
@@ -130,12 +145,6 @@ const NoteDetails = () => {
     });
   }, []);
 
-  useUpdateEffect(() => {
-    // firebase.getRecommendedUsers('company').then(snaps => {
-    //   snaps.forEach(doc => console.log(doc.data()));
-    // });
-  }, details);
-
   // ------- Helper Function
   const getArrayChangedValue = (value, index, objectKey) => {
     const update = details[objectKey].map((item, i) =>
@@ -227,11 +236,45 @@ const NoteDetails = () => {
     setIsFilesEditing(false);
   };
 
+  const showConnectModal = () => {
+    console.log('show');
+    firebase.getRecommendedUsers(brief.company_name, user.uid).then(members => console.log(members))
+  };
+
   console.log('state', details);
 
   return (
     <>
-      {brief && <NoteElement uid={user.uid} noteId={noteId} note={brief} setNote={setBrief} editable />}
+      <ButtonWrapper>
+        <Link to="/notes">
+          <Button
+            size="sm"
+            leftIcon={<ChevronLeftIcon />}
+            variant="outline"
+            colorScheme="teal"
+          >
+            回前頁
+          </Button>
+        </Link>
+        <Button
+          size="sm"
+          rightIcon={<AtSignIcon />}
+          variant="solid"
+          colorScheme="facebook"
+          onClick={showConnectModal}
+        >
+          查看其他相關會員
+        </Button>
+      </ButtonWrapper>
+      {brief && (
+        <NoteElement
+          uid={user.uid}
+          noteId={noteId}
+          note={brief}
+          setNote={setBrief}
+          editable
+        />
+      )}
       {details && (
         <Container>
           <SectionTitle>詳細資料</SectionTitle>
