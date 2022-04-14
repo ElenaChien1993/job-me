@@ -55,6 +55,20 @@ const firebase = {
     const docsSnap = await getDocs(collection(db, `users/${uid}/notes`));
     return docsSnap;
   },
+  async searchNotes(uid, term) {
+    const notesMatches = [];
+    const notesRef = collection(db, 'users', uid, 'notes');
+    const matchQuery = query(
+      notesRef,
+      where('company_name', '>=', term),
+      where('company_name', '<=', term + '~')
+    );
+    const querySnapshot = await getDocs(matchQuery);
+    querySnapshot.forEach((doc) => {
+      notesMatches.push(doc.data());
+    });
+    return notesMatches;
+  },
   async getNoteDetails(noteId) {
     const docSnap = await getDoc(doc(db, 'details', noteId));
     return docSnap;

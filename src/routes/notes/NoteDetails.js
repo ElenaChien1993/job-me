@@ -241,7 +241,6 @@ const NoteDetails = () => {
   };
 
   const showConnectModal = () => {
-    console.log('show');
     firebase
       .getRecommendedUsers(brief.company_name, user.uid)
       .then(members => {
@@ -251,11 +250,8 @@ const NoteDetails = () => {
       });
   };
 
-  console.log('state', details);
-
   return (
     <>
-      {/* <Button onClick={onOpen}>Open Modal</Button> */}
       <RecommendModal isOpen={isOpen} onClose={onClose} recommend={recommend}/>
       <ButtonWrapper>
         <Link to="/notes">
