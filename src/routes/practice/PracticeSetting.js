@@ -10,7 +10,7 @@ import { v4 as uuid } from 'uuid';
 import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
-import RadioGroup from '../../components/RadioGroup';
+import RadioGroup from '../../components/elements/RadioGroup';
 import Loader from '../../components/Loader';
 
 const Container = styled.div`

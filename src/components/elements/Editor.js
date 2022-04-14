@@ -9,7 +9,7 @@ import {
 import 'draft-js/dist/Draft.css';
 import styled from 'styled-components';
 
-import firebase from '../utils/firebase';
+import firebase from '../../utils/firebase';
 
 const StyledEditor = styled.div`
   border: 1px transparent solid;

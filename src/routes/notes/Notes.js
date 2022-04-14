@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
-import Note from '../../components/Note';
+import Note from '../../components/NoteCard';
 
 const Container = styled.div`
   display: flex;

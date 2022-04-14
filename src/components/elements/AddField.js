@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import firebase from '../../utils/firebase'
+
 const StyledAddButton = styled.button`
   height: 30px;
   color: #306172;
@@ -10,7 +12,7 @@ const StyledAddButton = styled.button`
 
 const AddField = ({setter, objectKey, newValue}) => {
   const handleAddField = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     setter((prev) => {
       return {
         ...prev,

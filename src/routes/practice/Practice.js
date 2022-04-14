@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 
-import Note from '../../components/Note';
+import Note from '../../components/NoteCard';
 
 const SearchBar = styled.div`
   width: 100%;
