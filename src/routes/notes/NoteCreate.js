@@ -24,7 +24,7 @@ const NoteCreate = () => {
     responsibilities: [],
     requirements: [{ is_qualified: false, description: '' }],
     bonus: [{ is_qualified: false, description: '' }],
-    questions: [{ question: '', answer: '' }],
+    questions: [],
     attached_files: [{ file_name: '', file_link: '' }],
     more_notes: [],
     other: '',

@@ -135,16 +135,16 @@ const NoteDetails = () => {
   let params = useParams();
   const noteId = params.noteId;
   const user = firebase.auth.currentUser;
-  console.log(user)
+  console.log(user);
 
   useEffect(() => {
-    firebase.getNote(user.uid, noteId).then(snap => {
+    firebase.getNote(user.uid, noteId).then((snap) => {
       setBrief(snap.data());
     });
-    firebase.getNoteDetails(noteId).then(snap => {
+    firebase.getNoteDetails(noteId).then((snap) => {
       setDetails(snap.data());
     });
-    firebase.listenDetailsChange(noteId, doc => {
+    firebase.listenDetailsChange(noteId, (doc) => {
       setDetails(doc.data());
     });
   }, []);
@@ -181,7 +181,7 @@ const NoteDetails = () => {
     return updatedChecked;
   };
 
-  const onBlurSubmit = objectKey => {
+  const onBlurSubmit = (objectKey) => {
     firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
   };
 
@@ -195,7 +195,7 @@ const NoteDetails = () => {
   const handleArrayInputChange = (e, index, objectKey) => {
     const update = getArrayChangedValue(e.target.value, index, objectKey);
 
-    setDetails(prev => {
+    setDetails((prev) => {
       return { ...prev, [objectKey]: update };
     });
   };
@@ -208,7 +208,7 @@ const NoteDetails = () => {
       objectKey,
       targetKey
     );
-    setDetails(prev => {
+    setDetails((prev) => {
       return { ...prev, [objectKey]: update };
     });
   };
@@ -226,7 +226,7 @@ const NoteDetails = () => {
   };
 
   const handleInputSalaryChange = (e, type) => {
-    setDetails(prev => {
+    setDetails((prev) => {
       return { ...prev, salary: { ...details.salary, [type]: e.target.value } };
     });
   };
@@ -243,8 +243,8 @@ const NoteDetails = () => {
   const showConnectModal = () => {
     firebase
       .getRecommendedUsers(brief.company_name, user.uid)
-      .then(members => {
-        console.log(members)
+      .then((members) => {
+        console.log(members);
         setRecommend(members);
         onOpen();
       });
@@ -252,7 +252,7 @@ const NoteDetails = () => {
 
   return (
     <>
-      <RecommendModal isOpen={isOpen} onClose={onClose} recommend={recommend}/>
+      <RecommendModal isOpen={isOpen} onClose={onClose} recommend={recommend} />
       <ButtonWrapper>
         <Link to="/notes">
           <Button
@@ -291,13 +291,13 @@ const NoteDetails = () => {
             <Editable value={details.product === '' && '尚未填寫資料'}>
               <EditablePreview />
               <EditableInput
-                onChange={e =>
-                  setDetails(prev => {
+                onChange={(e) =>
+                  setDetails((prev) => {
                     return { ...prev, product: e.target.value };
                   })
                 }
                 onBlur={() => onBlurSubmit('product')}
-                onKeyDown={e => handlePressEnter(e, 'product')}
+                onKeyDown={(e) => handlePressEnter(e, 'product')}
               />
             </Editable>
           </FieldWrapper>
@@ -309,9 +309,9 @@ const NoteDetails = () => {
               >
                 <EditablePreview />
                 <EditableInput
-                  onChange={e => handleInputSalaryChange(e, 'range')}
+                  onChange={(e) => handleInputSalaryChange(e, 'range')}
                   onBlur={() => onBlurSubmit('salary')}
-                  onKeyDown={e => handlePressEnter(e, 'salary')}
+                  onKeyDown={(e) => handlePressEnter(e, 'salary')}
                 />
               </StyledEditable>
               <Content> K </Content>
@@ -319,7 +319,7 @@ const NoteDetails = () => {
                 variant="outline"
                 isFullWidth={false}
                 maxWidth="100px"
-                onChange={e => handleInputSalaryChange(e, 'type')}
+                onChange={(e) => handleInputSalaryChange(e, 'type')}
                 onBlur={() => onBlurSubmit('salary')}
               >
                 <option value="年薪">年薪</option>
@@ -336,11 +336,13 @@ const NoteDetails = () => {
                     <StyledListItem>
                       <EditablePreview />
                       <EditableInput
-                        onChange={e =>
+                        onChange={(e) =>
                           handleArrayInputChange(e, i, 'responsibilities')
                         }
                         onBlur={() => onBlurSubmit('responsibilities')}
-                        onKeyDown={e => handlePressEnter(e, 'responsibilities')}
+                        onKeyDown={(e) =>
+                          handlePressEnter(e, 'responsibilities')
+                        }
                       />
                       <DeleteButton
                         w={4}
@@ -374,7 +376,7 @@ const NoteDetails = () => {
                   <Editable value={item.description === '' && '尚未填寫資料'}>
                     <EditablePreview />
                     <EditableInput
-                      onChange={e =>
+                      onChange={(e) =>
                         handleMapArrayInputChange(
                           e,
                           i,
@@ -383,7 +385,7 @@ const NoteDetails = () => {
                         )
                       }
                       onBlur={() => onBlurSubmit('requirements')}
-                      onKeyDown={e => handlePressEnter(e, 'requirements')}
+                      onKeyDown={(e) => handlePressEnter(e, 'requirements')}
                     />
                   </Editable>
                   <DeleteButton
@@ -419,11 +421,11 @@ const NoteDetails = () => {
                   <Editable value={item.description === '' && '尚未填寫資料'}>
                     <EditablePreview />
                     <EditableInput
-                      onChange={e =>
+                      onChange={(e) =>
                         handleMapArrayInputChange(e, i, 'bonus', 'description')
                       }
                       onBlur={() => onBlurSubmit('bonus')}
-                      onKeyDown={e => handlePressEnter(e, 'bonus')}
+                      onKeyDown={(e) => handlePressEnter(e, 'bonus')}
                     />
                   </Editable>
                   <DeleteButton
@@ -519,7 +521,7 @@ const NoteDetails = () => {
                       <StyledListItem>
                         <EditablePreview />
                         <EditableInput
-                          onChange={e =>
+                          onChange={(e) =>
                             handleMapArrayInputChange(
                               e,
                               i,
@@ -528,7 +530,7 @@ const NoteDetails = () => {
                             )
                           }
                           onBlur={() => onBlurSubmit('questions')}
-                          onKeyDown={e => handlePressEnter(e, 'questions')}
+                          onKeyDown={(e) => handlePressEnter(e, 'questions')}
                         />
                         <DeleteButton
                           w={4}
@@ -543,11 +545,11 @@ const NoteDetails = () => {
                     <Editable value={q.answer || '請輸入練習回答'}>
                       <EditablePreview />
                       <EditableTextarea
-                        onChange={e =>
+                        onChange={(e) =>
                           handleMapArrayInputChange(e, i, 'questions', 'answer')
                         }
                         onBlur={() => onBlurSubmit('questions')}
-                        onKeyDown={e => handlePressEnter(e, 'questions')}
+                        onKeyDown={(e) => handlePressEnter(e, 'questions')}
                       />
                     </Editable>
                   </QuestionWrapper>

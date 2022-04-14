@@ -10,6 +10,7 @@ import PrivateRoute from './routes/PrivateRoute';
 import Notes from './routes/notes/Notes';
 import NoteDetails from './routes/notes/NoteDetails';
 import NoteCreate from './routes/notes/NoteCreate';
+import PracticeParent from './routes/practice/PracticeParent';
 import Practice from './routes/practice/Practice';
 import PracticeSetting from './routes/practice/PracticeSetting';
 import PracticeStart from './routes/practice/PracticeStart';
@@ -59,7 +60,7 @@ const App = () => {
               <Route path="create" element={<NoteCreate />} />
             </Route>
 
-            <Route path="practice">
+            <Route path="practice" element={<PracticeParent />}>
               <Route index element={<Practice />} />
               <Route path="setting">
                 <Route path=":noteId" element={<PracticeSetting />} />
