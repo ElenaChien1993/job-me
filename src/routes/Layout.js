@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
-import ResponsiveAppBar from '../components/Nav';
 
 const Container = styled.div`
   margin: 0 auto;
@@ -65,9 +64,11 @@ const Nav = ({ isLogin }) => {
 
 const Layout = ({ isLogin }) => {
   const [notes, setNotes] = useState([]);
+  const user = firebase.auth.currentUser;
 
   useEffect(() => {
-    firebase.getNotes('UQjB80NDcqNauWxuSKl2y7VQg5J3').then(snaps => {
+    if (!user) return;
+    firebase.getNotes(user.uid).then(snaps => {
       snaps.forEach(doc => {
         setNotes(prev => [...prev, doc.data()]);
       });

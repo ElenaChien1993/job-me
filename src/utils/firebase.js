@@ -1,4 +1,3 @@
-import { SendTwoTone } from '@mui/icons-material';
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -6,6 +5,7 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
+  updateProfile,
 } from 'firebase/auth';
 import {
   getFirestore,
@@ -18,6 +18,8 @@ import {
   collectionGroup,
   where,
   query,
+  onSnapshot,
+  deleteDoc,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -43,7 +45,7 @@ const firebase = {
       if (docSnap.exists()) {
         return docSnap;
       } else {
-        console.log("No such document!");
+        console.log('No such document!');
       }
     } catch (err) {
       console.log(err);
@@ -68,43 +70,72 @@ const firebase = {
   },
   async setNoteDetails(noteId, data) {
     try {
-      await setDoc(doc(db, "details", noteId), data);
+      await setDoc(doc(db, 'details', noteId), data);
     } catch (err) {
       console.log(err);
     }
   },
-  async updateNoteBrief(uid, noteId, key, data) {
+  async updateNoteBrief(uid, noteId, data) {
     try {
-      await updateDoc(doc(db, "users", uid, "notes", noteId), {
-        [key]: data
-      });
+      await updateDoc(doc(db, 'users', uid, 'notes', noteId), data);
     } catch (err) {
       console.log(err);
     }
   },
-  async updateNoteDetails(noteId, key, data) {
+  async updateNoteDetails(noteId, data) {
     try {
-      await updateDoc(doc(db, "details", noteId), {
-        [key]: data
-      });
+      await updateDoc(doc(db, 'details', noteId), data);
     } catch (err) {
       console.log(err);
     }
+  },
+  async deleteNote(uid, noteId) {
+    try {
+      await deleteDoc(doc(db, 'users', uid, 'notes', noteId));
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  listenDetailsChange(noteId, callback) {
+    onSnapshot(doc(db, 'details', noteId), callback);
   },
   checklogin(callback) {
     onAuthStateChanged(auth, callback);
   },
+  async signUp(uid, email) {
+    try {
+      await setDoc(doc(db, 'users', uid), { display_name: email });
+    } catch (err) {
+      console.log(err);
+    }
+  },
   signOut() {
     return signOut(auth);
   },
-  async getRecommendedUsers(company) {
-    const museums = query(
+  updateUser(name) {
+    updateProfile(auth.currentUser, {
+      displayName: name,
+    })
+      .then(() => {
+        console.log('updated');
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  },
+  async getRecommendedUsers(company, uid) {
+    const members = query(
       collectionGroup(db, 'notes'),
       where('company_name', '==', company),
       where('is_share', '==', true)
     );
-    const querySnapshot = await getDocs(museums);
-    return querySnapshot;
+    const querySnapshot = await getDocs(members);
+    let data = [];
+    querySnapshot.forEach(doc => {
+      data.push(doc.data());
+    });
+    const filteredData = data.filter(item => item.creator !== uid);
+    return filteredData;
   },
   createUserWithEmailAndPassword,
   auth,
@@ -112,6 +143,7 @@ const firebase = {
   db,
   doc,
   setDoc,
+  onSnapshot,
 };
 
 export default firebase;

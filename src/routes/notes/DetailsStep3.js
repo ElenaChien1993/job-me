@@ -90,11 +90,18 @@ const StyledButton = styled.button`
   cursor: pointer;
 `;
 
-const DetailsStep3 = ({ prevStep, handleChange, values, setValues }) => {
+const DetailsStep3 = ({
+  prevStep,
+  handleChange,
+  values,
+  setValues,
+  noteDataBrief,
+  noteDetails,
+}) => {
   const user = firebase.auth.currentUser;
   const navigate = useNavigate();
 
-  const handleInputChange = (i) => (e) => {
+  const handleInputChange = i => e => {
     const updated = values.questions.map((q, index) =>
       index === i
         ? {
@@ -104,14 +111,14 @@ const DetailsStep3 = ({ prevStep, handleChange, values, setValues }) => {
         : q
     );
 
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, questions: updated };
     });
   };
 
-  const handleAddField = (e) => {
+  const handleAddField = e => {
     e.preventDefault();
-    setValues((prev) => {
+    setValues(prev => {
       return {
         ...prev,
         questions: [...prev.questions, { question: '', answer: '' }],
@@ -120,46 +127,13 @@ const DetailsStep3 = ({ prevStep, handleChange, values, setValues }) => {
   };
 
   const createNote = () => {
-    const { company_name, address, is_share, tags, status, job_title } = values;
-    const noteDataBrief = {
-      company_name,
-      address,
-      is_share,
-      tags,
-      status,
-      job_title,
-    };
-    const {
-      product,
-      job_link,
-      resume_link,
-      salary,
-      responsibilities,
-      requirements,
-      bonus,
-      questions,
-      attached_files,
-      more_notes,
-      other,
-    } = values;
-    const noteDetails = {
-      product,
-      job_link,
-      resume_link,
-      salary,
-      responsibilities,
-      requirements,
-      bonus,
-      questions,
-      attached_files,
-      more_notes,
-      other,
-    };
-    firebase.setNoteBrief(user.uid, noteDataBrief).then((id) => {
-      firebase.setNoteDetails(id, noteDetails).then(() => {
-        navigate(`/notes/details/${id}`);
+    firebase
+      .setNoteBrief(user.uid, { ...noteDataBrief, creator: user.uid })
+      .then(id => {
+        firebase.setNoteDetails(id, noteDetails).then(() => {
+          navigate(`/notes/details/${id}`);
+        });
       });
-    });
   };
 
   return (

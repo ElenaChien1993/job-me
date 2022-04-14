@@ -1,18 +1,31 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Editable,
   EditableInput,
   EditableTextarea,
   EditablePreview,
   Select,
+  IconButton,
+  Button,
+  useDisclosure,
 } from '@chakra-ui/react';
+import {
+  SmallCloseIcon,
+  EditIcon,
+  CheckCircleIcon,
+  ChevronLeftIcon,
+  AtSignIcon,
+} from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import NoteElement from '../../components/NoteElement';
 import firebase from '../../utils/firebase';
-import useUpdateEffect from '../../hooks/useUpdateEffect';
-import EditableText from '../../components/EditableText';
+import AddField from '../../components/AddField';
+import EditFiles from '../../components/EditFiles';
+import EditorArea from '../../components/Editor';
+import RecommendModal from '../../components/RecommendModal';
 
 const Container = styled.div`
   display: flex;
@@ -21,6 +34,19 @@ const Container = styled.div`
   background: white;
   padding: 20px 40px 0;
   margin-bottom: 60px;
+`;
+
+const DeleteButton = styled(IconButton)`
+  && {
+    display: none;
+  }
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
 `;
 
 const FieldWrapper = styled.div`
@@ -49,6 +75,9 @@ const Content = styled.div`
 const CheckBoxWrapper = styled.div`
   display: flex;
   margin-bottom: 10px;
+  &:hover ${DeleteButton} {
+    display: block;
+  }
 `;
 
 const CheckBox = styled.input`
@@ -72,6 +101,9 @@ const StyledLink = styled.a`
 
 const StyledListItem = styled.li`
   margin-bottom: 10px;
+  &:hover ${DeleteButton} {
+    display: block;
+  }
 `;
 
 const StyledSalaryWrapper = styled.div`
@@ -86,103 +118,204 @@ const StyledEditable = styled(Editable)`
   }
 `;
 
-// const StyledSelect = styled(Select)`
-//   && {
-//     width: 10%;
-//   }
-// `
+const QuestionWrapper = styled.div`
+  margin-bottom: 15px;
+  &:hover ${DeleteButton} {
+    display: block;
+  }
+`;
 
 const NoteDetails = () => {
   const [brief, setBrief] = useState();
   const [details, setDetails] = useState();
+  const [isFilesEditing, setIsFilesEditing] = useState(false);
+  const [recommend, setRecommend] = useState([]);
 
+  const { onOpen, isOpen, onClose } = useDisclosure({ id: 'recommend' });
   let params = useParams();
   const noteId = params.noteId;
   const user = firebase.auth.currentUser;
+  console.log(user)
 
   useEffect(() => {
-    firebase.getNote(user.uid, noteId).then((snap) => {
+    firebase.getNote(user.uid, noteId).then(snap => {
       setBrief(snap.data());
     });
-    firebase.getNoteDetails(noteId).then((snap) => {
+    firebase.getNoteDetails(noteId).then(snap => {
       setDetails(snap.data());
+    });
+    firebase.listenDetailsChange(noteId, doc => {
+      setDetails(doc.data());
     });
   }, []);
 
-  useUpdateEffect(() => {
-    // firebase.getRecommendedUsers('company').then(snaps => {
-    //   snaps.forEach(doc => console.log(doc.data()));
-    // });
-  }, details);
+  // ------- Helper Function
+  const getArrayChangedValue = (value, index, objectKey) => {
+    const update = details[objectKey].map((item, i) =>
+      index === i ? value : item
+    );
+    return update;
+  };
 
-  const handleRequirementsChange = (item, itemIndex) => {
-    const updatedChecked = details.requirements.map((item, index) =>
-      index === itemIndex
+  const getObjectInArrayChangedValue = (value, index, objectKey, targetKey) => {
+    const update = details[objectKey].map((item, i) =>
+      index === i
+        ? {
+            ...item,
+            [targetKey]: value,
+          }
+        : item
+    );
+    return update;
+  };
+
+  const getCheckboxChangedValue = (index, objectKey) => {
+    const updatedChecked = details[objectKey].map((item, i) =>
+      index === i
         ? {
             ...item,
             is_qualified: !item.is_qualified,
           }
         : item
     );
+    return updatedChecked;
+  };
 
-    setDetails((prev) => {
-      return { ...prev, requirements: updatedChecked };
+  const onBlurSubmit = objectKey => {
+    firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
+  };
+
+  const handlePressEnter = (e, objectKey) => {
+    if (e.keyCode === 13) {
+      firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
+    }
+  };
+
+  //-------- Handle Array of Strings
+  const handleArrayInputChange = (e, index, objectKey) => {
+    const update = getArrayChangedValue(e.target.value, index, objectKey);
+
+    setDetails(prev => {
+      return { ...prev, [objectKey]: update };
     });
   };
 
-  const handleBonusChange = (item, itemIndex) => {
-    const updatedChecked = details.bonus.map((item, index) =>
-      index === itemIndex
-        ? {
-            ...item,
-            is_qualified: !item.is_qualified,
-          }
-        : item
+  // ------- Handle Array of Maps
+  const handleMapArrayInputChange = (e, index, objectKey, targetKey) => {
+    const update = getObjectInArrayChangedValue(
+      e.target.value,
+      index,
+      objectKey,
+      targetKey
     );
-
-    setDetails((prev) => {
-      return { ...prev, bonus: updatedChecked };
+    setDetails(prev => {
+      return { ...prev, [objectKey]: update };
     });
   };
 
-  const editNoteDetails = (e, key) => {
-    if (e.target.value === details[key]) return;
-    setDetails((prev) => {
-      return { ...prev, [key]: e.target.value };
-    });
-    firebase.updateNoteDetails(noteId, key, e.target.value);
+  // ------- Handle Checkbox
+  const handleCheckboxChange = (itemIndex, objectKey) => {
+    const updatedChecked = getCheckboxChangedValue(itemIndex, objectKey);
+
+    firebase.updateNoteDetails(noteId, { [objectKey]: updatedChecked });
   };
 
-  const handleSalaryChange = (e, key) => {
-    const updated = { ...details.salary, [key]: e.target.value };
-    setDetails((prev) => {
-      return { ...prev, salary: { ...prev.salary, [key]: e.target.value } };
-    });
-    firebase.updateNoteDetails(noteId, 'salary', updated);
+  const handleDelete = (i, objectKey) => {
+    const newData = details[objectKey].filter((_, index) => index !== i);
+    firebase.updateNoteDetails(noteId, { [objectKey]: newData });
   };
 
-  console.log(details);
+  const handleInputSalaryChange = (e, type) => {
+    setDetails(prev => {
+      return { ...prev, salary: { ...details.salary, [type]: e.target.value } };
+    });
+  };
+
+  const handleFilesSubmit = () => {
+    firebase.updateNoteDetails(noteId, {
+      job_link: details.job_link,
+      resume_link: details.resume_link,
+      attached_files: details.attached_files,
+    });
+    setIsFilesEditing(false);
+  };
+
+  const showConnectModal = () => {
+    console.log('show');
+    firebase
+      .getRecommendedUsers(brief.company_name, user.uid)
+      .then(members => {
+        console.log(members)
+        setRecommend(members);
+        onOpen();
+      });
+  };
+
+  console.log('state', details);
 
   return (
     <>
-      {brief && <NoteElement note={brief} />}
+      {/* <Button onClick={onOpen}>Open Modal</Button> */}
+      <RecommendModal isOpen={isOpen} onClose={onClose} recommend={recommend}/>
+      <ButtonWrapper>
+        <Link to="/notes">
+          <Button
+            size="sm"
+            leftIcon={<ChevronLeftIcon />}
+            variant="outline"
+            colorScheme="teal"
+          >
+            回前頁
+          </Button>
+        </Link>
+        <Button
+          size="sm"
+          rightIcon={<AtSignIcon />}
+          variant="solid"
+          colorScheme="facebook"
+          onClick={showConnectModal}
+        >
+          查看其他相關會員
+        </Button>
+      </ButtonWrapper>
+      {brief && (
+        <NoteElement
+          uid={user.uid}
+          noteId={noteId}
+          note={brief}
+          setNote={setBrief}
+          editable
+        />
+      )}
       {details && (
         <Container>
           <SectionTitle>詳細資料</SectionTitle>
           <FieldWrapper>
             <Title>公司主要產品 / 服務</Title>
-            <Editable defaultValue={details.product}>
+            <Editable value={details.product === '' && '尚未填寫資料'}>
               <EditablePreview />
-              <EditableInput onSubmit={(e) => editNoteDetails(e, 'product')} />
+              <EditableInput
+                onChange={e =>
+                  setDetails(prev => {
+                    return { ...prev, product: e.target.value };
+                  })
+                }
+                onBlur={() => onBlurSubmit('product')}
+                onKeyDown={e => handlePressEnter(e, 'product')}
+              />
             </Editable>
           </FieldWrapper>
           <FieldWrapper>
             <Title>薪資範圍</Title>
             <StyledSalaryWrapper>
-              <StyledEditable defaultValue={details.salary.range}>
+              <StyledEditable
+                value={details.salary.range === '' && '尚未填寫資料'}
+              >
                 <EditablePreview />
                 <EditableInput
-                  onSubmit={(e) => handleSalaryChange(e, 'range')}
+                  onChange={e => handleInputSalaryChange(e, 'range')}
+                  onBlur={() => onBlurSubmit('salary')}
+                  onKeyDown={e => handlePressEnter(e, 'salary')}
                 />
               </StyledEditable>
               <Content> K </Content>
@@ -190,8 +323,8 @@ const NoteDetails = () => {
                 variant="outline"
                 isFullWidth={false}
                 maxWidth="100px"
-                // placeholder={details.salary.type}
-                onSubmit={(e) => handleSalaryChange(e, 'type')}
+                onChange={e => handleInputSalaryChange(e, 'type')}
+                onBlur={() => onBlurSubmit('salary')}
               >
                 <option value="年薪">年薪</option>
                 <option value="月薪">月薪</option>
@@ -200,18 +333,37 @@ const NoteDetails = () => {
           </FieldWrapper>
           <FieldWrapper>
             <Title>工作內容</Title>
-            <EditableText
-              prev={details.responsibilities}
-              noteId={noteId}
-              setDetails={setDetails}
-              details={details}
-              objectKey="responsibilities"
-            />
-            {/* <Content>
+            <Content>
               {details.responsibilities.map((item, i) => {
-                return <StyledListItem key={i}>{item}</StyledListItem>;
+                return (
+                  <Editable value={item === '' && '尚未填寫資料'} key={i}>
+                    <StyledListItem>
+                      <EditablePreview />
+                      <EditableInput
+                        onChange={e =>
+                          handleArrayInputChange(e, i, 'responsibilities')
+                        }
+                        onBlur={() => onBlurSubmit('responsibilities')}
+                        onKeyDown={e => handlePressEnter(e, 'responsibilities')}
+                      />
+                      <DeleteButton
+                        w={4}
+                        h={4}
+                        ml={5}
+                        aria-label="delete item"
+                        icon={<SmallCloseIcon />}
+                        onClick={() => handleDelete(i, 'responsibilities')}
+                      />
+                    </StyledListItem>
+                  </Editable>
+                );
               })}
-            </Content> */}
+            </Content>
+            <AddField
+              setter={setDetails}
+              objectKey="responsibilities"
+              newValue={'新欄位，請點擊編輯'}
+            />
           </FieldWrapper>
           <FieldWrapper>
             <Title>必備技能</Title>
@@ -221,12 +373,42 @@ const NoteDetails = () => {
                   <CheckBox
                     type="checkbox"
                     checked={details.requirements[i].is_qualified}
-                    onChange={() => handleRequirementsChange(item, i)}
+                    onChange={() => handleCheckboxChange(i, 'requirements')}
                   />
-                  <p>{item.description}</p>
+                  <Editable value={item.description === '' && '尚未填寫資料'}>
+                    <EditablePreview />
+                    <EditableInput
+                      onChange={e =>
+                        handleMapArrayInputChange(
+                          e,
+                          i,
+                          'requirements',
+                          'description'
+                        )
+                      }
+                      onBlur={() => onBlurSubmit('requirements')}
+                      onKeyDown={e => handlePressEnter(e, 'requirements')}
+                    />
+                  </Editable>
+                  <DeleteButton
+                    w={4}
+                    h={4}
+                    ml={5}
+                    aria-label="delete item"
+                    icon={<SmallCloseIcon />}
+                    onClick={() => handleDelete(i, 'requirements')}
+                  />
                 </CheckBoxWrapper>
               );
             })}
+            <AddField
+              setter={setDetails}
+              objectKey="requirements"
+              newValue={{
+                description: '新欄位，請點擊編輯',
+                is_qualified: false,
+              }}
+            />
           </FieldWrapper>
           <FieldWrapper>
             <Title>加分項目</Title>
@@ -236,35 +418,97 @@ const NoteDetails = () => {
                   <CheckBox
                     type="checkbox"
                     checked={details.bonus[i].is_qualified}
-                    onChange={() => handleBonusChange(item, i)}
+                    onChange={() => handleCheckboxChange(i, 'bonus')}
                   />
-                  <p>{item.description}</p>
+                  <Editable value={item.description === '' && '尚未填寫資料'}>
+                    <EditablePreview />
+                    <EditableInput
+                      onChange={e =>
+                        handleMapArrayInputChange(e, i, 'bonus', 'description')
+                      }
+                      onBlur={() => onBlurSubmit('bonus')}
+                      onKeyDown={e => handlePressEnter(e, 'bonus')}
+                    />
+                  </Editable>
+                  <DeleteButton
+                    w={4}
+                    h={4}
+                    ml={5}
+                    aria-label="delete item"
+                    icon={<SmallCloseIcon />}
+                    onClick={() => handleDelete(i, 'bonus')}
+                  />
                 </CheckBoxWrapper>
               );
             })}
+            <AddField
+              setter={setDetails}
+              objectKey="bonus"
+              newValue={{
+                description: '新欄位，請點擊編輯',
+                is_qualified: false,
+              }}
+            />
           </FieldWrapper>
           <FieldWrapper>
             <Title>相關準備資料連結</Title>
-            <Content>
-              <StyledListItem>
-                <StyledLink href={details.job_link}>職缺連結</StyledLink>
-              </StyledListItem>
-              <StyledListItem>
-                <StyledLink href={details.resume_link}>我的履歷連結</StyledLink>
-              </StyledListItem>
-              {details.attached_files.map((file, i) => {
-                return (
-                  <StyledListItem key={i}>
-                    <StyledLink href={file.file_link}>
-                      {file.file_name}
-                    </StyledLink>
-                  </StyledListItem>
-                );
-              })}
-            </Content>
+            {!isFilesEditing ? (
+              <Content>
+                <IconButton
+                  size="sm"
+                  onClick={() => setIsFilesEditing(true)}
+                  icon={<EditIcon />}
+                />
+                <StyledListItem>
+                  <StyledLink href={details.job_link} target="_blank">
+                    職缺連結
+                  </StyledLink>
+                </StyledListItem>
+                <StyledListItem>
+                  <StyledLink href={details.resume_link} target="_blank">
+                    我的履歷連結
+                  </StyledLink>
+                </StyledListItem>
+                {details.attached_files.map((file, i) => {
+                  return (
+                    <StyledListItem key={i}>
+                      <StyledLink href={file.file_link} target="_blank">
+                        {file.file_name}
+                      </StyledLink>
+                      <DeleteButton
+                        w={4}
+                        h={4}
+                        ml={5}
+                        aria-label="delete item"
+                        icon={<SmallCloseIcon />}
+                        onClick={() => handleDelete(i, 'attached_files')}
+                      />
+                    </StyledListItem>
+                  );
+                })}
+              </Content>
+            ) : (
+              <>
+                <IconButton
+                  size="sm"
+                  onClick={handleFilesSubmit}
+                  icon={<CheckCircleIcon />}
+                />
+                <EditFiles details={details} setDetails={setDetails} />
+                <AddField
+                  setter={setDetails}
+                  objectKey="attached_files"
+                  newValue={{
+                    file_name: '請輸入檔案名稱',
+                    file_link: '請輸入檔案連結',
+                  }}
+                />
+              </>
+            )}
           </FieldWrapper>
           <FieldWrapper>
             <Title>其他備註</Title>
+            <EditorArea noteId={noteId} details={details} objectKey="other" />
             <Content>{details.others}</Content>
           </FieldWrapper>
           <Line />
@@ -273,26 +517,82 @@ const NoteDetails = () => {
             <Title>面試題目猜題</Title>
             <Content>
               {details.questions.map((q, i) => {
-                return <StyledListItem key={i}>{q.question}</StyledListItem>;
+                return (
+                  <QuestionWrapper key={i}>
+                    <Editable value={q.question === '' && '尚未填寫資料'}>
+                      <StyledListItem>
+                        <EditablePreview />
+                        <EditableInput
+                          onChange={e =>
+                            handleMapArrayInputChange(
+                              e,
+                              i,
+                              'questions',
+                              'question'
+                            )
+                          }
+                          onBlur={() => onBlurSubmit('questions')}
+                          onKeyDown={e => handlePressEnter(e, 'questions')}
+                        />
+                        <DeleteButton
+                          w={4}
+                          h={4}
+                          ml={5}
+                          aria-label="delete item"
+                          icon={<SmallCloseIcon />}
+                          onClick={() => handleDelete(i, 'questions')}
+                        />
+                      </StyledListItem>
+                    </Editable>
+                    <Editable value={q.answer || '請輸入練習回答'}>
+                      <EditablePreview />
+                      <EditableTextarea
+                        onChange={e =>
+                          handleMapArrayInputChange(e, i, 'questions', 'answer')
+                        }
+                        onBlur={() => onBlurSubmit('questions')}
+                        onKeyDown={e => handlePressEnter(e, 'questions')}
+                      />
+                    </Editable>
+                  </QuestionWrapper>
+                );
               })}
+              <AddField
+                setter={setDetails}
+                objectKey="questions"
+                newValue={{
+                  question: '新欄位，請點擊編輯',
+                  answer: '請輸入練習回答',
+                }}
+              />
             </Content>
           </FieldWrapper>
           <FieldWrapper>
             <Title>面試前筆記區</Title>
             <Content>
-              <div>想問公司的問題</div>
-              {details.more_notes[0]?.question_for_company?.map((q, i) => {
-                return <p key={i}>{q}</p>;
-              })}
+              <div>Ex: 想問公司的問題？</div>
+              <EditorArea
+                noteId={noteId}
+                details={details}
+                objectKey="before_note"
+              />
             </Content>
           </FieldWrapper>
           <FieldWrapper>
             <Title>面試中筆記區</Title>
-            <Content>{details.more_notes[1]}</Content>
+            <EditorArea
+              noteId={noteId}
+              details={details}
+              objectKey="ing_note"
+            />
           </FieldWrapper>
           <FieldWrapper>
             <Title>面試後心得區</Title>
-            <Content>{details.more_notes[2]}</Content>
+            <EditorArea
+              noteId={noteId}
+              details={details}
+              objectKey="after_note"
+            />
           </FieldWrapper>
         </Container>
       )}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useOutletContext, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
@@ -48,7 +48,17 @@ const ButtonWrapper = styled.div`
 `;
 
 const Notes = () => {
-  const [notes] = useOutletContext();
+  const [notes, setNotes] = useState([]);
+  const user = firebase.auth.currentUser;
+
+  useEffect(() => {
+    // if (!user) return;
+    firebase.getNotes(user.uid).then(snaps => {
+      snaps.forEach(doc => {
+        setNotes(prev => [...prev, doc.data()]);
+      });
+    });
+  }, [])
 
   return (
     <Container>
@@ -63,7 +73,7 @@ const Notes = () => {
       <NotesWrapper>
         {notes.length !== 0 &&
           notes.map((note, i) => {
-            return <Note note={note} key={i} />;
+            return <Note note={note} key={i} notes={notes} setNotes={setNotes}/>;
           })}
       </NotesWrapper>
     </Container>
