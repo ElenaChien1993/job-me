@@ -48,22 +48,39 @@ const ButtonWrapper = styled.div`
 `;
 
 const Notes = () => {
-  const [notes, setNotes] = useState([]);
+  const [databaseNotes, setDatabaseNotes] = useState([]);
+  const [renderNotes, setRenderNotes] = useState([]);
   const user = firebase.auth.currentUser;
 
   useEffect(() => {
     // if (!user) return;
-    firebase.getNotes(user.uid).then(snaps => {
-      snaps.forEach(doc => {
-        setNotes(prev => [...prev, doc.data()]);
+    firebase.getNotes(user.uid).then((snaps) => {
+      const notesArray = [];
+      snaps.forEach((doc) => {
+        notesArray.push(doc.data());
       });
+      setDatabaseNotes(notesArray);
+      setRenderNotes(notesArray);
     });
-  }, [])
+  }, []);
+
+  const handleSearch = (e) => {
+    const term = e.target.value;
+    if (!term) {
+      setRenderNotes(databaseNotes);
+      return;
+    }
+    const filtered = databaseNotes.filter(
+      (note) =>
+        note.company_name.includes(term) || note.job_title.includes(term)
+    );
+    setRenderNotes(filtered);
+  };
 
   return (
     <Container>
       <SearchBar>
-        <Input type="text" />
+        <Input type="text" onChange={handleSearch} />
       </SearchBar>
       <ButtonWrapper>
         <Link to="/notes/create">
@@ -71,9 +88,17 @@ const Notes = () => {
         </Link>
       </ButtonWrapper>
       <NotesWrapper>
-        {notes.length !== 0 &&
-          notes.map((note, i) => {
-            return <Note note={note} key={i} notes={notes} setNotes={setNotes}/>;
+        {databaseNotes.length !== 0 &&
+          renderNotes.map((note, i) => {
+            return (
+              <Note
+                note={note}
+                key={i}
+                databaseNotes={databaseNotes}
+                setRenderNotes={setRenderNotes}
+                setDatabaseNotes={setDatabaseNotes}
+              />
+            );
           })}
       </NotesWrapper>
     </Container>
