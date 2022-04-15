@@ -6,13 +6,13 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import { Button } from '@chakra-ui/react';
-import { ArrowForwardIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import BackButton from '../../components/elements/BackButton';
 import NoteBar from '../../components/elements/NoteBar';
-import SwitchElement from '../../components/elements/Switch';
+import BeforeRecord from '../../components/BeforeRecord';
+import Recording from '../../components/Recording';
+import { Audio, Video } from '../../components/elements/MediaRecorder';
 
 const Container = styled.div`
   display: flex;
@@ -51,8 +51,8 @@ const TimerSettingWrapper = styled.div`
 
 const PracticeStart = () => {
   const [currentQuestion, setCurrentQuestion] = useState('');
-  const [isTimer, setIsTimer] = useState(true);
   const [timer, setTimer] = useState(3);
+  const [progress, setProgress] = useState('before');
   const props = useOutletContext();
 
   useEffect(() => {
@@ -67,30 +67,17 @@ const PracticeStart = () => {
         <StyledNoteBar brief={props.brief} />
       </TitleWrapper>
       <Question>{currentQuestion}</Question>
-      <PlayerWrapper>
-        {props.recordType === '錄音' ? '錄音 Player' : '錄影 Player'}
-      </PlayerWrapper>
-      <TimerSettingWrapper>
-        <SwitchElement isTimer={isTimer} setIsTimer={setIsTimer} />
-        {isTimer ? (
-          <>
-            <p>此題定時</p>
-            <div>
-              <input value={timer} onChange={(e) => setTimer(e.target.value)} />
-              <p>分鐘</p>
-            </div>
-          </>
-        ) : (
-          <p>此題不定時（回答時間上限為 3 分鐘）</p>
-        )}
-      </TimerSettingWrapper>
-      <Button
-        size="sm"
-        // onClick={() => }
-        rightIcon={<ArrowForwardIcon />}
-      >
-        開始練習
-      </Button>
+      {progress === 'before' && <BeforeRecord
+        recordType={props.recordType}
+        timer={timer}
+        setTimer={setTimer}
+        setProgress={setProgress}
+      />}
+      {progress === 'recording' && <Recording
+        timer={timer}
+        setProgress={setProgress}
+      />}
+
     </Container>
   );
 };

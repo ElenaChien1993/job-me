@@ -184,7 +184,7 @@ const PracticeSetting = () => {
     navigate(`/practice/start/${noteId}`);
   };
 
-  console.log(props.practiceQuestions);
+  console.log(props.recordType, questionsBase);
 
   return (
     <Container>
@@ -212,7 +212,7 @@ const PracticeSetting = () => {
             </OptionWrapper>
             <OptionWrapper>
               <OptionTitle>題庫選擇</OptionTitle>
-              <RadioGroup items={['隨機', '指定']} setter={setQuestionsBase} />
+              <RadioGroup items={['隨機', '指定']} value={questionsBase} setter={setQuestionsBase} />
             </OptionWrapper>
             {questionsBase === '指定' && (
               <Questions>
@@ -247,6 +247,7 @@ const PracticeSetting = () => {
               <OptionTitle>紀錄模式</OptionTitle>
               <RadioGroup
                 items={['錄音', '錄影']}
+                value={props.recordType}
                 setter={props.setRecordType}
               />
             </OptionWrapper>

@@ -32,12 +32,12 @@ function RadioCard(props) {
 }
 
 // Step 2: Use the `useRadioGroup` hook to control a group of custom radios.
-const RadioGroup = ({ items, setter }) => {
+const RadioGroup = ({ items, value ,setter }) => {
   const options = items;
 
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: 'radio',
-    defaultValue: items[0],
+    defaultValue: value,
     onChange: setter,
   });
 
