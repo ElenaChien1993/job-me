@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useOutletContext } from 'react-router-dom';
+import {
+  useParams,
+  Link,
+  useOutletContext,
+  useNavigate,
+} from 'react-router-dom';
 import { Button, Input, IconButton } from '@chakra-ui/react';
 import {
   ArrowForwardIcon,
@@ -12,6 +17,8 @@ import styled from 'styled-components';
 import firebase from '../../utils/firebase';
 import RadioGroup from '../../components/elements/RadioGroup';
 import Loader from '../../components/Loader';
+import NoteBar from '../../components/elements/NoteBar';
+import BackButton from '../../components/elements/BackButton';
 
 const Container = styled.div`
   display: flex;
@@ -37,41 +44,6 @@ const Title = styled.div`
   color: #306172;
 `;
 
-const BackButton = styled(Button)`
-  && {
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-`;
-
-const NoteWrapper = styled.div`
-  display: flex;
-  height: 80px;
-  align-items: center;
-  border-radius: 24px;
-  background: white;
-  margin-bottom: 25px;
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
-  position: relative;
-  justify-content: center;
-  margin-top: 20px;
-`;
-
-const CompanyName = styled.p`
-  font-weight: 700;
-  font-size: 25px;
-  color: #306172;
-  position: absolute;
-  left: 0;
-`;
-
-const JobTitle = styled.p`
-  font-weight: 700;
-  font-size: 25px;
-  color: black;
-`;
-
 const SettingWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -92,6 +64,7 @@ const OptionWrapper = styled.div`
 const StyledInput = styled(Input)`
   && {
     border-radius: 10px;
+    border-color: ${(props) => (props.isValid ? 'black' : 'red')};
   }
 `;
 
@@ -130,16 +103,16 @@ const InputWrapper = styled.div`
 
 const PracticeSetting = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [brief, setBrief] = useState();
   const [details, setDetails] = useState(null);
   const [questionsBase, setQuestionsBase] = useState('隨機');
-  const [recordType, setRecordType] = useState('錄影');
   const [newQuestion, setNewQuestion] = useState('');
-  const { databaseNotes, practiceQuestions, setPracticeQuestions } =
-    useOutletContext();
+  const [qty, setQty] = useState(5);
+  const [isQtyValid, setIsQtyValid] = useState(true);
+  const props = useOutletContext();
 
   let params = useParams();
   const noteId = params.noteId;
+  const navigate = useNavigate();
 
   useEffect(() => {
     firebase.getNoteDetails(noteId).then((snap) => {
@@ -152,11 +125,13 @@ const PracticeSetting = () => {
   }, []);
 
   useEffect(() => {
-    const noteBrief = databaseNotes.filter((note) => note.note_id === noteId);
-    setBrief(...noteBrief);
-  }, [databaseNotes]);
+    const noteBrief = props.databaseNotes.filter(
+      (note) => note.note_id === noteId
+    );
+    props.setBrief(...noteBrief);
+  }, [props.databaseNotes]);
 
-  console.log(databaseNotes, brief, details);
+  // console.log(databaseNotes, brief, details);
 
   const handleInputChange = (e) => {
     setNewQuestion(e.target.value);
@@ -183,6 +158,34 @@ const PracticeSetting = () => {
     });
   };
 
+  const qtyValidate = (value) => {
+    if (value < 1) {
+      setIsQtyValid(false);
+      return;
+    }
+    setIsQtyValid(true);
+  };
+
+  useEffect(() => {
+    qtyValidate(qty);
+  }, [qty]);
+
+  const shuffleQuestions = () => {
+    const filtered = details.questions.filter((q) => q.checked === true);
+    const shuffled = filtered.sort(() => {
+      return 0.5 - Math.random();
+    });
+    const selected = shuffled.slice(0, qty);
+    props.setPracticeQuestions(selected);
+  };
+
+  const handleStartPractice = () => {
+    shuffleQuestions();
+    navigate(`/practice/start/${noteId}`);
+  };
+
+  console.log(props.practiceQuestions);
+
   return (
     <Container>
       <Loader isLoading={isLoading} />
@@ -190,31 +193,22 @@ const PracticeSetting = () => {
         <>
           <TopWrapper>
             <TitleWrapper>
-              <Link to="/notes">
-                <BackButton
-                  size="sm"
-                  leftIcon={<ChevronLeftIcon />}
-                  variant="outline"
-                  colorScheme="teal"
-                >
-                  回前頁
-                </BackButton>
-              </Link>
+              <BackButton path="/practice" isStart={false}/>
               <Title>面試練習設定</Title>
             </TitleWrapper>
-            <NoteWrapper>
-              <CompanyName>{brief.company_name || '安安'}</CompanyName>
-              <JobTitle>{brief.job_title}</JobTitle>
-            </NoteWrapper>
+            <NoteBar brief={props.brief} />
           </TopWrapper>
           <SettingWrapper>
             <OptionWrapper>
               <OptionTitle>練習題數</OptionTitle>
               <StyledInput
+                isValid={isQtyValid}
+                type="number"
                 size="sm"
-                value="default"
-                // onChange={handleChange('company_name')}
+                value={qty}
+                onChange={(e) => setQty(e.target.value)}
               />
+              {!isQtyValid && <Reminder>請正確輸入數字</Reminder>}
             </OptionWrapper>
             <OptionWrapper>
               <OptionTitle>題庫選擇</OptionTitle>
@@ -251,14 +245,17 @@ const PracticeSetting = () => {
             )}
             <OptionWrapper>
               <OptionTitle>紀錄模式</OptionTitle>
-              <RadioGroup items={['錄音', '錄影']} setter={setRecordType} />
+              <RadioGroup
+                items={['錄音', '錄影']}
+                setter={props.setRecordType}
+              />
             </OptionWrapper>
             <Reminder>*稍後記得允許麥克風和相機使用權限</Reminder>
           </SettingWrapper>
           <div>
             <Button
               size="sm"
-              // onClick={() => setIsFilesEditing(true)}
+              onClick={handleStartPractice}
               rightIcon={<ArrowForwardIcon />}
             >
               開始練習

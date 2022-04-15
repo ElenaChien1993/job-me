@@ -65,7 +65,9 @@ const App = () => {
               <Route path="setting">
                 <Route path=":noteId" element={<PracticeSetting />} />
               </Route>
-              <Route path="start" element={<PracticeStart />} />
+              <Route path="start">
+                <Route path=":noteId" element={<PracticeStart />} />
+              </Route>
             </Route>
 
             <Route path="profile" element={<Profile />}>
