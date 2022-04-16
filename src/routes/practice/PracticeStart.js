@@ -75,7 +75,8 @@ const PracticeStart = () => {
       />}
       {progress === 'recording' && <Recording
         timer={timer}
-        setProgress={setProgress}
+        brief={props.brief}
+        currentQuestion={currentQuestion}
       />}
 
     </Container>

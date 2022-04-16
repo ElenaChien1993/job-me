@@ -87,6 +87,7 @@ const Notes = () => {
           <CreateButton>建立筆記</CreateButton>
         </Link>
       </ButtonWrapper>
+      <audio src="https://localhost:3000/8a11af60-6803-4cd6-9291-2ec2cce8acaf" controls autoPlay loop />
       <NotesWrapper>
         {databaseNotes.length !== 0 &&
           renderNotes.map((note, i) => {
