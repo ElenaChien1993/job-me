@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import {
   useParams,
-  Link,
   useOutletContext,
   useNavigate,
 } from 'react-router-dom';
 import { Button, Input, IconButton } from '@chakra-ui/react';
 import {
   ArrowForwardIcon,
-  ChevronLeftIcon,
   PlusSquareIcon,
 } from '@chakra-ui/icons';
 import { v4 as uuid } from 'uuid';
@@ -38,6 +36,7 @@ const TitleWrapper = styled.div`
   position: relative;
   margin-top: 10px;
 `;
+
 const Title = styled.div`
   font-size: 30px;
   font-weight: 700;

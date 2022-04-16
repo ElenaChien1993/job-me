@@ -69,8 +69,6 @@ const NoteCreate = () => {
     });
   };
 
-  console.log(values);
-
   return (
     <>
       {(() => {

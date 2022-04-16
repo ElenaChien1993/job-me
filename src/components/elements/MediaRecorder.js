@@ -37,8 +37,6 @@ const Audio = ({ status, mediaBlobUrl }) => {
   return (
     <Container>
       <Status>{status}</Status>
-      {/* <button onClick={startRecording}>Start Recording</button> */}
-      {/* <button onClick={stopRecording}>Stop Recording</button> */}
       {status === 'stopped' && (
         <audio src={mediaBlobUrl} controls autoPlay loop />
       )}
@@ -46,26 +44,17 @@ const Audio = ({ status, mediaBlobUrl }) => {
   );
 };
 
-const Video = () => {
-  const { status, startRecording, stopRecording, mediaBlobUrl, previewStream } =
-    useReactMediaRecorder({
-      video: true,
-      audio: true,
-      echoCancellation: true,
-    });
+const Video = ({ status, mediaBlobUrl, previewStream}) => {
 
   console.log(mediaBlobUrl);
 
   return (
-    <div>
-      <p>{status}</p>
-      <button onClick={startRecording}>Start Recording</button>
-      <button onClick={stopRecording}>Stop Recording</button>
-      <VideoPreview stream={previewStream} />
-      {status === 'stopped' && (
+    <Container>
+      <Status>{status}</Status>
+      {status === 'stopped' ? (
         <video src={mediaBlobUrl} controls autoPlay loop />
-      )}
-    </div>
+      ) : <VideoPreview stream={previewStream} />}
+    </Container>
   );
 };
 
