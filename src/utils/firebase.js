@@ -20,6 +20,7 @@ import {
   query,
   onSnapshot,
   deleteDoc,
+  Timestamp,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -51,40 +52,11 @@ const firebase = {
       console.log(err);
     }
   },
-  async getNotes(uid) {
-    const docsSnap = await getDocs(collection(db, `users/${uid}/notes`));
-    return docsSnap;
-  },
-  async searchNotes(uid, term) {
-    const notesMatches = [];
-    const notesRef = collection(db, 'users', uid, 'notes');
-    const matchQuery = query(
-      notesRef,
-      where('company_name', '>=', term),
-      where('company_name', '<=', term + '~')
-    );
-    const querySnapshot = await getDocs(matchQuery);
-    querySnapshot.forEach((doc) => {
-      notesMatches.push(doc.data());
-    });
-    return notesMatches;
-  },
-  async getNoteDetails(noteId) {
-    const docSnap = await getDoc(doc(db, 'details', noteId));
-    return docSnap;
-  },
   async setNoteBrief(uid, data) {
     const newDocRef = doc(collection(db, `users/${uid}/notes`));
     try {
       await setDoc(newDocRef, { ...data, note_id: newDocRef.id });
       return newDocRef.id;
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  async setNoteDetails(noteId, data) {
-    try {
-      await setDoc(doc(db, 'details', noteId), data);
     } catch (err) {
       console.log(err);
     }
@@ -96,6 +68,28 @@ const firebase = {
       console.log(err);
     }
   },
+  async deleteNote(uid, noteId) {
+    try {
+      await deleteDoc(doc(db, 'users', uid, 'notes', noteId));
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  async getNotes(uid) {
+    const docsSnap = await getDocs(collection(db, `users/${uid}/notes`));
+    return docsSnap;
+  },
+  async getNoteDetails(noteId) {
+    const docSnap = await getDoc(doc(db, 'details', noteId));
+    return docSnap;
+  },
+  async setNoteDetails(noteId, data) {
+    try {
+      await setDoc(doc(db, 'details', noteId), data);
+    } catch (err) {
+      console.log(err);
+    }
+  },
   async updateNoteDetails(noteId, data) {
     try {
       await updateDoc(doc(db, 'details', noteId), data);
@@ -103,9 +97,12 @@ const firebase = {
       console.log(err);
     }
   },
-  async deleteNote(uid, noteId) {
+  async setRecord(uid, data) {
+    const newDocRef = doc(collection(db, `users/${uid}/records`));
+    console.log('in setRecord!');
     try {
-      await deleteDoc(doc(db, 'users', uid, 'notes', noteId));
+      await setDoc(newDocRef, { ...data, record_id: newDocRef.id });
+      // return newDocRef.id;
     } catch (err) {
       console.log(err);
     }
@@ -151,6 +148,21 @@ const firebase = {
     const filteredData = data.filter(item => item.creator !== uid);
     return filteredData;
   },
+  async uplaodFile(path, file) {
+    const fileRef = ref(storage, path);
+    return uploadBytes(fileRef, file).then(() => {
+      console.log('Uploaded a blob or file!');
+    });
+  },
+  async getDownloadURL(path) {
+    return getDownloadURL(ref(storage, path))
+      .then(url => {
+        return url;
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  },
   createUserWithEmailAndPassword,
   auth,
   signInWithEmailAndPassword,
@@ -158,6 +170,7 @@ const firebase = {
   doc,
   setDoc,
   onSnapshot,
+  Timestamp,
 };
 
 export default firebase;

@@ -18,13 +18,14 @@ import {
   ChevronLeftIcon,
   AtSignIcon,
 } from '@chakra-ui/icons';
+import { v4 as uuid } from 'uuid';
 import styled from 'styled-components';
 
-import NoteElement from '../../components/NoteElement';
+import NoteElement from '../../components/NoteCardEditable';
 import firebase from '../../utils/firebase';
-import AddField from '../../components/AddField';
-import EditFiles from '../../components/EditFiles';
-import EditorArea from '../../components/Editor';
+import AddField from '../../components/elements/AddField';
+import EditFiles from '../../components/elements/EditFiles';
+import EditorArea from '../../components/elements/Editor';
 import RecommendModal from '../../components/RecommendModal';
 
 const Container = styled.div`
@@ -135,7 +136,6 @@ const NoteDetails = () => {
   let params = useParams();
   const noteId = params.noteId;
   const user = firebase.auth.currentUser;
-  console.log(user)
 
   useEffect(() => {
     firebase.getNote(user.uid, noteId).then(snap => {
@@ -146,6 +146,7 @@ const NoteDetails = () => {
     });
     firebase.listenDetailsChange(noteId, doc => {
       setDetails(doc.data());
+      console.log('database changed', doc.data());
     });
   }, []);
 
@@ -181,7 +182,8 @@ const NoteDetails = () => {
     return updatedChecked;
   };
 
-  const onBlurSubmit = objectKey => {
+  const onBlurSubmit = (objectKey) => {
+    // handleMapArrayInputChange(e, i, 'questions', 'question');
     firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
   };
 
@@ -221,7 +223,9 @@ const NoteDetails = () => {
   };
 
   const handleDelete = (i, objectKey) => {
+    console.log(i, objectKey, details[objectKey]);
     const newData = details[objectKey].filter((_, index) => index !== i);
+    console.log(newData);
     firebase.updateNoteDetails(noteId, { [objectKey]: newData });
   };
 
@@ -241,18 +245,15 @@ const NoteDetails = () => {
   };
 
   const showConnectModal = () => {
-    firebase
-      .getRecommendedUsers(brief.company_name, user.uid)
-      .then(members => {
-        console.log(members)
-        setRecommend(members);
-        onOpen();
-      });
+    firebase.getRecommendedUsers(brief.company_name, user.uid).then(members => {
+      setRecommend(members);
+      onOpen();
+    });
   };
 
   return (
     <>
-      <RecommendModal isOpen={isOpen} onClose={onClose} recommend={recommend}/>
+      <RecommendModal isOpen={isOpen} onClose={onClose} recommend={recommend} />
       <ButtonWrapper>
         <Link to="/notes">
           <Button
@@ -288,7 +289,9 @@ const NoteDetails = () => {
           <SectionTitle>詳細資料</SectionTitle>
           <FieldWrapper>
             <Title>公司主要產品 / 服務</Title>
-            <Editable value={details.product === '' && '尚未填寫資料'}>
+            <Editable
+              value={details.product === '' ? '尚未填寫資料' : details.product}
+            >
               <EditablePreview />
               <EditableInput
                 onChange={e =>
@@ -305,7 +308,11 @@ const NoteDetails = () => {
             <Title>薪資範圍</Title>
             <StyledSalaryWrapper>
               <StyledEditable
-                value={details.salary.range === '' && '尚未填寫資料'}
+                value={
+                  details.salary.range === ''
+                    ? '尚未填寫資料'
+                    : details.salary.range
+                }
               >
                 <EditablePreview />
                 <EditableInput
@@ -332,7 +339,10 @@ const NoteDetails = () => {
             <Content>
               {details.responsibilities.map((item, i) => {
                 return (
-                  <Editable value={item === '' && '尚未填寫資料'} key={i}>
+                  <Editable
+                    value={item === '' ? '尚未填寫資料' : item}
+                    key={uuid()}
+                  >
                     <StyledListItem>
                       <EditablePreview />
                       <EditableInput
@@ -365,13 +375,19 @@ const NoteDetails = () => {
             <Title>必備技能</Title>
             {details.requirements.map((item, i) => {
               return (
-                <CheckBoxWrapper key={i}>
+                <CheckBoxWrapper key={uuid()}>
                   <CheckBox
                     type="checkbox"
                     checked={details.requirements[i].is_qualified}
                     onChange={() => handleCheckboxChange(i, 'requirements')}
                   />
-                  <Editable value={item.description === '' && '尚未填寫資料'}>
+                  <Editable
+                    value={
+                      item.description === ''
+                        ? '尚未填寫資料'
+                        : item.description
+                    }
+                  >
                     <EditablePreview />
                     <EditableInput
                       onChange={e =>
@@ -410,13 +426,19 @@ const NoteDetails = () => {
             <Title>加分項目</Title>
             {details.bonus.map((item, i) => {
               return (
-                <CheckBoxWrapper key={i}>
+                <CheckBoxWrapper key={uuid()}>
                   <CheckBox
                     type="checkbox"
                     checked={details.bonus[i].is_qualified}
                     onChange={() => handleCheckboxChange(i, 'bonus')}
                   />
-                  <Editable value={item.description === '' && '尚未填寫資料'}>
+                  <Editable
+                    value={
+                      item.description === ''
+                        ? '尚未填寫資料'
+                        : item.description
+                    }
+                  >
                     <EditablePreview />
                     <EditableInput
                       onChange={e =>
@@ -467,7 +489,7 @@ const NoteDetails = () => {
                 </StyledListItem>
                 {details.attached_files.map((file, i) => {
                   return (
-                    <StyledListItem key={i}>
+                    <StyledListItem key={uuid()}>
                       <StyledLink href={file.file_link} target="_blank">
                         {file.file_name}
                       </StyledLink>
@@ -514,8 +536,11 @@ const NoteDetails = () => {
             <Content>
               {details.questions.map((q, i) => {
                 return (
-                  <QuestionWrapper key={i}>
-                    <Editable value={q.question === '' && '尚未填寫資料'}>
+                  <QuestionWrapper key={uuid()}>
+                    <Editable
+                      value={q.question === '' ? '尚未填寫資料' : q.question}
+                      onSubmit={() => onBlurSubmit('questions')}
+                    >
                       <StyledListItem>
                         <EditablePreview />
                         <EditableInput
@@ -527,8 +552,6 @@ const NoteDetails = () => {
                               'question'
                             )
                           }
-                          onBlur={() => onBlurSubmit('questions')}
-                          onKeyDown={e => handlePressEnter(e, 'questions')}
                         />
                         <DeleteButton
                           w={4}

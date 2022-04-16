@@ -1,5 +1,13 @@
+import styled from 'styled-components';
+
+const Container = styled.div`
+  width: 100%;
+  background-color: white
+  border-radius: 20px;
+`;
+
 const Messages = () => {
-  return <h1>Messages</h1>
-}
+  return <Container></Container>;
+};
 
 export default Messages;

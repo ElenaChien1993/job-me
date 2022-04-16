@@ -4,7 +4,7 @@ import { DeleteIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
-import NoteElement from './NoteElement';
+import NoteElement from './NoteCardEditable';
 
 const Container = styled.div`
   position: relative;

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 
-import firebase from '../../utils/firebase';
-
-import Note from '../../components/Note';
+import Note from '../../components/NoteCard';
 
 const SearchBar = styled.div`
   width: 100%;
@@ -20,21 +19,15 @@ const Input = styled.input`
 `;
 
 const Practice = () => {
-  const [databaseNotes, setDatabaseNotes] = useState([]);
   const [renderNotes, setRenderNotes] = useState([]);
-  const user = firebase.auth.currentUser;
+
+  const {databaseNotes} = useOutletContext();
 
   useEffect(() => {
-    // if (!user) return;
-    firebase.getNotes(user.uid).then((snaps) => {
-      const notesArray = [];
-      snaps.forEach((doc) => {
-        notesArray.push(doc.data());
-      });
-      setDatabaseNotes(notesArray);
-      setRenderNotes(notesArray);
-    });
-  }, []);
+    setRenderNotes(databaseNotes);
+  }, [databaseNotes]);
+
+  console.log(databaseNotes)
 
   const handleSearch = (e) => {
     const term = e.target.value;

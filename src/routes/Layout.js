@@ -1,5 +1,4 @@
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
@@ -63,23 +62,12 @@ const Nav = ({ isLogin }) => {
 }
 
 const Layout = ({ isLogin }) => {
-  const [notes, setNotes] = useState([]);
-  const user = firebase.auth.currentUser;
-
-  useEffect(() => {
-    if (!user) return;
-    firebase.getNotes(user.uid).then(snaps => {
-      snaps.forEach(doc => {
-        setNotes(prev => [...prev, doc.data()]);
-      });
-    });
-  }, []);
 
   return (
     <>
       <Nav isLogin={isLogin}/>
       <Container>
-        <Outlet context={[notes]}/>
+        <Outlet/>
       </Container>
     </>
   )

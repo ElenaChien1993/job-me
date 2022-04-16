@@ -12,7 +12,6 @@ import {
 import Member from './Member';
 
 const RecommendModal = ({isOpen, onClose, recommend}) => {
-  // const { onClose } = useDisclosure({ id: 'recommend' });
   return (
     <>
       <Modal size="xl" isOpen={isOpen} onClose={onClose} id="recommend">
