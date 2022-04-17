@@ -117,7 +117,7 @@ const StyledIconButton = styled(IconButton)`
 `;
 
 const Messages = () => {
-  const [value, setValue] = useState('');
+  const [text, setText] = useState('');
   const [rooms, setRooms] = useState([]);
   const [active, setActive] = useState({});
   const [messages, setMessages] = useState(null);
@@ -151,7 +151,22 @@ const Messages = () => {
     firebase.getMessages(active.id).then(messages => setMessages(messages));
   }, [active]);
 
-  console.log(rooms, active);
+  const send = () => {
+    const MessageData = {
+      uid: user.uid,
+      text: text,
+      create_at: firebase.Timestamp.fromDate(new Date()),
+    };
+    firebase.sendMessage(active.id, MessageData);
+    setText('');
+  };
+
+  const handleEnter = e => {
+    if (e.keyCode === 13) {
+      send();
+    }
+  };
+  // console.log(rooms, active);
 
   return (
     <Container>
@@ -167,8 +182,8 @@ const Messages = () => {
               <Input
                 type="text"
                 placeholder="Search people or message"
-                value={value}
-                onChange={event => setValue(event.target.value)}
+                // value={value}
+                // onChange={event => setValue(event.target.value)}
               />
             </InputGroup>
           </SearchBar>
@@ -181,16 +196,25 @@ const Messages = () => {
           <Name>{active?.member}</Name>
         </TopWrapper>
         <Content>
-          {messages && <ChatContent messages={messages} uid={uid}/>}
+          {messages && (
+            <ChatContent
+              roomId={active.id}
+              messages={messages}
+              setMessages={setMessages}
+              uid={uid}
+            />
+          )}
         </Content>
         <BottomWrapper>
           <MessageBar
             type="text"
             placeholder="Type your message"
-            value={value}
-            onChange={event => setValue(event.target.value)}
+            value={text}
+            onChange={event => setText(event.target.value)}
+            onKeyDown={e => handleEnter(e)}
           />
           <StyledIconButton
+            onClick={send}
             variant="ghost"
             aria-label="Send Message"
             icon={<BiSend />}

@@ -22,6 +22,8 @@ import {
   deleteDoc,
   Timestamp,
   orderBy,
+  limit,
+  addDoc,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -183,15 +185,39 @@ const firebase = {
     return name;
   },
   async getMessages(roomId) {
-    const docsSnap = await getDocs(query(
-      collection(db, `chatrooms/${roomId}/messages`),
-      orderBy('create_at')
-    ));
+    const docsSnap = await getDocs(
+      query(
+        collection(db, `chatrooms/${roomId}/messages`),
+        orderBy('create_at'),
+        limit(20)
+      )
+    );
     let data = [];
     docsSnap.forEach(doc => {
       data.push(doc.data());
     });
     return data;
+  },
+  listenMessagesChange(roomId, callback) {
+    const q = query(
+      collection(db, 'chatrooms', roomId, 'messages'),
+      orderBy('create_at'),
+      limit(20)
+    );
+    onSnapshot(q, async docs => {
+      let data = [];
+      docs.forEach(doc => {
+        data.push(doc.data());
+      });
+      callback(data);
+    });
+  },
+  async sendMessage(roomId, data) {
+    try {
+      await addDoc(collection(db, 'chatrooms', roomId, 'messages'), data);
+    } catch (err) {
+      console.log(err);
+    }
   },
   createUserWithEmailAndPassword,
   auth,
