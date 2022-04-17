@@ -5,10 +5,12 @@ import { InputGroup, InputLeftElement, Input, IconButton } from '@chakra-ui/reac
 import styled from 'styled-components';
 
 import ChatList from '../components/ChatList';
+import ChatRecived from '../components/ChatRecived';
+import ChatSent from '../components/ChatSent';
 
 const Container = styled.div`
   width: 100%;
-  height: 700px;
+  height: 650px;
   background-color: white;
   border-radius: 20px;
   position: relative;
@@ -73,7 +75,7 @@ const Name = styled.div`
 `;
 
 const Content = styled.div`
-  height: 572px;
+  height: 522px;
 `
 
 const BottomWrapper = styled.div`
@@ -134,7 +136,12 @@ const Messages = () => {
           <ImageWrapper />
           <Name>Elena Chien</Name>
         </TopWrapper>
-        <Content></Content>
+        <Content>
+          <ChatRecived text="奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人"/>
+          <ChatRecived text="奇怪的人奇怪的人奇怪的人奇怪的人奇怪"/>
+          <ChatSent text="奇怪的人奇怪的人奇怪的人奇"/>
+          <ChatRecived text="奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人"/>
+        </Content>
         <BottomWrapper>
           <MessageBar
             type="text"
