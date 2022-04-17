@@ -57,8 +57,8 @@ const ChatList = ({ rooms, active, setActive}) => {
         <ChatWrapper isSelected={active.id === room.id} key={uuid()} onClick={() => setActive(room)}>
           <ImageWrapper />
           <BriefContent>
-            <Name>{room.member}</Name>
-            <LatestMessage>好啊那我們再聯絡</LatestMessage>
+            <Name>{room.members}</Name>
+            <LatestMessage>{room.latest_message}</LatestMessage>
           </BriefContent>
           <DateText>{room.latest_timestamp}</DateText>
         </ChatWrapper>

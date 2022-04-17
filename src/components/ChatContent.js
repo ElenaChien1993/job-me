@@ -8,11 +8,14 @@ import ChatSent from './elements/ChatSent';
 const ChatContent = ({ roomId, messages, setMessages, uid }) => {
   const bottomRef = useRef();
 
+  // useEffect(() => {
+  //   if (!roomId) return;
+  //   // firebase.listenMessagesChange(roomId, setMessages);
+  // }, [roomId]);
+
   useEffect(() => {
-    if (!roomId) return;
-    bottomRef.current.scrollIntoView({ behavior: 'smooth' });
-    firebase.listenMessagesChange(roomId, setMessages);
-  }, [roomId]);
+    bottomRef.current.scrollIntoView({ behavior: 'auto' });
+  }, [messages])
 
   return (
     <>

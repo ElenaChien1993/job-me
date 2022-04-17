@@ -12,8 +12,6 @@ import { zhTW } from 'date-fns/locale';
 import styled from 'styled-components';
 
 import ChatList from '../components/ChatList';
-import ChatRecived from '../components/elements/ChatRecived';
-import ChatSent from '../components/elements/ChatSent';
 import firebase from '../utils/firebase';
 import ChatContent from '../components/ChatContent';
 
@@ -124,31 +122,21 @@ const Messages = () => {
   const user = firebase.auth.currentUser;
   const uid = user.uid;
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      const roomsData = await firebase.getChatrooms(uid);
-      const transformedRooms = await Promise.all(
-        roomsData.map(async room => {
-          const timeRelative = formatRelative(
-            new Date(room.latest_timestamp.seconds * 1000),
-            new Date(),
-            { locale: zhTW, addSuffix: true }
-          );
-          const friendId = room.members.filter(id => id !== uid);
-          const name = await firebase.getUserName(friendId[0]);
-          return { ...room, member: name, latest_timestamp: timeRelative };
-        })
-      );
-      setRooms(transformedRooms);
-      setActive(transformedRooms[0]);
-    };
+  // useEffect(() => {
+  //   firebase.listenRoomsChange(uid);
+  // }, []);
 
-    fetchRooms();
+  useEffect(() => {
+    
+    firebase.listenRoomsChange2(uid, setRooms);
+    // firebase.listenMessagesChange(roomId, setMessages);
+    
   }, []);
 
   useEffect(() => {
     if (active === {}) return;
     firebase.getMessages(active.id).then(messages => setMessages(messages));
+    // firebase.listenMessagesChange(active.id, setMessages);
   }, [active]);
 
   const send = () => {
@@ -193,7 +181,7 @@ const Messages = () => {
       <RightWrapper>
         <TopWrapper>
           <ImageWrapper />
-          <Name>{active?.member}</Name>
+          <Name>{active?.members}</Name>
         </TopWrapper>
         <Content>
           {messages && (
