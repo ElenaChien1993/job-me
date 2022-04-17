@@ -12,9 +12,10 @@ import { zhTW } from 'date-fns/locale';
 import styled from 'styled-components';
 
 import ChatList from '../components/ChatList';
-import ChatRecived from '../components/ChatRecived';
-import ChatSent from '../components/ChatSent';
+import ChatRecived from '../components/elements/ChatRecived';
+import ChatSent from '../components/elements/ChatSent';
 import firebase from '../utils/firebase';
+import ChatContent from '../components/ChatContent';
 
 const Container = styled.div`
   width: 100%;
@@ -84,6 +85,7 @@ const Name = styled.div`
 
 const Content = styled.div`
   height: 522px;
+  overflow: scroll;
 `;
 
 const BottomWrapper = styled.div`
@@ -117,7 +119,8 @@ const StyledIconButton = styled(IconButton)`
 const Messages = () => {
   const [value, setValue] = useState('');
   const [rooms, setRooms] = useState([]);
-  const [active, setActive] = useState('');
+  const [active, setActive] = useState({});
+  const [messages, setMessages] = useState(null);
   const user = firebase.auth.currentUser;
   const uid = user.uid;
 
@@ -137,11 +140,16 @@ const Messages = () => {
         })
       );
       setRooms(transformedRooms);
-      setActive(transformedRooms[0].id)
+      setActive(transformedRooms[0]);
     };
 
     fetchRooms();
   }, []);
+
+  useEffect(() => {
+    if (active === {}) return;
+    firebase.getMessages(active.id).then(messages => setMessages(messages));
+  }, [active]);
 
   console.log(rooms, active);
 
@@ -165,18 +173,15 @@ const Messages = () => {
             </InputGroup>
           </SearchBar>
         </TitleWrapper>
-        <ChatList rooms={rooms} active={active} setActive={setActive}/>
+        <ChatList rooms={rooms} active={active} setActive={setActive} />
       </LeftWrapper>
       <RightWrapper>
         <TopWrapper>
           <ImageWrapper />
-          <Name>Elena Chien</Name>
+          <Name>{active?.member}</Name>
         </TopWrapper>
         <Content>
-          <ChatRecived text="奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人" />
-          <ChatRecived text="奇怪的人奇怪的人奇怪的人奇怪的人奇怪" />
-          <ChatSent text="奇怪的人奇怪的人奇怪的人奇" />
-          <ChatRecived text="奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人" />
+          {messages && <ChatContent messages={messages} uid={uid}/>}
         </Content>
         <BottomWrapper>
           <MessageBar

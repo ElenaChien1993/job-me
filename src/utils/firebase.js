@@ -182,6 +182,17 @@ const firebase = {
     const name = docSnap.data().display_name;
     return name;
   },
+  async getMessages(roomId) {
+    const docsSnap = await getDocs(query(
+      collection(db, `chatrooms/${roomId}/messages`),
+      orderBy('create_at')
+    ));
+    let data = [];
+    docsSnap.forEach(doc => {
+      data.push(doc.data());
+    });
+    return data;
+  },
   createUserWithEmailAndPassword,
   auth,
   signInWithEmailAndPassword,

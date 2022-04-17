@@ -54,7 +54,7 @@ const ChatList = ({ rooms, active, setActive}) => {
   return (
     <Container>
       {rooms.map(room => (
-        <ChatWrapper isSelected={active === room.id} key={uuid()} onClick={() => setActive(room.id)}>
+        <ChatWrapper isSelected={active.id === room.id} key={uuid()} onClick={() => setActive(room)}>
           <ImageWrapper />
           <BriefContent>
             <Name>{room.member}</Name>
