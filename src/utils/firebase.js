@@ -21,6 +21,7 @@ import {
   onSnapshot,
   deleteDoc,
   Timestamp,
+  orderBy,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -162,6 +163,24 @@ const firebase = {
       .catch(error => {
         console.log(error);
       });
+  },
+  async getChatrooms(uid) {
+    const rooms = query(
+      collection(db, 'chatrooms'),
+      where('members', 'array-contains', uid),
+      orderBy('latest_timestamp', 'desc')
+    );
+    const querySnapshot = await getDocs(rooms);
+    let data = [];
+    querySnapshot.forEach(doc => {
+      data.push(doc.data());
+    });
+    return data;
+  },
+  async getUserName(uid) {
+    const docSnap = await getDoc(doc(db, 'users', uid));
+    const name = docSnap.data().display_name;
+    return name;
   },
   createUserWithEmailAndPassword,
   auth,

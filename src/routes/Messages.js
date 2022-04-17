@@ -1,12 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search2Icon } from '@chakra-ui/icons';
-import { BiSend } from "react-icons/bi";
-import { InputGroup, InputLeftElement, Input, IconButton } from '@chakra-ui/react';
+import { BiSend } from 'react-icons/bi';
+import {
+  InputGroup,
+  InputLeftElement,
+  Input,
+  IconButton,
+} from '@chakra-ui/react';
+import { formatDistance, formatRelative } from 'date-fns';
+import { zhTW } from 'date-fns/locale';
 import styled from 'styled-components';
 
 import ChatList from '../components/ChatList';
 import ChatRecived from '../components/ChatRecived';
 import ChatSent from '../components/ChatSent';
+import firebase from '../utils/firebase';
 
 const Container = styled.div`
   width: 100%;
@@ -58,7 +66,7 @@ const TopWrapper = styled.div`
   display: flex;
   align-items: center;
   padding-left: 20px;
-`
+`;
 
 const ImageWrapper = styled.div`
   width: 36px;
@@ -76,7 +84,7 @@ const Name = styled.div`
 
 const Content = styled.div`
   height: 522px;
-`
+`;
 
 const BottomWrapper = styled.div`
   height: 64px;
@@ -85,29 +93,57 @@ const BottomWrapper = styled.div`
   border-radius: 0 0 20px 0;
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.25);
   padding-left: 20px;
-`
+`;
 
 const MessageBar = styled(Input)`
   && {
     width: 85%;
     border-radius: 20px;
-    border-color: #E8E8E8;
+    border-color: #e8e8e8;
     margin-right: 20px;
   }
-`
+`;
 
 const StyledIconButton = styled(IconButton)`
   && {
     svg {
       width: 25px;
       height: 25px;
-      color: #21978B;
+      color: #21978b;
     }
   }
-`
+`;
 
 const Messages = () => {
   const [value, setValue] = useState('');
+  const [rooms, setRooms] = useState([]);
+  const [active, setActive] = useState('');
+  const user = firebase.auth.currentUser;
+  const uid = user.uid;
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      const roomsData = await firebase.getChatrooms(uid);
+      const transformedRooms = await Promise.all(
+        roomsData.map(async room => {
+          const timeRelative = formatRelative(
+            new Date(room.latest_timestamp.seconds * 1000),
+            new Date(),
+            { locale: zhTW, addSuffix: true }
+          );
+          const friendId = room.members.filter(id => id !== uid);
+          const name = await firebase.getUserName(friendId[0]);
+          return { ...room, member: name, latest_timestamp: timeRelative };
+        })
+      );
+      setRooms(transformedRooms);
+      setActive(transformedRooms[0].id)
+    };
+
+    fetchRooms();
+  }, []);
+
+  console.log(rooms, active);
 
   return (
     <Container>
@@ -124,12 +160,12 @@ const Messages = () => {
                 type="text"
                 placeholder="Search people or message"
                 value={value}
-                onChange={(event) => setValue(event.target.value)}
+                onChange={event => setValue(event.target.value)}
               />
             </InputGroup>
           </SearchBar>
         </TitleWrapper>
-        <ChatList />
+        <ChatList rooms={rooms} active={active} setActive={setActive}/>
       </LeftWrapper>
       <RightWrapper>
         <TopWrapper>
@@ -137,19 +173,23 @@ const Messages = () => {
           <Name>Elena Chien</Name>
         </TopWrapper>
         <Content>
-          <ChatRecived text="奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人"/>
-          <ChatRecived text="奇怪的人奇怪的人奇怪的人奇怪的人奇怪"/>
-          <ChatSent text="奇怪的人奇怪的人奇怪的人奇"/>
-          <ChatRecived text="奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人"/>
+          <ChatRecived text="奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人" />
+          <ChatRecived text="奇怪的人奇怪的人奇怪的人奇怪的人奇怪" />
+          <ChatSent text="奇怪的人奇怪的人奇怪的人奇" />
+          <ChatRecived text="奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人奇怪的人" />
         </Content>
         <BottomWrapper>
           <MessageBar
             type="text"
             placeholder="Type your message"
             value={value}
-            onChange={(event) => setValue(event.target.value)}
+            onChange={event => setValue(event.target.value)}
           />
-          <StyledIconButton variant='ghost' aria-label="Send Message" icon={<BiSend />}/>
+          <StyledIconButton
+            variant="ghost"
+            aria-label="Send Message"
+            icon={<BiSend />}
+          />
         </BottomWrapper>
       </RightWrapper>
     </Container>

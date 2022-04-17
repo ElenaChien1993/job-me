@@ -12,7 +12,11 @@ const ChatWrapper = styled.div`
   display: flex;
   align-items: center;
   padding: 15px 16px;
-  background-color: ${props => (props.active ? '#D5F4F7' : '')};
+  background-color: ${props => (props.isSelected ? '#D5F4F7' : '')};
+  cursor: pointer;
+  &:hover {
+    background-color: #D5F4F7;
+  }
 `;
 
 const ImageWrapper = styled.div`
@@ -46,18 +50,17 @@ const DateText = styled.div`
   margin-left: auto;
 `;
 
-const ChatList = () => {
-  const [fakeQty, setFakeQty] = useState(['', '', '']);
+const ChatList = ({ rooms, active, setActive}) => {
   return (
     <Container>
-      {fakeQty.map(item => (
-        <ChatWrapper key={uuid()}>
+      {rooms.map(room => (
+        <ChatWrapper isSelected={active === room.id} key={uuid()} onClick={() => setActive(room.id)}>
           <ImageWrapper />
           <BriefContent>
-            <Name>Elena Chien</Name>
+            <Name>{room.member}</Name>
             <LatestMessage>好啊那我們再聯絡</LatestMessage>
           </BriefContent>
-          <DateText>昨天 14:20</DateText>
+          <DateText>{room.latest_timestamp}</DateText>
         </ChatWrapper>
       ))}
     </Container>
