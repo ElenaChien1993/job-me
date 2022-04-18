@@ -7,8 +7,6 @@ import {
   Input,
   IconButton,
 } from '@chakra-ui/react';
-import { formatDistance, formatRelative, set } from 'date-fns';
-import { zhTW } from 'date-fns/locale';
 import styled from 'styled-components';
 
 import ChatList from '../components/ChatList';
@@ -116,7 +114,8 @@ const StyledIconButton = styled(IconButton)`
 
 const Messages = () => {
   const [text, setText] = useState('');
-  const [rooms, setRooms] = useState([]);
+  const [databaseRooms, setDatabaseRooms] = useState([]);
+  const [renderRooms, setRenderRooms] = useState([]);
   const [active, setActive] = useState({});
   const [messages, setMessages] = useState(null);
   const user = firebase.auth.currentUser;
@@ -125,17 +124,21 @@ const Messages = () => {
   useEffect(() => {
     const fetchRooms = async (uid) => {
       const rooms = await firebase.getChatrooms(uid);
-      setRooms(rooms);
+      setDatabaseRooms(rooms);
     };
-    const unsubscribe = firebase.listenRoomsChange(uid, setRooms);
+    const unsubscribe = firebase.listenRoomsChange(uid, setDatabaseRooms);
 
     fetchRooms(uid);
     return unsubscribe;
   }, []);
 
   useEffect(() => {
+    setRenderRooms(databaseRooms);
+  }, [databaseRooms]);
+
+  useEffect(() => {
     if (!active.id || uid === active.latest_sender) return;
-    console.log(active)
+    console.log(active);
     firebase.updateRoom(active.id, { receiver_has_read: true });
   }, [active]);
 
@@ -160,6 +163,18 @@ const Messages = () => {
     }
   };
 
+  const handleSearch = (e) => {
+    const term = e.target.value;
+    if (!term) {
+      setRenderRooms(databaseRooms);
+      return;
+    }
+    const filtered = databaseRooms.filter(
+      (room) => room.members.includes(term) || room.latest_message.includes(term)
+    );
+    setRenderRooms(filtered);
+  };
+
   return (
     <Container>
       <LeftWrapper>
@@ -174,13 +189,17 @@ const Messages = () => {
               <Input
                 type="text"
                 placeholder="Search people or message"
-                // value={value}
-                // onChange={event => setValue(event.target.value)}
+                onChange={handleSearch}
               />
             </InputGroup>
           </SearchBar>
         </TitleWrapper>
-        <ChatList rooms={rooms} active={active} setActive={setActive} uid={uid}/>
+        <ChatList
+          rooms={renderRooms}
+          active={active}
+          setActive={setActive}
+          uid={uid}
+        />
       </LeftWrapper>
       <RightWrapper>
         <TopWrapper>

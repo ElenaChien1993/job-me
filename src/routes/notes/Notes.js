@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
 import Note from '../../components/NoteCard';
+import ChatCorner from '../../components/ChatCorner';
 
 const Container = styled.div`
   display: flex;
@@ -101,6 +102,7 @@ const Notes = () => {
             );
           })}
       </NotesWrapper>
+      <ChatCorner />
     </Container>
   );
 };
