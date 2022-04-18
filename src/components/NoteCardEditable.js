@@ -138,13 +138,11 @@ const NoteElement = React.memo(function NoteElement({
   };
 
   const handleStatusChange = (e) => {
-    console.log(e.target.value)
     setNote((prev) => {
       return { ...prev, status: e.target.value };
     });
   };
 
-  console.log(note)
   const handleTagsChange = (e) => {
     const tagsArray = e.target.value.split(',', 5);
     setNote((prev) => {

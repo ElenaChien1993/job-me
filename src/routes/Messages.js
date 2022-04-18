@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Search2Icon } from '@chakra-ui/icons';
 import { BiSend } from 'react-icons/bi';
 import {
@@ -14,8 +15,8 @@ import firebase from '../utils/firebase';
 import ChatContent from '../components/ChatContent';
 
 const Container = styled.div`
-  width: 100%;
-  height: 650px;
+  width: ${(props) => (props.isCorner ? '40vw' : '100%')};
+  height: ${(props) => (props.isCorner ? '400px' : '650px')};
   background-color: white;
   border-radius: 20px;
   position: relative;
@@ -118,11 +119,21 @@ const Messages = () => {
   const [renderRooms, setRenderRooms] = useState([]);
   const [active, setActive] = useState({});
   const [messages, setMessages] = useState(null);
+  const [isCorner, setIsCorner] = useState(true);
   const user = firebase.auth.currentUser;
   const uid = user.uid;
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    const fetchRooms = async (uid) => {
+    if (pathname === '/messages') {
+      setIsCorner(false);
+    } else {
+      setIsCorner(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchRooms = async uid => {
       const rooms = await firebase.getChatrooms(uid);
       setDatabaseRooms(rooms);
     };
@@ -144,7 +155,7 @@ const Messages = () => {
 
   useEffect(() => {
     if (active === {}) return;
-    firebase.getMessages(active.id).then((messages) => setMessages(messages));
+    firebase.getMessages(active.id).then(messages => setMessages(messages));
   }, [active]);
 
   const send = () => {
@@ -157,26 +168,26 @@ const Messages = () => {
     setText('');
   };
 
-  const handleEnter = (e) => {
+  const handleEnter = e => {
     if (e.keyCode === 13) {
       send();
     }
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     const term = e.target.value;
     if (!term) {
       setRenderRooms(databaseRooms);
       return;
     }
     const filtered = databaseRooms.filter(
-      (room) => room.members.includes(term) || room.latest_message.includes(term)
+      room => room.members.includes(term) || room.latest_message.includes(term)
     );
     setRenderRooms(filtered);
   };
 
   return (
-    <Container>
+    <Container isCorner={isCorner}>
       <LeftWrapper>
         <TitleWrapper>
           <Title>Messages</Title>
@@ -221,8 +232,8 @@ const Messages = () => {
             type="text"
             placeholder="Type your message"
             value={text}
-            onChange={(event) => setText(event.target.value)}
-            onKeyDown={(e) => handleEnter(e)}
+            onChange={event => setText(event.target.value)}
+            onKeyDown={e => handleEnter(e)}
           />
           <StyledIconButton
             onClick={send}
