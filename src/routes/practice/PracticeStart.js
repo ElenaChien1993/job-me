@@ -62,11 +62,9 @@ const StyledButton = styled(Button)`
 
 const PracticeStart = () => {
   const [current, setCurrent] = useState(0);
-  const [timer, setTimer] = useState(3);
+  const [timer, setTimer] = useState(180);
   const [progress, setProgress] = useState('before');
   const props = useOutletContext();
-
-  console.log(props.practiceQuestions);
 
   return (
     <Container>

@@ -1,5 +1,4 @@
 import { useRef, useEffect } from 'react';
-import { useReactMediaRecorder } from 'react-media-recorder';
 import styled from 'styled-components';
 
 const Container = styled.div`

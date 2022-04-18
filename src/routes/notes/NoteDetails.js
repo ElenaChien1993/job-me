@@ -144,10 +144,12 @@ const NoteDetails = () => {
     firebase.getNoteDetails(noteId).then(snap => {
       setDetails(snap.data());
     });
-    firebase.listenDetailsChange(noteId, doc => {
+    const unsubscribe = firebase.listenDetailsChange(noteId, doc => {
       setDetails(doc.data());
       console.log('database changed', doc.data());
     });
+
+    return unsubscribe;
   }, []);
 
   // ------- Helper Function
@@ -196,7 +198,7 @@ const NoteDetails = () => {
   //-------- Handle Array of Strings
   const handleArrayInputChange = (e, index, objectKey) => {
     const update = getArrayChangedValue(e.target.value, index, objectKey);
-
+    console.log('checkme', update)
     setDetails(prev => {
       return { ...prev, [objectKey]: update };
     });
@@ -291,6 +293,7 @@ const NoteDetails = () => {
             <Title>公司主要產品 / 服務</Title>
             <Editable
               value={details.product === '' ? '尚未填寫資料' : details.product}
+              onSubmit={() => onBlurSubmit('product')}
             >
               <EditablePreview />
               <EditableInput
@@ -299,8 +302,6 @@ const NoteDetails = () => {
                     return { ...prev, product: e.target.value };
                   })
                 }
-                onBlur={() => onBlurSubmit('product')}
-                onKeyDown={e => handlePressEnter(e, 'product')}
               />
             </Editable>
           </FieldWrapper>
@@ -313,12 +314,11 @@ const NoteDetails = () => {
                     ? '尚未填寫資料'
                     : details.salary.range
                 }
+                onSubmit={() => onBlurSubmit('salary')}
               >
                 <EditablePreview />
                 <EditableInput
                   onChange={e => handleInputSalaryChange(e, 'range')}
-                  onBlur={() => onBlurSubmit('salary')}
-                  onKeyDown={e => handlePressEnter(e, 'salary')}
                 />
               </StyledEditable>
               <Content> K </Content>
@@ -342,6 +342,7 @@ const NoteDetails = () => {
                   <Editable
                     value={item === '' ? '尚未填寫資料' : item}
                     key={uuid()}
+                    onSubmit={() => onBlurSubmit('responsibilities')}
                   >
                     <StyledListItem>
                       <EditablePreview />
@@ -349,8 +350,6 @@ const NoteDetails = () => {
                         onChange={e =>
                           handleArrayInputChange(e, i, 'responsibilities')
                         }
-                        onBlur={() => onBlurSubmit('responsibilities')}
-                        onKeyDown={e => handlePressEnter(e, 'responsibilities')}
                       />
                       <DeleteButton
                         w={4}

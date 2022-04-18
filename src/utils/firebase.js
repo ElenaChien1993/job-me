@@ -113,7 +113,7 @@ const firebase = {
     }
   },
   listenDetailsChange(noteId, callback) {
-    onSnapshot(doc(db, 'details', noteId), callback);
+    return onSnapshot(doc(db, 'details', noteId), callback);
   },
   checklogin(callback) {
     onAuthStateChanged(auth, callback);

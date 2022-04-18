@@ -32,15 +32,15 @@ const BeforeRecord = ({ recordType, timer, setTimer, setProgress }) => {
           <>
             <p>此題定時</p>
             <Select
-              onChange={e => setTimer(e.target.value)}
+              onChange={(e) => setTimer(e.target.value)}
               placeholder="請選擇計時時間"
             >
               <option value={30}>30 秒</option>
               <option value={60}>1 分鐘</option>
               <option value={90}>1 分半</option>
               <option value={120}>2 分鐘</option>
-              <option value={180}>2 分半</option>
-              <option value={240}>3 分鐘</option>
+              <option value={150}>2 分半</option>
+              <option value={180}>3 分鐘</option>
             </Select>
           </>
         ) : (
