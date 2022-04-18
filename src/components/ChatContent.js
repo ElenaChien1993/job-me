@@ -2,16 +2,18 @@ import { useRef, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import firebase from '../utils/firebase';
 
-import ChatRecived from './elements/ChatRecived';
+import ChatReceived from './elements/ChatReceived';
 import ChatSent from './elements/ChatSent';
 
-const ChatContent = ({ roomId, messages, setMessages, uid }) => {
+const ChatContent = ({ room, messages, setMessages, uid }) => {
   const bottomRef = useRef();
 
-  // useEffect(() => {
-  //   if (!roomId) return;
-  //   // firebase.listenMessagesChange(roomId, setMessages);
-  // }, [roomId]);
+  useEffect(() => {
+    if (!room.id) return;
+    const unsubscribe = firebase.listenMessagesChange(room, setMessages, uid);
+
+    return unsubscribe;
+  }, [room]);
 
   useEffect(() => {
     bottomRef.current.scrollIntoView({ behavior: 'auto' });
@@ -21,7 +23,7 @@ const ChatContent = ({ roomId, messages, setMessages, uid }) => {
     <>
       {messages.map(message =>
         message.uid !== uid ? (
-          <ChatRecived key={uuid()} text={message.text} />
+          <ChatReceived key={uuid()} text={message.text} />
         ) : (
           <ChatSent key={uuid()} text={message.text} />
         )

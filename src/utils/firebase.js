@@ -135,7 +135,7 @@ const firebase = {
       .then(() => {
         console.log('updated');
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   },
@@ -147,10 +147,10 @@ const firebase = {
     );
     const querySnapshot = await getDocs(members);
     let data = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       data.push(doc.data());
     });
-    const filteredData = data.filter(item => item.creator !== uid);
+    const filteredData = data.filter((item) => item.creator !== uid);
     return filteredData;
   },
   async uplaodFile(path, file) {
@@ -161,10 +161,10 @@ const firebase = {
   },
   async getDownloadURL(path) {
     return getDownloadURL(ref(storage, path))
-      .then(url => {
+      .then((url) => {
         return url;
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   },
@@ -177,98 +177,78 @@ const firebase = {
     );
     const querySnapshot = await getDocs(rooms);
     let data = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       data.push(doc.data());
     });
-    return data;
+    const transformedRooms = await Promise.all(
+      data.map(async (room) => {
+        const timeRelative = formatRelative(
+          new Date(room.latest_timestamp.seconds * 1000),
+          new Date(),
+          { locale: zhTW, addSuffix: true }
+        );
+        const friendId = room.members.filter((id) => id !== uid);
+        const name = await this.getUserName(friendId[0]);
+        return { ...room, members: name, latest_timestamp: timeRelative };
+      })
+    );
+    return transformedRooms;
   },
   async getUserName(uid) {
     const docSnap = await getDoc(doc(db, 'users', uid));
     const name = docSnap.data().display_name;
     return name;
   },
-  listenRoomsChange2(uid, callback) {
+  listenRoomsChange(uid, callback) {
     const q = query(
       collection(db, 'chatrooms'),
       where('members', 'array-contains', uid)
     );
-    onSnapshot(q, async snapshot => {
-      let data = [];
-      snapshot.docChanges().forEach(change => {
-        if (change.type === 'added' || change.type === 'modified') {
-          console.log(change.doc.data())
-          data.push(change.doc.data()); 
+    return onSnapshot(q, async (snapshot) => {
+      let data;
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'modified') {
+          data = change.doc.data();
         }
       });
-      const transformedRooms = await Promise.all(
-        data.map(async room => {
-          const timeRelative = formatRelative(
-            new Date(room.latest_timestamp.seconds * 1000),
-            new Date(),
-            { locale: zhTW, addSuffix: true }
-          );
-          const friendId = room.members.filter(id => id !== uid);
-          const name = await this.getUserName(friendId[0]);
-          return { ...room, members: name, latest_timestamp: timeRelative };
-        })
+      if (!data) return;
+      const timeRelative = formatRelative(
+        new Date(data.latest_timestamp.seconds * 1000),
+        new Date(),
+        { locale: zhTW, addSuffix: true }
       );
-      callback(transformedRooms);
-
-    });
-  },
-  async listenRoomsChange(uid, callback) {
-    const q = query(
-      collection(db, 'chatrooms'),
-      where('members', 'array-contains', uid),
-      orderBy('latest_timestamp', 'desc'),
-      limit(7)
-    );
-    onSnapshot(q, async docs => {
-      let data = [];
-      docs.forEach(doc => {
-        data.push(doc.data());
+      const friendId = data.members.filter((id) => id !== uid);
+      const name = await this.getUserName(friendId[0]);
+      data = { ...data, latest_timestamp: timeRelative, members: name };
+      callback((prev) => {
+        const filtered = prev.filter((room) => room.id !== data.id);
+        return [data, ...filtered];
       });
-      const transformedRooms = await Promise.all(
-        data.map(async room => {
-          const timeRelative = formatRelative(
-            new Date(room.latest_timestamp.seconds * 1000),
-            new Date(),
-            { locale: zhTW, addSuffix: true }
-          );
-          const friendId = room.members.filter(id => id !== uid);
-          const name = await this.getUserName(friendId[0]);
-          return { ...room, members: name, latest_timestamp: timeRelative };
-        })
-      );
-      console.log(transformedRooms);
-      callback(transformedRooms);
-
-      // res(() => {
-      //   console.log(transformedRooms);
-      //   callback(prev => [...prev, transformedRooms]);
-      // });
     });
   },
   async getMessages(roomId) {
     const docsSnap = await getDocs(
       query(
         collection(db, `chatrooms/${roomId}/messages`),
-        orderBy('create_at'),
+        orderBy('create_at', 'desc'),
         limit(20)
       )
     );
     let data = [];
-    docsSnap.forEach(doc => {
+    docsSnap.forEach((doc) => {
       data.push(doc.data());
     });
+    data.sort((a, b) => !b.create_at - a.create_at);
     return data;
   },
-  listenMessagesChange(roomId, callback) {
-    const q = query(collection(db, 'chatrooms', roomId, 'messages'));
-    onSnapshot(q, snapshot => {
-      snapshot.docChanges().forEach(change => {
+  listenMessagesChange(room, callback, uid) {
+    const q = query(collection(db, 'chatrooms', room.id, 'messages'));
+    return onSnapshot(q, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
-          callback(prev => [...prev, change.doc.data()]);
+          callback((prev) => [...prev, change.doc.data()]);
+          if (!room.id || uid === room.latest_sender) return;
+          this.updateRoom(room.id, { receiver_has_read: true });
         }
       });
     });
@@ -280,7 +260,15 @@ const firebase = {
         latest_timestamp: data.create_at,
         latest_message: data.text,
         receiver_has_read: false,
+        latest_sender: data.uid,
       });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  async updateRoom(roomId, data) {
+    try {
+      await updateDoc(doc(db, 'chatrooms', roomId), data);
     } catch (err) {
       console.log(err);
     }

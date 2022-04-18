@@ -7,7 +7,7 @@ import {
   Input,
   IconButton,
 } from '@chakra-ui/react';
-import { formatDistance, formatRelative } from 'date-fns';
+import { formatDistance, formatRelative, set } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 import styled from 'styled-components';
 
@@ -122,21 +122,26 @@ const Messages = () => {
   const user = firebase.auth.currentUser;
   const uid = user.uid;
 
-  // useEffect(() => {
-  //   firebase.listenRoomsChange(uid);
-  // }, []);
-
   useEffect(() => {
-    
-    firebase.listenRoomsChange2(uid, setRooms);
-    // firebase.listenMessagesChange(roomId, setMessages);
-    
+    const fetchRooms = async (uid) => {
+      const rooms = await firebase.getChatrooms(uid);
+      setRooms(rooms);
+    };
+    const unsubscribe = firebase.listenRoomsChange(uid, setRooms);
+
+    fetchRooms(uid);
+    return unsubscribe;
   }, []);
 
   useEffect(() => {
+    if (!active.id || uid === active.latest_sender) return;
+    console.log(active)
+    firebase.updateRoom(active.id, { receiver_has_read: true });
+  }, [active]);
+
+  useEffect(() => {
     if (active === {}) return;
-    firebase.getMessages(active.id).then(messages => setMessages(messages));
-    // firebase.listenMessagesChange(active.id, setMessages);
+    firebase.getMessages(active.id).then((messages) => setMessages(messages));
   }, [active]);
 
   const send = () => {
@@ -149,12 +154,11 @@ const Messages = () => {
     setText('');
   };
 
-  const handleEnter = e => {
+  const handleEnter = (e) => {
     if (e.keyCode === 13) {
       send();
     }
   };
-  // console.log(rooms, active);
 
   return (
     <Container>
@@ -176,7 +180,7 @@ const Messages = () => {
             </InputGroup>
           </SearchBar>
         </TitleWrapper>
-        <ChatList rooms={rooms} active={active} setActive={setActive} />
+        <ChatList rooms={rooms} active={active} setActive={setActive} uid={uid}/>
       </LeftWrapper>
       <RightWrapper>
         <TopWrapper>
@@ -186,7 +190,7 @@ const Messages = () => {
         <Content>
           {messages && (
             <ChatContent
-              roomId={active.id}
+              room={active}
               messages={messages}
               setMessages={setMessages}
               uid={uid}
@@ -198,8 +202,8 @@ const Messages = () => {
             type="text"
             placeholder="Type your message"
             value={text}
-            onChange={event => setText(event.target.value)}
-            onKeyDown={e => handleEnter(e)}
+            onChange={(event) => setText(event.target.value)}
+            onKeyDown={(e) => handleEnter(e)}
           />
           <StyledIconButton
             onClick={send}

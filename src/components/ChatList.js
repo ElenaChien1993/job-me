@@ -9,13 +9,14 @@ const Container = styled.div`
 `;
 
 const ChatWrapper = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
   padding: 15px 16px;
-  background-color: ${props => (props.isSelected ? '#D5F4F7' : '')};
+  background-color: ${(props) => (props.isSelected ? '#D5F4F7' : '')};
   cursor: pointer;
   &:hover {
-    background-color: #D5F4F7;
+    background-color: #d5f4f7;
   }
 `;
 
@@ -42,6 +43,7 @@ const Name = styled.div`
 const LatestMessage = styled.div`
   color: #4f5665;
   font-size: 16px;
+  font-weight: ${(props) => (props.isRead ? '400' : '700')};
 `;
 
 const DateText = styled.div`
@@ -50,17 +52,38 @@ const DateText = styled.div`
   margin-left: auto;
 `;
 
-const ChatList = ({ rooms, active, setActive}) => {
+const NewMessage = styled.div`
+  position: absolute;
+  height: 12px;
+  width: 12px;
+  border-radius: 6px;
+  background-color: red;
+  right: 20px;
+  display: ${(props) => (props.isRead ? 'none' : 'block')};
+`;
+
+const ChatList = ({ rooms, active, setActive, uid }) => {
   return (
     <Container>
-      {rooms.map(room => (
-        <ChatWrapper isSelected={active.id === room.id} key={uuid()} onClick={() => setActive(room)}>
+      {rooms.map((room) => (
+        <ChatWrapper
+          isSelected={active.id === room.id}
+          key={uuid()}
+          onClick={() => setActive(room)}
+        >
           <ImageWrapper />
           <BriefContent>
             <Name>{room.members}</Name>
-            <LatestMessage>{room.latest_message}</LatestMessage>
+            <LatestMessage
+              isRead={room.receiver_has_read || uid === room.latest_sender}
+            >
+              {room.latest_message}
+            </LatestMessage>
           </BriefContent>
           <DateText>{room.latest_timestamp}</DateText>
+          <NewMessage
+            isRead={room.receiver_has_read || uid === room.latest_sender}
+          />
         </ChatWrapper>
       ))}
     </Container>
