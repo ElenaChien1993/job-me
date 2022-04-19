@@ -75,7 +75,7 @@ const ChatList = ({ rooms, active, setActive, uid, isCorner }) => {
       <Container>
         {rooms.map((room) => (
           <ChatWrapper
-            isSelected={active.id === room.id}
+            isSelected={active?.id === room.id}
             key={uuid()}
             onClick={() => setActive(room)}
           >

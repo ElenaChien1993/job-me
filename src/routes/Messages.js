@@ -15,8 +15,8 @@ import firebase from '../utils/firebase';
 import ChatContent from '../components/ChatContent';
 
 const Container = styled.div`
-  width: ${(props) => (props.theme.isCorner ? '40vw' : '100%')};
-  height: ${(props) => (props.theme.isCorner ? '400px' : '650px')};
+  width: ${props => (props.theme.isCorner ? '40vw' : '100%')};
+  height: ${props => (props.theme.isCorner ? '400px' : '650px')};
   background-color: white;
   border-radius: 20px;
   position: relative;
@@ -56,7 +56,7 @@ const RightWrapper = styled.div`
 const SearchBar = styled.div`
   width: 90%;
   margin-bottom: 30px;
-  display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
+  display: ${props => (props.theme.isCorner ? 'none' : 'block')};
 `;
 
 const TopWrapper = styled.div`
@@ -83,7 +83,7 @@ const Name = styled.div`
 `;
 
 const Content = styled.div`
-  height: ${(props) => (props.theme.isCorner ? '272px' : '522px')};
+  height: ${props => (props.theme.isCorner ? '272px' : '522px')};
   overflow: scroll;
 `;
 
@@ -119,8 +119,8 @@ const Messages = () => {
   const [text, setText] = useState('');
   const [databaseRooms, setDatabaseRooms] = useState([]);
   const [renderRooms, setRenderRooms] = useState([]);
-  const [active, setActive] = useState({});
-  const [messages, setMessages] = useState(null);
+  const [active, setActive] = useState(null);
+  const [messages, setMessages] = useState({});
   const [isCorner, setIsCorner] = useState(true);
   const observeTargetRef = useRef();
   const rootRef = useRef();
@@ -137,7 +137,7 @@ const Messages = () => {
   }, []);
 
   useEffect(() => {
-    const fetchRooms = async (uid) => {
+    const fetchRooms = async uid => {
       const rooms = await firebase.getChatrooms(uid);
       setDatabaseRooms(rooms);
     };
@@ -152,19 +152,19 @@ const Messages = () => {
   }, [databaseRooms]);
 
   useEffect(() => {
-    if (!active.id || uid === active.latest_sender) return;
+    if (!active || uid === active.latest_sender) return;
     firebase.updateRoom(active.id, { receiver_has_read: true });
   }, [active]);
 
-  useEffect(() => {
-    if (active === {}) return;
-    firebase
-      .getMessages(active.id, messages)
-      .then((messages) => {
-        console.log('get', messages)
-        setMessages(messages)
-      });
-  }, [active]);
+  // useEffect(() => {
+  //   if (active === {}) return;
+  //   firebase
+  //     .getMessages(active.id, messages)
+  //     .then((messages) => {
+  //       console.log('get', messages)
+  //       setMessages(messages)
+  //     });
+  // }, [active]);
 
   const send = () => {
     const MessageData = {
@@ -176,35 +176,33 @@ const Messages = () => {
     setText('');
   };
 
-  const handleEnter = (e) => {
+  const handleEnter = e => {
     if (e.keyCode === 13) {
       send();
     }
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     const term = e.target.value;
     if (!term) {
       setRenderRooms(databaseRooms);
       return;
     }
     const filtered = databaseRooms.filter(
-      (room) =>
-        room.members.includes(term) || room.latest_message.includes(term)
+      room => room.members.includes(term) || room.latest_message.includes(term)
     );
     setRenderRooms(filtered);
   };
 
-  console.log('out side', messages)
+  console.log('In Msgs', active);
+  console.log('Messages Render', messages);
 
   const callback = ([entry]) => {
-    // console.log(messages)
     if (entry && entry.isIntersecting) {
-      // if (messages.length === 0) return;
-      // console.log('observer', messages);
-      firebase.getMoreMessages(active.id, messages).then((messages) => {
-        console.log('fetched', messages);
-        // setMessages((prev) => [...messages, ...prev]);
+      firebase.getMoreMessages(active.id, messages).then(messages => {
+        setMessages(prev => {
+          return { ...prev, [active.id]: [...messages, ...prev[active.id]] };
+        });
       });
     }
   };
@@ -259,7 +257,7 @@ const Messages = () => {
             <Name>{active?.members}</Name>
           </TopWrapper>
           <Content ref={rootRef}>
-            {messages && (
+            {active ? (
               <ChatContent
                 room={active}
                 messages={messages}
@@ -267,6 +265,8 @@ const Messages = () => {
                 uid={uid}
                 observeTargetRef={observeTargetRef}
               />
+            ) : (
+              <div>請選取聊天室</div>
             )}
           </Content>
           <BottomWrapper>
@@ -274,8 +274,8 @@ const Messages = () => {
               type="text"
               placeholder="Type your message"
               value={text}
-              onChange={(event) => setText(event.target.value)}
-              onKeyDown={(e) => handleEnter(e)}
+              onChange={event => setText(event.target.value)}
+              onKeyDown={e => handleEnter(e)}
             />
             <StyledIconButton
               onClick={send}
