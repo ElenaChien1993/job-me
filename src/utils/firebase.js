@@ -226,6 +226,24 @@ const firebase = {
       });
     });
   },
+  async getMoreMessages(roomId, messages) {
+    if (!messages || messages.length === 0) return;
+    const docsSnap = await getDocs(
+      query(
+        collection(db, `chatrooms/${roomId}/messages`),
+        where('create_at', '<', messages[0].create_at),
+        orderBy('create_at', 'desc'),
+        limit(20)
+      )
+    );
+    let data = [];
+    docsSnap.forEach((doc) => {
+      data.push(doc.data());
+    });
+    data.sort((a, b) => !b.create_at - a.create_at);
+    console.log('data,', data);
+    return data;
+  },
   async getMessages(roomId) {
     const docsSnap = await getDocs(
       query(

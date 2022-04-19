@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
 const Container = styled.div`
@@ -21,8 +21,8 @@ const ChatWrapper = styled.div`
 `;
 
 const ImageWrapper = styled.div`
-  width: 50px;
-  height: 50px;
+  min-width: 50px;
+  min-height: 50px;
   border-radius: 25px;
   background: #f5cdc5;
   margin-right: 13px;
@@ -31,6 +31,9 @@ const ImageWrapper = styled.div`
 const BriefContent = styled.div`
   display: flex;
   flex-direction: column;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 `;
 
 const Name = styled.div`
@@ -38,6 +41,9 @@ const Name = styled.div`
   font-size: 20px;
   color: #141414;
   margin-bottom: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 `;
 
 const LatestMessage = styled.div`
@@ -50,6 +56,7 @@ const DateText = styled.div`
   align-self: flex-start;
   font-size: 14px;
   margin-left: auto;
+  display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
 `;
 
 const NewMessage = styled.div`
@@ -62,31 +69,33 @@ const NewMessage = styled.div`
   display: ${(props) => (props.isRead ? 'none' : 'block')};
 `;
 
-const ChatList = ({ rooms, active, setActive, uid }) => {
+const ChatList = ({ rooms, active, setActive, uid, isCorner }) => {
   return (
-    <Container>
-      {rooms.map((room) => (
-        <ChatWrapper
-          isSelected={active.id === room.id}
-          key={uuid()}
-          onClick={() => setActive(room)}
-        >
-          <ImageWrapper />
-          <BriefContent>
-            <Name>{room.members}</Name>
-            <LatestMessage
+    <ThemeProvider theme={{ isCorner }}>
+      <Container>
+        {rooms.map((room) => (
+          <ChatWrapper
+            isSelected={active.id === room.id}
+            key={uuid()}
+            onClick={() => setActive(room)}
+          >
+            <ImageWrapper />
+            <BriefContent>
+              <Name>{room.members}</Name>
+              <LatestMessage
+                isRead={room.receiver_has_read || uid === room.latest_sender}
+              >
+                {room.latest_message}
+              </LatestMessage>
+            </BriefContent>
+            <DateText>{room.latest_timestamp}</DateText>
+            <NewMessage
               isRead={room.receiver_has_read || uid === room.latest_sender}
-            >
-              {room.latest_message}
-            </LatestMessage>
-          </BriefContent>
-          <DateText>{room.latest_timestamp}</DateText>
-          <NewMessage
-            isRead={room.receiver_has_read || uid === room.latest_sender}
-          />
-        </ChatWrapper>
-      ))}
-    </Container>
+            />
+          </ChatWrapper>
+        ))}
+      </Container>
+    </ThemeProvider>
   );
 };
 

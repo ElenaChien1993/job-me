@@ -23,13 +23,13 @@ const Content = styled.div`
   line-height: 1.4;
 `;
 
-const ChatRecived = ({text}) => {
+const ChatReceived = ({text, observeTargetRef}) => {
   return (
-    <Wrapper>
+    <Wrapper ref={observeTargetRef}>
       <ImageWrapper />
       <Content>{text}</Content>
     </Wrapper>
   );
 };
 
-export default ChatRecived;
+export default ChatReceived;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Search2Icon } from '@chakra-ui/icons';
 import { BiSend } from 'react-icons/bi';
@@ -8,18 +8,19 @@ import {
   Input,
   IconButton,
 } from '@chakra-ui/react';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 
 import ChatList from '../components/ChatList';
 import firebase from '../utils/firebase';
 import ChatContent from '../components/ChatContent';
 
 const Container = styled.div`
-  width: ${(props) => (props.isCorner ? '40vw' : '100%')};
-  height: ${(props) => (props.isCorner ? '400px' : '650px')};
+  width: ${(props) => (props.theme.isCorner ? '40vw' : '100%')};
+  height: ${(props) => (props.theme.isCorner ? '400px' : '650px')};
   background-color: white;
   border-radius: 20px;
   position: relative;
+  z-index: 1;
 `;
 
 const LeftWrapper = styled.div`
@@ -55,6 +56,7 @@ const RightWrapper = styled.div`
 const SearchBar = styled.div`
   width: 90%;
   margin-bottom: 30px;
+  display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
 `;
 
 const TopWrapper = styled.div`
@@ -81,7 +83,7 @@ const Name = styled.div`
 `;
 
 const Content = styled.div`
-  height: 522px;
+  height: ${(props) => (props.theme.isCorner ? '272px' : '522px')};
   overflow: scroll;
 `;
 
@@ -120,6 +122,8 @@ const Messages = () => {
   const [active, setActive] = useState({});
   const [messages, setMessages] = useState(null);
   const [isCorner, setIsCorner] = useState(true);
+  const observeTargetRef = useRef();
+  const rootRef = useRef();
   const user = firebase.auth.currentUser;
   const uid = user.uid;
   const { pathname } = useLocation();
@@ -133,7 +137,7 @@ const Messages = () => {
   }, []);
 
   useEffect(() => {
-    const fetchRooms = async uid => {
+    const fetchRooms = async (uid) => {
       const rooms = await firebase.getChatrooms(uid);
       setDatabaseRooms(rooms);
     };
@@ -149,13 +153,17 @@ const Messages = () => {
 
   useEffect(() => {
     if (!active.id || uid === active.latest_sender) return;
-    console.log(active);
     firebase.updateRoom(active.id, { receiver_has_read: true });
   }, [active]);
 
   useEffect(() => {
     if (active === {}) return;
-    firebase.getMessages(active.id).then(messages => setMessages(messages));
+    firebase
+      .getMessages(active.id, messages)
+      .then((messages) => {
+        console.log('get', messages)
+        setMessages(messages)
+      });
   }, [active]);
 
   const send = () => {
@@ -168,82 +176,117 @@ const Messages = () => {
     setText('');
   };
 
-  const handleEnter = e => {
+  const handleEnter = (e) => {
     if (e.keyCode === 13) {
       send();
     }
   };
 
-  const handleSearch = e => {
+  const handleSearch = (e) => {
     const term = e.target.value;
     if (!term) {
       setRenderRooms(databaseRooms);
       return;
     }
     const filtered = databaseRooms.filter(
-      room => room.members.includes(term) || room.latest_message.includes(term)
+      (room) =>
+        room.members.includes(term) || room.latest_message.includes(term)
     );
     setRenderRooms(filtered);
   };
 
+  console.log('out side', messages)
+
+  const callback = ([entry]) => {
+    // console.log(messages)
+    if (entry && entry.isIntersecting) {
+      // if (messages.length === 0) return;
+      // console.log('observer', messages);
+      firebase.getMoreMessages(active.id, messages).then((messages) => {
+        console.log('fetched', messages);
+        // setMessages((prev) => [...messages, ...prev]);
+      });
+    }
+  };
+
+  const options = {
+    root: rootRef.current,
+    rootMargin: '100px',
+    threshold: 1,
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(callback, options);
+    if (observeTargetRef.current) observer.observe(observeTargetRef.current);
+
+    return () => {
+      if (observeTargetRef.current)
+        observer.unobserve(observeTargetRef.current);
+    };
+  }, [observeTargetRef.current]);
+
   return (
-    <Container isCorner={isCorner}>
-      <LeftWrapper>
-        <TitleWrapper>
-          <Title>Messages</Title>
-          <SearchBar>
-            <InputGroup>
-              <InputLeftElement
-                pointerEvents="none"
-                children={<Search2Icon color="gray.300" />}
+    <ThemeProvider theme={{ isCorner }}>
+      <Container>
+        <LeftWrapper>
+          <TitleWrapper>
+            <Title>Messages</Title>
+            <SearchBar>
+              <InputGroup>
+                <InputLeftElement
+                  pointerEvents="none"
+                  children={<Search2Icon color="gray.300" />}
+                />
+                <Input
+                  type="text"
+                  placeholder="Search people or message"
+                  onChange={handleSearch}
+                />
+              </InputGroup>
+            </SearchBar>
+          </TitleWrapper>
+          <ChatList
+            rooms={renderRooms}
+            active={active}
+            setActive={setActive}
+            uid={uid}
+            isCorner={isCorner}
+          />
+        </LeftWrapper>
+        <RightWrapper>
+          <TopWrapper>
+            <ImageWrapper />
+            <Name>{active?.members}</Name>
+          </TopWrapper>
+          <Content ref={rootRef}>
+            {messages && (
+              <ChatContent
+                room={active}
+                messages={messages}
+                setMessages={setMessages}
+                uid={uid}
+                observeTargetRef={observeTargetRef}
               />
-              <Input
-                type="text"
-                placeholder="Search people or message"
-                onChange={handleSearch}
-              />
-            </InputGroup>
-          </SearchBar>
-        </TitleWrapper>
-        <ChatList
-          rooms={renderRooms}
-          active={active}
-          setActive={setActive}
-          uid={uid}
-        />
-      </LeftWrapper>
-      <RightWrapper>
-        <TopWrapper>
-          <ImageWrapper />
-          <Name>{active?.members}</Name>
-        </TopWrapper>
-        <Content>
-          {messages && (
-            <ChatContent
-              room={active}
-              messages={messages}
-              setMessages={setMessages}
-              uid={uid}
+            )}
+          </Content>
+          <BottomWrapper>
+            <MessageBar
+              type="text"
+              placeholder="Type your message"
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              onKeyDown={(e) => handleEnter(e)}
             />
-          )}
-        </Content>
-        <BottomWrapper>
-          <MessageBar
-            type="text"
-            placeholder="Type your message"
-            value={text}
-            onChange={event => setText(event.target.value)}
-            onKeyDown={e => handleEnter(e)}
-          />
-          <StyledIconButton
-            onClick={send}
-            variant="ghost"
-            aria-label="Send Message"
-            icon={<BiSend />}
-          />
-        </BottomWrapper>
-      </RightWrapper>
-    </Container>
+            <StyledIconButton
+              onClick={send}
+              variant="ghost"
+              aria-label="Send Message"
+              icon={<BiSend />}
+            />
+          </BottomWrapper>
+        </RightWrapper>
+      </Container>
+    </ThemeProvider>
   );
 };
 

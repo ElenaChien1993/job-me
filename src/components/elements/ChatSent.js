@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -19,12 +20,12 @@ const Content = styled.div`
   line-height: 1.4;
 `;
 
-const ChatSent = ({ text }) => {
+const ChatSent = React.memo(({ text, observeTargetRef }) => {
   return (
-    <Wrapper>
+    <Wrapper ref={observeTargetRef}>
       <Content>{text}</Content>
     </Wrapper>
   );
-};
+})
 
 export default ChatSent;
