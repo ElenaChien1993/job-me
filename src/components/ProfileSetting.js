@@ -7,9 +7,10 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { EditIcon } from '@chakra-ui/icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import firebase from '../utils/firebase';
+import useClickOutside from '../hooks/useClickOutside';
 
 const Container = styled.div`
   margin: 20px 10%;
@@ -101,11 +102,6 @@ const SectionTitle = styled.div`
   line-height: 33px;
 `;
 
-const NameInputWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
 const InputWrap = styled.div`
   display: flex;
   flex-direction: column;
@@ -125,20 +121,55 @@ const StyledInput = styled(Input)`
   }
 `;
 
+const IconWrapper = styled.div`
+  position: absolute;
+  bottom: 17px;
+  right: 6px;
+  z-index: 0;
+`;
+
+const MenuWrapper = styled.div`
+  position: absolute;
+  right: -70px;
+  bottom: -37px;
+  width: 120px;
+  height: 100px;
+  background-color: white;
+  box-shadow: 4px 4px 4px 1px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+`
+
+const Option = styled.div`
+  padding: 10px 15px;
+  cursor: pointer;
+  &:hover {
+    background: #E3E3E3;
+  }
+`
+
 const ProfileSetting = ({ uid }) => {
   const [userInfo, setUserInfo] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [values, setValues] = useState({
     display_name: '',
     title: '',
     about_me: '',
   });
+  const menuRef = useRef();
 
   useEffect(() => {
     const unsubscribe = firebase.listenUserProfileChange(uid, setUserInfo);
 
     return () => unsubscribe();
-    // firebase.getUser(uid).then((user) => setUserInfo(user.data()));
   }, [uid]);
+
+  useClickOutside(menuRef, () => isMenuOpen && setIsMenuOpen(false))
 
   const handleSubmit = () => {
     const entries = Object.entries(values);
@@ -153,7 +184,13 @@ const ProfileSetting = ({ uid }) => {
       <LeftWrapper>
         <ImageContainer>
           <ImageWrapper />
-          <StyledIcon aria-label="Edit profile image" icon={<EditIcon />} />
+          {isMenuOpen && <MenuWrapper ref={menuRef}>
+            <Option>上傳照片</Option>
+            <Option>刪除照片</Option>
+          </MenuWrapper>}
+          <IconWrapper>
+            <IconButton aria-label="Edit profile image" icon={<EditIcon />} onClick={() => setIsMenuOpen(true)}/>
+          </IconWrapper>
         </ImageContainer>
         <NameWrapper>{userInfo && userInfo.display_name}</NameWrapper>
         <JobTitle>{userInfo?.title || '尚未提供'}</JobTitle>

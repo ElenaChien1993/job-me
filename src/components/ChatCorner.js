@@ -22,7 +22,6 @@ const IconWrapper = styled.div`
 const ChatCorner = () => {
   const [chatOpen, setChatOpen] = useState(false);
   const cornerRef = useRef();
-  console.log('render')
 
   useClickOutside(cornerRef, () => chatOpen && setChatOpen(false));
 
