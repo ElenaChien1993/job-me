@@ -271,7 +271,7 @@ const Messages = () => {
             <ImageWrapper />
             <Name>{active?.members}</Name>
           </TopWrapper>
-          <Content ref={rootRef}>
+          <Content ref={rootRef} >
             {active ? (
               <ChatContent
                 room={active}

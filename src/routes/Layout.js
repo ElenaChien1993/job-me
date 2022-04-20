@@ -42,7 +42,7 @@ const Logout = styled.button`
 `;
 
 const Nav = ({ isLogin }) => {
-  const currentUserId = firebase.auth.currentUser.uid
+  const currentUserId = firebase.auth.currentUser?.uid
   const navigate = useNavigate();
 
   const handleLogout = () => {

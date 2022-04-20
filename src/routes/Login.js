@@ -11,7 +11,8 @@ import firebase from // createUserWithEmailAndPassword,
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const Container = styled.div`
-  margin: 10px auto 0;
+  margin: 0 10%;
+  padding-top: 90px;
   width: 400px;
   display: flex;
   flex-direction: column;
