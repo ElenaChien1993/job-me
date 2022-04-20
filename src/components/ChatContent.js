@@ -7,10 +7,10 @@ import ChatSent from './elements/ChatSent';
 
 const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
   const [messages, setMessages] = useState({});
-  const [isFirst, setIsFirst] = useState(true);
   // const unsubscribeRef = useRef();
   const observeTargetRef = useRef();
   const firstMessageRef = useRef();
+  const firstRenderRef = useRef(true);
 
   console.log('In Content', messages);
 
@@ -23,37 +23,34 @@ const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
     bottomRef.current.scrollIntoView(false, { behavior: 'auto' });
 
     if (messages[room.id]) return;
-    setIsFirst(true);
-  }, [room])
-
-  console.log('In Content', firstMessageRef);
+  }, [room, bottomRef]);
 
   useEffect(() => {
     let unsubscribe;
     const callback = ([entry]) => {
       if (!entry || !entry.isIntersecting) return;
 
-      console.log('observer fire', isFirst, firstMessageRef);
+      console.log('observer fire', firstRenderRef.current, firstMessageRef);
 
-      if (isFirst) {
+      if (firstRenderRef.current) {
         firebase.listenMessagesChange(room, setMessages, uid).then(res => {
           unsubscribe = res;
-          console.log('bottom', bottomRef)
           bottomRef.current.scrollIntoView(false, { behavior: 'auto' });
-          setIsFirst(false);
-
+          firstRenderRef.current = false;
         });
       } else {
-        firebase.getMoreMessages(room.id, firstMessageRef.current).then((messages) => {
-          console.log(messages);
-          // setMessages((prev) => {
-          //   return { ...prev, [room.id]: [...messages, ...prev[room.id]] };
-          // });
-        });
+        firebase
+          .getMoreMessages(room.id, firstMessageRef.current)
+          .then(messages => {
+            console.log(messages);
+            // setMessages((prev) => {
+            //   return { ...prev, [room.id]: [...messages, ...prev[room.id]] };
+            // });
+          });
       }
     };
 
-    console.log(unsubscribe)
+    console.log(unsubscribe);
 
     const options = {
       root: rootRef.current,
@@ -70,13 +67,13 @@ const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
       // unsubscribe();
       observer.unobserve(observeTargetRef.current);
     };
-  }, [observeTargetRef, isFirst, bottomRef, room, rootRef, uid]);
+  }, [observeTargetRef, firstRenderRef, bottomRef, room, rootRef, uid]);
 
   return (
     <>
       <div ref={observeTargetRef}></div>
       {messages[room.id] &&
-        messages[room.id].map((message) =>
+        messages[room.id].map(message =>
           message.uid !== uid ? (
             <ChatReceived key={uuid()} text={message.text} />
           ) : (
