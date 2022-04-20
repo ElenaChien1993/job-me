@@ -259,6 +259,7 @@ const firebase = {
     return data;
   },
   listenMessagesChange(room, callback, uid) {
+    console.log('firebase')
     const q = query(
       collection(db, 'chatrooms', room.id, 'messages'),
       orderBy('create_at', 'desc'),
@@ -266,6 +267,7 @@ const firebase = {
     );
     return onSnapshot(q, snapshot => {
       let data = [];
+      console.log(data)
       snapshot.docChanges().forEach(change => {
         if (change.type === 'added') {
           data.push(change.doc.data());

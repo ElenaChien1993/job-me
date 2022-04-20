@@ -13,10 +13,11 @@ import styled, { ThemeProvider } from 'styled-components';
 import ChatList from '../components/ChatList';
 import firebase from '../utils/firebase';
 import ChatContent from '../components/ChatContent';
+import { ca } from 'date-fns/locale';
 
 const Container = styled.div`
-  width: ${props => (props.theme.isCorner ? '40vw' : '100%')};
-  height: ${props => (props.theme.isCorner ? '400px' : '650px')};
+  width: ${(props) => (props.theme.isCorner ? '40vw' : '100%')};
+  height: ${(props) => (props.theme.isCorner ? '400px' : '650px')};
   background-color: white;
   border-radius: 20px;
   position: relative;
@@ -56,7 +57,7 @@ const RightWrapper = styled.div`
 const SearchBar = styled.div`
   width: 90%;
   margin-bottom: 30px;
-  display: ${props => (props.theme.isCorner ? 'none' : 'block')};
+  display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
 `;
 
 const TopWrapper = styled.div`
@@ -83,7 +84,7 @@ const Name = styled.div`
 `;
 
 const Content = styled.div`
-  height: ${props => (props.theme.isCorner ? '272px' : '522px')};
+  height: ${(props) => (props.theme.isCorner ? '272px' : '522px')};
   overflow: scroll;
 `;
 
@@ -120,10 +121,11 @@ const Messages = () => {
   const [databaseRooms, setDatabaseRooms] = useState([]);
   const [renderRooms, setRenderRooms] = useState([]);
   const [active, setActive] = useState(null);
-  const [messages, setMessages] = useState({});
   const [isCorner, setIsCorner] = useState(true);
-  const observeTargetRef = useRef();
+  // const observeTargetRef = useRef();
   const rootRef = useRef();
+  const bottomRef = useRef();
+  // const unsubscribeRef = useRef();
   const user = firebase.auth.currentUser;
   const uid = user.uid;
   const { pathname } = useLocation();
@@ -137,7 +139,7 @@ const Messages = () => {
   }, []);
 
   useEffect(() => {
-    const fetchRooms = async uid => {
+    const fetchRooms = async (uid) => {
       const rooms = await firebase.getChatrooms(uid);
       setDatabaseRooms(rooms);
     };
@@ -156,16 +158,6 @@ const Messages = () => {
     firebase.updateRoom(active.id, { receiver_has_read: true });
   }, [active]);
 
-  // useEffect(() => {
-  //   if (active === {}) return;
-  //   firebase
-  //     .getMessages(active.id, messages)
-  //     .then((messages) => {
-  //       console.log('get', messages)
-  //       setMessages(messages)
-  //     });
-  // }, [active]);
-
   const send = () => {
     const MessageData = {
       uid: user.uid,
@@ -174,54 +166,75 @@ const Messages = () => {
     };
     firebase.sendMessage(active.id, MessageData);
     setText('');
+    bottomRef.current.scrollIntoView({ behavior: 'auto' });
   };
 
-  const handleEnter = e => {
+  const handleEnter = (e) => {
     if (e.keyCode === 13) {
       send();
     }
   };
 
-  const handleSearch = e => {
+  const handleSearch = (e) => {
     const term = e.target.value;
     if (!term) {
       setRenderRooms(databaseRooms);
       return;
     }
     const filtered = databaseRooms.filter(
-      room => room.members.includes(term) || room.latest_message.includes(term)
+      (room) =>
+        room.members.includes(term) || room.latest_message.includes(term)
     );
     setRenderRooms(filtered);
   };
 
   console.log('In Msgs', active);
-  console.log('Messages Render', messages);
+  
+  // useEffect(() => {
+  //   let isFetching = false;
+  //   const callback = ([entry]) => {
+  //     if (isFetching || !active.id) return;
+  //     if (!entry || !entry.isIntersecting) return;
 
-  const callback = ([entry]) => {
-    if (entry && entry.isIntersecting) {
-      firebase.getMoreMessages(active.id, messages).then(messages => {
-        setMessages(prev => {
-          return { ...prev, [active.id]: [...messages, ...prev[active.id]] };
-        });
-      });
-    }
-  };
 
-  const options = {
-    root: rootRef.current,
-    rootMargin: '100px',
-    threshold: 1,
-  };
+  //     isFetching = true;
+  //     console.log('observer fire')
+  //     console.log(!messages[active.id])
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(callback, options);
-    if (observeTargetRef.current) observer.observe(observeTargetRef.current);
+  //     if (!messages[active.id]) {
+  //       unsubscribeRef.current = firebase.listenMessagesChange(active, setMessages, uid);
+  //       bottomRef.current.scrollIntoView({ behavior: 'auto' });
+  //       isFetching = false;
+  //     } else {
+  //       // console.log('before', messages)
+  //       firebase.getMoreMessages(active.id, messages).then((messages) => {
+  //         // console.log('return', messages)
+  //         setMessages((prev) => {
+  //           // console.log(prev)
+  //           return { ...prev, [active.id]: [...messages, ...prev[active.id]] };
+  //         });
+  //       });
+  //     }
 
-    return () => {
-      if (observeTargetRef.current)
-        observer.unobserve(observeTargetRef.current);
-    };
-  }, [observeTargetRef.current]);
+      
+  //   };
+
+  //   const options = {
+  //     root: rootRef.current,
+  //     rootMargin: '100px',
+  //     threshold: 1,
+  //   };
+
+  //   const observer = new IntersectionObserver(callback, options);
+  //   if (!observeTargetRef.current) return;
+  //   observer.observe(observeTargetRef.current);
+    
+  //   return () => {
+  //     unsubscribeRef.current();
+  //     observer.unobserve(observeTargetRef.current);
+  //   };
+    
+  // }, [active, uid]);
 
   return (
     <ThemeProvider theme={{ isCorner }}>
@@ -260,10 +273,9 @@ const Messages = () => {
             {active ? (
               <ChatContent
                 room={active}
-                messages={messages}
-                setMessages={setMessages}
                 uid={uid}
-                observeTargetRef={observeTargetRef}
+                bottomRef={bottomRef}
+                rootRef={rootRef}
               />
             ) : (
               <div>請選取聊天室</div>
@@ -274,8 +286,8 @@ const Messages = () => {
               type="text"
               placeholder="Type your message"
               value={text}
-              onChange={event => setText(event.target.value)}
-              onKeyDown={e => handleEnter(e)}
+              onChange={(event) => setText(event.target.value)}
+              onKeyDown={(e) => handleEnter(e)}
             />
             <StyledIconButton
               onClick={send}

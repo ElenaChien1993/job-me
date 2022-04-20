@@ -1,54 +1,77 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import firebase from '../utils/firebase';
 
 import ChatReceived from './elements/ChatReceived';
 import ChatSent from './elements/ChatSent';
 
-const ChatContent = 
-  ({ room, messages, setMessages, uid, observeTargetRef }) => {
-    const bottomRef = useRef();
-    console.log('In Content', room)
+const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
+  const [messages, setMessages] = useState({});
+  const [isFirst, setIsFirst] = useState(true)
+  // const unsubscribeRef = useRef();
+  const observeTargetRef = useRef();
+  const firstMessageRef = useRef();
 
-    // useEffect(() => {
-    //   if (!room.id) return;
-    //   const unsubscribe = firebase.listenMessagesChange(room, setMessages, uid);
-
-    //   return unsubscribe;
-    // }, [room]);
-
-    useEffect(() => {
-      if (!room.id || messages[room.id]) return;
-      
-      console.log('in dep==room useEffect')
-      const unsubscribe = firebase.listenMessagesChange(room, setMessages, uid);
-      return unsubscribe;
-    }, [room])
-
-    useEffect(() => {
-      if (messages[room.id] && messages[room.id].length > 20) {
-        console.log('大於');
-      } else {
+  console.log('In Content', messages);
+  
+  useEffect(() => {
+    let unsubscribe;
+    const callback = ([entry]) => {
+      if (!entry || !entry.isIntersecting) return;
+  
+      console.log('observer fire', isFirst, messages);
+  
+      if (isFirst) {
+        console.log('true!')
+        unsubscribe = firebase.listenMessagesChange(
+          room,
+          setMessages,
+          uid
+        );
         bottomRef.current.scrollIntoView({ behavior: 'auto' });
-      }
-    }, [messages]);
+        setIsFirst(false);
+      } else {
+        firebase.getMoreMessages(room.id, messages).then((messages) => {
+          console.log(messages);
+          // setMessages((prev) => {
+            // return { ...prev, [room.id]: [...messages, ...prev[room.id]] };
+            // });
+          });
+        }
+      };
+      
+    const options = {
+      root: rootRef.current,
+      rootMargin: '100px',
+      threshold: 1,
+    };
 
-    console.log('ChatContent render');
+    const observer = new IntersectionObserver(callback, options);
+    if (observeTargetRef.current) {
+      observer.observe(observeTargetRef.current);
+    }
+    
+    return () => {
+      unsubscribe();
+      observer.unobserve(observeTargetRef.current);
+    };
+  }, [observeTargetRef, isFirst])
 
-    return (
-      <>
-        <div ref={observeTargetRef}></div>
-        {messages[room.id] && messages[room.id].map((message) =>
+  
+  return (
+    <>
+      <div ref={observeTargetRef}></div>
+      {messages[room.id] &&
+        messages[room.id].map((message) =>
           message.uid !== uid ? (
             <ChatReceived key={uuid()} text={message.text} />
           ) : (
             <ChatSent key={uuid()} text={message.text} />
           )
         )}
-        <span ref={bottomRef}></span>
-      </>
-    );
-  }
-
+      <div ref={bottomRef}></div>
+    </>
+  );
+};
 
 export default ChatContent;
