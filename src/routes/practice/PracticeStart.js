@@ -20,6 +20,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 0 10%;
+  padding-top: 90px;
 `;
 
 const TitleWrapper = styled.div`

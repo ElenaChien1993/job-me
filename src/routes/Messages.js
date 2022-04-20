@@ -16,12 +16,14 @@ import ChatContent from '../components/ChatContent';
 import { ca } from 'date-fns/locale';
 
 const Container = styled.div`
-  width: ${(props) => (props.theme.isCorner ? '40vw' : '100%')};
+  width: ${(props) => (props.theme.isCorner ? '40vw' : '')};
   height: ${(props) => (props.theme.isCorner ? '400px' : '650px')};
   background-color: white;
   border-radius: 20px;
   position: relative;
   z-index: 1;
+  margin: ${(props) => (props.theme.isCorner ? '' : '0 10%')};
+  top: ${(props) => (props.theme.isCorner ? '' : '110px')}
 `;
 
 const LeftWrapper = styled.div`

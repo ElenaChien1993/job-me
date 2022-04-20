@@ -70,9 +70,8 @@ const App = () => {
               </Route>
             </Route>
 
-            <Route path="profile" element={<Profile />}>
+            <Route path="profile">
               <Route path=":uid" element={<Profile />}/>
-              {/* <Route path="records" element={<Records />}/> */}
             </Route> 
 
             <Route path="messages" element={<Messages />} />

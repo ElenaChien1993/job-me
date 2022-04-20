@@ -45,6 +45,18 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 const firebase = {
+  async getUser(uid) {
+    try {
+      const docSnap = await getDoc(doc(db, 'users', uid));
+      if (docSnap.exists()) {
+        return docSnap;
+      } else {
+        console.log('No such document!');
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  },
   async getNote(uid, docId) {
     try {
       const docSnap = await getDoc(doc(db, 'users', uid, 'notes', docId));
@@ -135,7 +147,7 @@ const firebase = {
       .then(() => {
         console.log('updated');
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   },
@@ -147,10 +159,10 @@ const firebase = {
     );
     const querySnapshot = await getDocs(members);
     let data = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       data.push(doc.data());
     });
-    const filteredData = data.filter(item => item.creator !== uid);
+    const filteredData = data.filter((item) => item.creator !== uid);
     return filteredData;
   },
   async uplaodFile(path, file) {
@@ -161,10 +173,10 @@ const firebase = {
   },
   async getDownloadURL(path) {
     return getDownloadURL(ref(storage, path))
-      .then(url => {
+      .then((url) => {
         return url;
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   },
@@ -177,17 +189,17 @@ const firebase = {
     );
     const querySnapshot = await getDocs(rooms);
     let data = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       data.push(doc.data());
     });
     const transformedRooms = await Promise.all(
-      data.map(async room => {
+      data.map(async (room) => {
         const timeRelative = formatRelative(
           new Date(room.latest_timestamp.seconds * 1000),
           new Date(),
           { locale: zhTW, addSuffix: true }
         );
-        const friendId = room.members.filter(id => id !== uid);
+        const friendId = room.members.filter((id) => id !== uid);
         const name = await this.getUserName(friendId[0]);
         return { ...room, members: name, latest_timestamp: timeRelative };
       })
@@ -204,9 +216,9 @@ const firebase = {
       collection(db, 'chatrooms'),
       where('members', 'array-contains', uid)
     );
-    return onSnapshot(q, async snapshot => {
+    return onSnapshot(q, async (snapshot) => {
       let data;
-      snapshot.docChanges().forEach(change => {
+      snapshot.docChanges().forEach((change) => {
         if (change.type === 'modified') {
           data = change.doc.data();
         }
@@ -217,27 +229,27 @@ const firebase = {
         new Date(),
         { locale: zhTW, addSuffix: true }
       );
-      const friendId = data.members.filter(id => id !== uid);
+      const friendId = data.members.filter((id) => id !== uid);
       const name = await this.getUserName(friendId[0]);
       data = { ...data, latest_timestamp: timeRelative, members: name };
-      callback(prev => {
-        const filtered = prev.filter(room => room.id !== data.id);
+      callback((prev) => {
+        const filtered = prev.filter((room) => room.id !== data.id);
         return [data, ...filtered];
       });
     });
   },
-  async getMoreMessages(roomId, messages) {
-    if (!messages || messages[roomId].length === 0) return;
+  async getMoreMessages(roomId, message) {
+    if (!message) return;
     const docsSnap = await getDocs(
       query(
         collection(db, `chatrooms/${roomId}/messages`),
-        where('create_at', '<', messages[roomId][0].create_at),
+        where('create_at', '<', message.create_at),
         orderBy('create_at', 'desc'),
         limit(20)
       )
     );
     let data = [];
-    docsSnap.forEach(doc => {
+    docsSnap.forEach((doc) => {
       data.push(doc.data());
     });
     data.sort((a, b) => !b.create_at - a.create_at);
@@ -252,40 +264,48 @@ const firebase = {
       )
     );
     let data = [];
-    docsSnap.forEach(doc => {
+    docsSnap.forEach((doc) => {
       data.push(doc.data());
     });
     data.sort((a, b) => !b.create_at - a.create_at);
     return data;
   },
-  listenMessagesChange(room, callback, uid) {
-    console.log('firebase')
+  async listenMessagesChange(room, callback, uid) {
     const q = query(
       collection(db, 'chatrooms', room.id, 'messages'),
       orderBy('create_at', 'desc'),
       limit(20)
     );
-    return onSnapshot(q, snapshot => {
-      let data = [];
-      console.log(data)
-      snapshot.docChanges().forEach(change => {
-        if (change.type === 'added') {
-          data.push(change.doc.data());
+    return new Promise((res) => {
+      const unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+          let data = [];
+          console.log('data', data);
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === 'added') {
+              data.push(change.doc.data());
+            }
+          });
+          data.sort((a, b) => !b.create_at - a.create_at);
+          callback((prev) => {
+            if (!prev[room.id]) {
+              return {
+                ...prev,
+                [room.id]: data,
+              };
+            } else {
+              return { ...prev, [room.id]: [...prev[room.id], ...data] };
+            }
+          });
+          if (!room.id || uid === room.latest_sender) return;
+          this.updateRoom(room.id, { receiver_has_read: true });
+        },
+        (error) => {
+          console.error(error);
         }
-      });
-      data.sort((a, b) => !b.create_at - a.create_at);
-      callback(prev => {
-        if (!prev[room.id]) {
-          return {
-            ...prev,
-            [room.id]: data,
-          };
-        } else {
-          return { ...prev, [room.id]: [...prev[room.id], ...data] };
-        }
-      });
-      if (!room.id || uid === room.latest_sender) return;
-      this.updateRoom(room.id, { receiver_has_read: true });
+      );
+      res(unsubscribe);
     });
   },
   async sendMessage(roomId, data) {

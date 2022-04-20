@@ -28,6 +28,11 @@ import EditFiles from '../../components/elements/EditFiles';
 import EditorArea from '../../components/elements/Editor';
 import RecommendModal from '../../components/RecommendModal';
 
+const Background = styled.div`
+  margin: 0 10%;
+  padding-top: 90px;
+`
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -254,7 +259,7 @@ const NoteDetails = () => {
   };
 
   return (
-    <>
+    <Background>
       <RecommendModal isOpen={isOpen} onClose={onClose} recommend={recommend} />
       <ButtonWrapper>
         <Link to="/notes">
@@ -614,7 +619,7 @@ const NoteDetails = () => {
           </FieldWrapper>
         </Container>
       )}
-    </>
+    </Background>
   );
 };
 

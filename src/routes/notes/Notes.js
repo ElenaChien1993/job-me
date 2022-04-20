@@ -9,6 +9,8 @@ import ChatCorner from '../../components/ChatCorner';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  margin: 0 10%;
+  padding-top: 90px;
 `;
 
 const SearchBar = styled.div`

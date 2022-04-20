@@ -7,39 +7,54 @@ import ChatSent from './elements/ChatSent';
 
 const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
   const [messages, setMessages] = useState({});
-  const [isFirst, setIsFirst] = useState(true)
+  const [isFirst, setIsFirst] = useState(true);
   // const unsubscribeRef = useRef();
   const observeTargetRef = useRef();
   const firstMessageRef = useRef();
 
   console.log('In Content', messages);
-  
+
+  useEffect(() => {
+    if (!messages[room.id]) return;
+    firstMessageRef.current = messages[room.id][0];
+  }, [messages, room.id]);
+
+  useEffect(() => {
+    bottomRef.current.scrollIntoView(false, { behavior: 'auto' });
+
+    if (messages[room.id]) return;
+    setIsFirst(true);
+  }, [room])
+
+  console.log('In Content', firstMessageRef);
+
   useEffect(() => {
     let unsubscribe;
     const callback = ([entry]) => {
       if (!entry || !entry.isIntersecting) return;
-  
-      console.log('observer fire', isFirst, messages);
-  
+
+      console.log('observer fire', isFirst, firstMessageRef);
+
       if (isFirst) {
-        console.log('true!')
-        unsubscribe = firebase.listenMessagesChange(
-          room,
-          setMessages,
-          uid
-        );
-        bottomRef.current.scrollIntoView({ behavior: 'auto' });
-        setIsFirst(false);
+        firebase.listenMessagesChange(room, setMessages, uid).then(res => {
+          unsubscribe = res;
+          console.log('bottom', bottomRef)
+          bottomRef.current.scrollIntoView(false, { behavior: 'auto' });
+          setIsFirst(false);
+
+        });
       } else {
-        firebase.getMoreMessages(room.id, messages).then((messages) => {
+        firebase.getMoreMessages(room.id, firstMessageRef.current).then((messages) => {
           console.log(messages);
           // setMessages((prev) => {
-            // return { ...prev, [room.id]: [...messages, ...prev[room.id]] };
-            // });
-          });
-        }
-      };
-      
+          //   return { ...prev, [room.id]: [...messages, ...prev[room.id]] };
+          // });
+        });
+      }
+    };
+
+    console.log(unsubscribe)
+
     const options = {
       root: rootRef.current,
       rootMargin: '100px',
@@ -50,14 +65,13 @@ const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
     if (observeTargetRef.current) {
       observer.observe(observeTargetRef.current);
     }
-    
+
     return () => {
-      unsubscribe();
+      // unsubscribe();
       observer.unobserve(observeTargetRef.current);
     };
-  }, [observeTargetRef, isFirst])
+  }, [observeTargetRef, isFirst, bottomRef, room, rootRef, uid]);
 
-  
   return (
     <>
       <div ref={observeTargetRef}></div>

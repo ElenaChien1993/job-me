@@ -4,6 +4,11 @@ import styled from 'styled-components';
 
 import Note from '../../components/NoteCard';
 
+const Background = styled.div`
+  margin: 0 10%;
+  padding-top: 90px;
+`
+
 const SearchBar = styled.div`
   width: 100%;
   height: 30px;
@@ -43,7 +48,7 @@ const Practice = () => {
   };
 
   return (
-    <>
+    <Background>
       <SearchBar>
         <Input type="text" onChange={handleSearch} />
       </SearchBar>
@@ -51,7 +56,7 @@ const Practice = () => {
         renderNotes.map((note, i) => {
           return <Note note={note} key={i} />;
         })}
-    </>
+    </Background>
   );
 };
 

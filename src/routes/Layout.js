@@ -4,12 +4,11 @@ import styled from 'styled-components';
 import firebase from '../utils/firebase';
 
 const Container = styled.div`
-  height: 100vh;
+  height: auto;
 `;
 
 const ContentContainer = styled.div`
   margin: 0 auto;
-  padding: 90px 10% 0;
   width: 100%;
   height: 100%;
   background-color: #ffeade;
@@ -20,6 +19,7 @@ const StyledNav = styled.nav`
   height: 70px;
   background-color: #306172;
   position: fixed;
+  z-index: 5;
 `;
 
 const Ul = styled.ul`
@@ -42,6 +42,7 @@ const Logout = styled.button`
 `;
 
 const Nav = ({ isLogin }) => {
+  const currentUserId = firebase.auth.currentUser.uid
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -66,7 +67,7 @@ const Nav = ({ isLogin }) => {
           <Link to="/practice">Practice</Link>
         </NavItem>
         <NavItem>
-          <Link to="/profile">Profile</Link>
+          <Link to={`/profile/${currentUserId}`}>Profile</Link>
         </NavItem>
         <NavItem>
           <Link to="/messages">Messages</Link>
