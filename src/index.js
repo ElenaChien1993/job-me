@@ -17,7 +17,7 @@ import PracticeStart from './routes/practice/PracticeStart';
 import Login from './routes/Login';
 import Profile from './routes/profile/Profile';
 import Messages from './routes/Messages';
-import GlobalStyle from './components/GlobalStyle';
+import GlobalStyle from './style/GlobalStyle';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -70,9 +70,8 @@ const App = () => {
               </Route>
             </Route>
 
-            <Route path="profile" element={<Profile />}>
+            <Route path="profile">
               <Route path=":uid" element={<Profile />}/>
-              {/* <Route path="records" element={<Records />}/> */}
             </Route> 
 
             <Route path="messages" element={<Messages />} />

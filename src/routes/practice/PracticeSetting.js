@@ -22,7 +22,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  margin: 0 10%;
+  padding-top: 90px;
 `;
 
 const TopWrapper = styled.div`

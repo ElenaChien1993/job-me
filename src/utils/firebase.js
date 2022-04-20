@@ -21,8 +21,13 @@ import {
   onSnapshot,
   deleteDoc,
   Timestamp,
+  orderBy,
+  limit,
+  addDoc,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { formatDistance, formatRelative } from 'date-fns';
+import { zhTW } from 'date-fns/locale';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBO5LwocKFyWmosZiVyP0uCxNdNbOUYDho',
@@ -40,6 +45,42 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 const firebase = {
+  updateUser(name) {
+    updateProfile(auth.currentUser, {
+      displayName: name,
+    })
+      .then(() => {
+        console.log('updated');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
+  async getUser(uid) {
+    try {
+      const docSnap = await getDoc(doc(db, 'users', uid));
+      if (docSnap.exists()) {
+        return docSnap;
+      } else {
+        console.log('No such document!');
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  async updateUserInfo(uid, data) {
+    try {
+      await updateDoc(doc(db, 'users', uid), data);
+      this.updateUser(data.display_name);
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  listenUserProfileChange(uid, callback) {
+    return onSnapshot(doc(db, 'users', uid), async doc => {
+      callback(prev => {return {...prev, ...doc.data()}});
+    })
+  },
   async getNote(uid, docId) {
     try {
       const docSnap = await getDoc(doc(db, 'users', uid, 'notes', docId));
@@ -108,7 +149,7 @@ const firebase = {
     }
   },
   listenDetailsChange(noteId, callback) {
-    onSnapshot(doc(db, 'details', noteId), callback);
+    return onSnapshot(doc(db, 'details', noteId), callback);
   },
   checklogin(callback) {
     onAuthStateChanged(auth, callback);
@@ -123,17 +164,6 @@ const firebase = {
   signOut() {
     return signOut(auth);
   },
-  updateUser(name) {
-    updateProfile(auth.currentUser, {
-      displayName: name,
-    })
-      .then(() => {
-        console.log('updated');
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  },
   async getRecommendedUsers(company, uid) {
     const members = query(
       collectionGroup(db, 'notes'),
@@ -142,10 +172,10 @@ const firebase = {
     );
     const querySnapshot = await getDocs(members);
     let data = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       data.push(doc.data());
     });
-    const filteredData = data.filter(item => item.creator !== uid);
+    const filteredData = data.filter((item) => item.creator !== uid);
     return filteredData;
   },
   async uplaodFile(path, file) {
@@ -156,12 +186,160 @@ const firebase = {
   },
   async getDownloadURL(path) {
     return getDownloadURL(ref(storage, path))
-      .then(url => {
+      .then((url) => {
         return url;
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
+  },
+  async getChatrooms(uid) {
+    const rooms = query(
+      collection(db, 'chatrooms'),
+      where('members', 'array-contains', uid),
+      orderBy('latest_timestamp', 'desc'),
+      limit(7)
+    );
+    const querySnapshot = await getDocs(rooms);
+    let data = [];
+    querySnapshot.forEach((doc) => {
+      data.push(doc.data());
+    });
+    const transformedRooms = await Promise.all(
+      data.map(async (room) => {
+        const timeRelative = formatRelative(
+          new Date(room.latest_timestamp.seconds * 1000),
+          new Date(),
+          { locale: zhTW, addSuffix: true }
+        );
+        const friendId = room.members.filter((id) => id !== uid);
+        const name = await this.getUserName(friendId[0]);
+        return { ...room, members: name, latest_timestamp: timeRelative };
+      })
+    );
+    return transformedRooms;
+  },
+  async getUserName(uid) {
+    const docSnap = await getDoc(doc(db, 'users', uid));
+    const name = docSnap.data().display_name;
+    return name;
+  },
+  listenRoomsChange(uid, callback) {
+    const q = query(
+      collection(db, 'chatrooms'),
+      where('members', 'array-contains', uid)
+    );
+    return onSnapshot(q, async (snapshot) => {
+      let data;
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'modified') {
+          data = change.doc.data();
+        }
+      });
+      if (!data) return;
+      const timeRelative = formatRelative(
+        new Date(data.latest_timestamp.seconds * 1000),
+        new Date(),
+        { locale: zhTW, addSuffix: true }
+      );
+      const friendId = data.members.filter((id) => id !== uid);
+      const name = await this.getUserName(friendId[0]);
+      data = { ...data, latest_timestamp: timeRelative, members: name };
+      callback((prev) => {
+        const filtered = prev.filter((room) => room.id !== data.id);
+        return [data, ...filtered];
+      });
+    });
+  },
+  async getMoreMessages(roomId, message) {
+    if (!message) return;
+    const docsSnap = await getDocs(
+      query(
+        collection(db, `chatrooms/${roomId}/messages`),
+        where('create_at', '<', message.create_at),
+        orderBy('create_at', 'desc'),
+        limit(20)
+      )
+    );
+    let data = [];
+    docsSnap.forEach((doc) => {
+      data.push(doc.data());
+    });
+    data.sort((a, b) => !b.create_at - a.create_at);
+    return data;
+  },
+  async getMessages(roomId) {
+    const docsSnap = await getDocs(
+      query(
+        collection(db, `chatrooms/${roomId}/messages`),
+        orderBy('create_at', 'desc'),
+        limit(20)
+      )
+    );
+    let data = [];
+    docsSnap.forEach((doc) => {
+      data.push(doc.data());
+    });
+    data.sort((a, b) => !b.create_at - a.create_at);
+    return data;
+  },
+  async listenMessagesChange(room, callback, uid) {
+    const q = query(
+      collection(db, 'chatrooms', room.id, 'messages'),
+      orderBy('create_at', 'desc'),
+      limit(20)
+    );
+    return new Promise((res) => {
+      const unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+          let data = [];
+          console.log('data', data);
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === 'added') {
+              data.push(change.doc.data());
+            }
+          });
+          data.sort((a, b) => !b.create_at - a.create_at);
+          callback((prev) => {
+            if (!prev[room.id]) {
+              return {
+                ...prev,
+                [room.id]: data,
+              };
+            } else {
+              return { ...prev, [room.id]: [...prev[room.id], ...data] };
+            }
+          });
+          if (!room.id || uid === room.latest_sender) return;
+          this.updateRoom(room.id, { receiver_has_read: true });
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
+      res(unsubscribe);
+    });
+  },
+  async sendMessage(roomId, data) {
+    try {
+      await addDoc(collection(db, 'chatrooms', roomId, 'messages'), data);
+      await updateDoc(doc(db, 'chatrooms', roomId), {
+        latest_timestamp: data.create_at,
+        latest_message: data.text,
+        receiver_has_read: false,
+        latest_sender: data.uid,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  async updateRoom(roomId, data) {
+    try {
+      await updateDoc(doc(db, 'chatrooms', roomId), data);
+    } catch (err) {
+      console.log(err);
+    }
   },
   createUserWithEmailAndPassword,
   auth,

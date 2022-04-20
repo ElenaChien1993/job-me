@@ -4,7 +4,6 @@ import {
   Input,
   Editable,
   EditableInput,
-  EditableTextarea,
   EditablePreview,
   Select,
   IconButton,
@@ -140,7 +139,7 @@ const NoteElement = React.memo(function NoteElement({
 
   const handleStatusChange = (e) => {
     setNote((prev) => {
-      return { ...prev, status: { ...note, status: e.target.value } };
+      return { ...prev, status: e.target.value };
     });
   };
 
@@ -162,7 +161,7 @@ const NoteElement = React.memo(function NoteElement({
         <Container>
           <ImageWrapper />
           <ContentWrapper>
-            <Editable value={note.company_name}>
+            <Editable value={note.company_name} onSubmit={() => onBlurSubmit('company_name')}>
               <StyledCompanyPreview />
               <EditableInput
                 onChange={(e) =>
@@ -170,11 +169,9 @@ const NoteElement = React.memo(function NoteElement({
                     return { ...prev, company_name: e.target.value };
                   })
                 }
-                onBlur={() => onBlurSubmit('company_name')}
-                onKeyDown={(e) => handlePressEnter(e, 'company_name')}
               />
             </Editable>
-            <Editable value={note.job_title}>
+            <Editable value={note.job_title} onSubmit={() => onBlurSubmit('job_title')}>
               <StyledJobPreview />
               <EditableInput
                 onChange={(e) =>
@@ -182,8 +179,6 @@ const NoteElement = React.memo(function NoteElement({
                     return { ...prev, job_title: e.target.value };
                   })
                 }
-                onBlur={() => onBlurSubmit('job_title')}
-                onKeyDown={(e) => handlePressEnter(e, 'job_title')}
               />
             </Editable>
             <StatusWrapper>

@@ -28,7 +28,6 @@ const Note = ({ note, databaseNotes, setRenderNotes, setDatabaseNotes }) => {
   const user = firebase.auth.currentUser;
 
   const handleDeleteNote = () => {
-    console.log(note.note_id);
     firebase.deleteNote(user.uid, note.note_id);
     const update = databaseNotes.filter(
       (item) => item.note_id !== note.note_id

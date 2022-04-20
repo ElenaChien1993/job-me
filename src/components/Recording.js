@@ -36,7 +36,7 @@ const Recording = ({
   current,
   recordType,
   setCurrent,
-  setProgress
+  setProgress,
 }) => {
   const {
     status,
@@ -55,11 +55,13 @@ const Recording = ({
   const { company_name, job_title } = brief;
   const user = firebase.auth.currentUser;
 
-  const getDownloadURL = async type => {
-    const fileBlob = await fetch(mediaBlobUrl).then(r => r.blob());
+  const getDownloadURL = async (type) => {
+    const fileBlob = await fetch(mediaBlobUrl).then((r) => r.blob());
     const path = `${type === 0 ? 'audios' : 'videos'}/${
       user.uid
-    }/${company_name}｜${job_title}/${practiceQuestions[current].question}-${uuid()}`;
+    }/${company_name}｜${job_title}/${
+      practiceQuestions[current].question
+    }-${uuid()}`;
 
     const url = await firebase.uplaodFile(path, fileBlob).then(() => {
       return firebase.getDownloadURL(path);
@@ -68,7 +70,7 @@ const Recording = ({
     return url;
   };
 
-  const handleSave = async type => {
+  const handleSave = async (type) => {
     const url = await getDownloadURL(type);
 
     const recordData = {
@@ -87,9 +89,12 @@ const Recording = ({
       setProgress('finished');
       return;
     }
-    setCurrent(prev => prev + 1);
+    setCurrent((prev) => prev + 1);
     clearBlobUrl();
+    setProgress('before');
   };
+
+  console.log('status', status)
 
   return (
     <>
@@ -112,7 +117,10 @@ const Recording = ({
       {status === 'idle' ? (
         <Button
           size="sm"
-          onClick={startRecording}
+          onClick={() => {
+            console.log('press start')
+            startRecording()
+          }}
           rightIcon={<ArrowForwardIcon />}
         >
           開始答題
@@ -188,7 +196,9 @@ const Recording = ({
               </>
             )}
           </ButtonsWrapper>
-          {status === 'stopped' && <Reminder>若希望在帳號中留存此檔案，記得按儲存唷！</Reminder>}
+          {status === 'stopped' && (
+            <Reminder>若希望在帳號中留存此檔案，記得按儲存唷！</Reminder>
+          )}
         </>
       )}
     </>

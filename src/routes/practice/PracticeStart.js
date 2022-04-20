@@ -20,6 +20,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 0 10%;
+  padding-top: 90px;
 `;
 
 const TitleWrapper = styled.div`
@@ -62,11 +64,9 @@ const StyledButton = styled(Button)`
 
 const PracticeStart = () => {
   const [current, setCurrent] = useState(0);
-  const [timer, setTimer] = useState(3);
+  const [timer, setTimer] = useState(180);
   const [progress, setProgress] = useState('before');
   const props = useOutletContext();
-
-  console.log(props.practiceQuestions);
 
   return (
     <Container>

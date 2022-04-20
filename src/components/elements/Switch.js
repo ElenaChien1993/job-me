@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Switch, FormControl, FormLabel } from '@chakra-ui/react';
 
 const SwitchElement = ({isTimer, setIsTimer}) => {
