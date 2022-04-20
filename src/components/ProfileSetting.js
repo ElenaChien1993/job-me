@@ -128,17 +128,26 @@ const StyledInput = styled(Input)`
 const ProfileSetting = ({ uid }) => {
   const [userInfo, setUserInfo] = useState(null);
   const [values, setValues] = useState({
-    firstName: '',
-    lastName: '',
-    jobTitle: '',
-    aboutMe: '',
+    display_name: '',
+    title: '',
+    about_me: '',
   });
 
   useEffect(() => {
-    firebase.getUser(uid).then((user) => setUserInfo(user.data()));
-  }, []);
+    const unsubscribe = firebase.listenUserProfileChange(uid, setUserInfo);
 
-  console.log(values);
+    return () => unsubscribe();
+    // firebase.getUser(uid).then((user) => setUserInfo(user.data()));
+  }, [uid]);
+
+  const handleSubmit = () => {
+    const entries = Object.entries(values);
+    const filtered = entries.filter((entry) => entry[1] !== '');
+    const filteredObject = Object.fromEntries(filtered);
+    firebase.updateUserInfo(uid, filteredObject);
+    setValues({ display_name: '', title: '', about_me: '' });
+  };
+
   return (
     <Container>
       <LeftWrapper>
@@ -162,53 +171,40 @@ const ProfileSetting = ({ uid }) => {
               variant="outline"
               onClick={() =>
                 setValues({
-                  firstName: '',
-                  lastName: '',
-                  jobTitle: '',
-                  aboutMe: '',
+                  display_name: '',
+                  title: '',
+                  about_me: '',
                 })
               }
             >
               取消
             </Button>
-            <Button variant="solid">變更</Button>
+            <Button variant="solid" onClick={handleSubmit}>
+              變更
+            </Button>
           </ButtonGroup>
         </SelectionWrapper>
         <Divider />
-        <NameInputWrapper>
-          <InputWrap>
-            <label>名字</label>
-            <StyledInput
-              size="sm"
-              value={values.firstName}
-              onChange={(e) =>
-                setValues((prev) => {
-                  return { ...prev, firstName: e.target.value };
-                })
-              }
-            />
-          </InputWrap>
-          <InputWrap>
-            <label>姓氏</label>
-            <StyledInput
-              size="sm"
-              value={values.lastName}
-              onChange={(e) =>
-                setValues((prev) => {
-                  return { ...prev, lastName: e.target.value };
-                })
-              }
-            />
-          </InputWrap>
-        </NameInputWrapper>
+        <InputWrap>
+          <label>名字（暱稱）</label>
+          <StyledInput
+            size="sm"
+            value={values.display_name}
+            onChange={(e) =>
+              setValues((prev) => {
+                return { ...prev, display_name: e.target.value };
+              })
+            }
+          />
+        </InputWrap>
         <InputWrap>
           <label>目前職稱</label>
           <StyledInput
             size="sm"
-            value={values.jobTitle}
+            value={values.title}
             onChange={(e) =>
               setValues((prev) => {
-                return { ...prev, jobTitle: e.target.value };
+                return { ...prev, title: e.target.value };
               })
             }
           />
@@ -217,10 +213,10 @@ const ProfileSetting = ({ uid }) => {
         <Divider mt="10px" mb="20px" />
         <Textarea
           placeholder="請輸入簡短的自我介紹"
-          value={values.aboutMe}
+          value={values.about_me}
           onChange={(e) =>
             setValues((prev) => {
-              return { ...prev, aboutMe: e.target.value };
+              return { ...prev, about_me: e.target.value };
             })
           }
         />

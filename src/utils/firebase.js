@@ -45,6 +45,17 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 const firebase = {
+  updateUser(name) {
+    updateProfile(auth.currentUser, {
+      displayName: name,
+    })
+      .then(() => {
+        console.log('updated');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
   async getUser(uid) {
     try {
       const docSnap = await getDoc(doc(db, 'users', uid));
@@ -56,6 +67,19 @@ const firebase = {
     } catch (err) {
       console.log(err);
     }
+  },
+  async updateUserInfo(uid, data) {
+    try {
+      await updateDoc(doc(db, 'users', uid), data);
+      this.updateUser(data.display_name);
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  listenUserProfileChange(uid, callback) {
+    return onSnapshot(doc(db, 'users', uid), async doc => {
+      callback(prev => {return {...prev, ...doc.data()}});
+    })
   },
   async getNote(uid, docId) {
     try {
@@ -139,17 +163,6 @@ const firebase = {
   },
   signOut() {
     return signOut(auth);
-  },
-  updateUser(name) {
-    updateProfile(auth.currentUser, {
-      displayName: name,
-    })
-      .then(() => {
-        console.log('updated');
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   },
   async getRecommendedUsers(company, uid) {
     const members = query(
