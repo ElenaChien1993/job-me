@@ -36,13 +36,6 @@ const NavItem = styled.li`
   margin: 10px 20px;
 `;
 
-const Logout = styled.button`
-  color: white;
-  background-color: #306172;
-  margin-left: auto;
-  margin-right: 20px;
-`;
-
 const ImageWrapper = styled.div`
   width: 60px;
   height: 60px;
@@ -100,15 +93,15 @@ const Nav = ({ isLogin, userInfo, currentUserId }) => {
         alert('已成功登出');
         navigate('/login', { state: { from: { pathname: '/notes' } } });
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
   };
 
   const goToProfile = () => {
     setIsMenuOpen(false);
-    navigate(`/profile/${currentUserId}`)
-  }
+    navigate(`/profile/${currentUserId}`);
+  };
 
   return (
     <StyledNav>
@@ -120,13 +113,10 @@ const Nav = ({ isLogin, userInfo, currentUserId }) => {
           <Link to="/practice">Practice</Link>
         </NavItem>
         <NavItem>
-          <Link to={`/profile/${currentUserId}`}>Profile</Link>
-        </NavItem>
-        <NavItem>
           <Link to="/messages">Messages</Link>
         </NavItem>
         <ImageWrapper onClick={() => setIsMenuOpen(true)}>
-          <StyledImg src={userInfo && userInfo.photo_url} alt="head-shot"/>
+          <StyledImg src={userInfo && userInfo.photo_url} alt="head-shot" />
         </ImageWrapper>
         {isMenuOpen && (
           <MenuWrapper ref={menuRef}>
@@ -134,7 +124,6 @@ const Nav = ({ isLogin, userInfo, currentUserId }) => {
             {!isLogin && <Option onClick={handleLogout}>登出</Option>}
           </MenuWrapper>
         )}
-        {/* {!isLogin && <Logout onClick={handleLogout}>Log out</Logout>} */}
       </Ul>
     </StyledNav>
   );
@@ -145,16 +134,29 @@ const Layout = ({ isLogin }) => {
   const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = firebase.listenUserProfileChange(currentUserId, setUserInfo);
+    if (!currentUserId) return;
+    const unsubscribe = firebase.listenUserProfileChange(
+      currentUserId,
+      setUserInfo
+    );
 
     return () => unsubscribe();
   }, [currentUserId]);
 
+  const props = {
+    currentUserId,
+    userInfo,
+  };
+
   return (
     <Container>
-      <Nav isLogin={isLogin} userInfo={userInfo} currentUserId={currentUserId}/>
+      <Nav
+        isLogin={isLogin}
+        userInfo={userInfo}
+        currentUserId={currentUserId}
+      />
       <ContentContainer>
-        <Outlet context={userInfo}/>
+        <Outlet context={props} />
       </ContentContainer>
     </Container>
   );

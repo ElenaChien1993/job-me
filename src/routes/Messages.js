@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useOutletContext } from 'react-router-dom';
 import { Search2Icon } from '@chakra-ui/icons';
 import { BiSend } from 'react-icons/bi';
 import {
@@ -134,8 +134,7 @@ const Messages = () => {
   const rootRef = useRef();
   const bottomRef = useRef();
   // const unsubscribeRef = useRef();
-  const user = firebase.auth.currentUser;
-  const uid = user.uid;
+  const { currentUserId } = useOutletContext();
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -144,16 +143,17 @@ const Messages = () => {
     } else {
       setIsCorner(true);
     }
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     const fetchRooms = async (uid) => {
       const rooms = await firebase.getChatrooms(uid);
       setDatabaseRooms(rooms);
     };
-    const unsubscribe = firebase.listenRoomsChange(uid, setDatabaseRooms);
 
-    fetchRooms(uid);
+    const unsubscribe = firebase.listenRoomsChange(currentUserId, setDatabaseRooms);
+
+    fetchRooms(currentUserId);
     return unsubscribe;
   }, []);
 
@@ -162,13 +162,13 @@ const Messages = () => {
   }, [databaseRooms]);
 
   useEffect(() => {
-    if (!active || uid === active.latest_sender) return;
+    if (!active || currentUserId === active.latest_sender) return;
     firebase.updateRoom(active.id, { receiver_has_read: true });
-  }, [active]);
+  }, [active, currentUserId]);
 
   const send = () => {
     const MessageData = {
-      uid: user.uid,
+      uid: currentUserId,
       text: text,
       create_at: firebase.Timestamp.fromDate(new Date()),
     };
@@ -222,7 +222,6 @@ const Messages = () => {
             rooms={renderRooms}
             active={active}
             setActive={setActive}
-            uid={uid}
             isCorner={isCorner}
           />
         </LeftWrapper>
@@ -242,7 +241,6 @@ const Messages = () => {
             {active ? (
               <ChatContent
                 room={active}
-                uid={uid}
                 bottomRef={bottomRef}
                 rootRef={rootRef}
               />

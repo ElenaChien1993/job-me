@@ -18,6 +18,7 @@ import Login from './routes/Login';
 import Profile from './routes/profile/Profile';
 import Messages from './routes/Messages';
 import GlobalStyle from './style/GlobalStyle';
+import Loader from './components/Loader';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -35,6 +36,8 @@ const App = () => {
       setIsLoading(false);
     });
   }, []);
+
+  if (isLoading) return <Loader isLoading={isLoading}/>;
 
   return (
     <ChakraProvider>

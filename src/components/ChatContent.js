@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 import firebase from '../utils/firebase';
 
 import ChatReceived from './elements/ChatReceived';
 import ChatSent from './elements/ChatSent';
 
-const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
+const ChatContent = ({ room, rootRef, bottomRef }) => {
   const [messages, setMessages] = useState({});
   // const unsubscribeRef = useRef();
   const observeTargetRef = useRef();
@@ -13,6 +14,8 @@ const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
   const firstRenderRef = useRef(true);
   const lastMessagesRef = useRef(false);
   const containerRef = useRef();
+  const { currentUserId } = useOutletContext();
+
 
   console.log('In Content', bottomRef.current);
 
@@ -43,7 +46,7 @@ const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
       if (lastMessagesRef.current) return;
 
       if (firstRenderRef.current) {
-        firebase.listenMessagesChange(room, setMessages, uid).then((res) => {
+        firebase.listenMessagesChange(room, setMessages, currentUserId).then((res) => {
           unsubscribe = res;
           // rootRef.current.scrollTop = rootRef.current.scrollHeight;
           // rootRef.current.scrollTo(0, rootRef.current.scrollHeight)
@@ -80,7 +83,7 @@ const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
       // unsubscribe();
       observer.unobserve(observeTargetRef.current);
     };
-  }, [observeTargetRef, firstRenderRef, bottomRef, room, rootRef, uid]);
+  }, [observeTargetRef, firstRenderRef, bottomRef, room, rootRef, currentUserId]);
 
   return (
     <div ref={containerRef}>
@@ -88,13 +91,13 @@ const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
       {messages[room.id] &&
         messages[room.id].map((message, index) => {
           if (index === messages[room.id].length - 1) {
-            return message.uid !== uid ? (
+            return message.uid !== currentUserId ? (
               <ChatReceived ref={bottomRef} key={uuid()} text={message.text} />
             ) : (
               <ChatSent ref={bottomRef} key={uuid()} text={message.text} />
             );
           } else {
-            return message.uid !== uid ? (
+            return message.uid !== currentUserId ? (
               <ChatReceived key={uuid()} text={message.text} />
             ) : (
               <ChatSent key={uuid()} text={message.text} />

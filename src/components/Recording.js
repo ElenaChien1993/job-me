@@ -78,6 +78,7 @@ const Recording = ({
       type: type,
       link: url,
       record_name: practiceQuestions[current].question,
+      record_job: `${company_name} / ${job_title}`
     };
 
     firebase.setRecord(user.uid, recordData).then(() => alert('已成功儲存！'));

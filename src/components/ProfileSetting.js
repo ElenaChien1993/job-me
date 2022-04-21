@@ -96,7 +96,7 @@ const Number = styled.div`
 const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 0 50px;
+  padding-left: 50px;
   width: 62%;
 `;
 
@@ -164,7 +164,7 @@ const Option = styled.div`
   }
 `;
 
-const ProfileSetting = ({ uid }) => {
+const ProfileSetting = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [values, setValues] = useState({
     display_name: '',
@@ -174,23 +174,23 @@ const ProfileSetting = ({ uid }) => {
   const [image, setImage] = useState({ preview: '', raw: '' });
   const menuRef = useRef();
   const hiddenInputRef = useRef();
-  const userInfo = useOutletContext();
+  const { userInfo, currentUserId } = useOutletContext();
 
   useClickOutside(menuRef, () => isMenuOpen && setIsMenuOpen(false));
 
   const handleSubmit = () => {
     const entries = Object.entries(values);
-    const filtered = entries.filter((entry) => entry[1] !== '');
+    const filtered = entries.filter(entry => entry[1] !== '');
     const filteredObject = Object.fromEntries(filtered);
-    firebase.updateUserInfo(uid, filteredObject);
+    firebase.updateUserInfo(currentUserId, filteredObject);
     setValues({ display_name: '', title: '', about_me: '' });
   };
 
-  const handleChooseFile = (e) => {
+  const handleChooseFile = e => {
     hiddenInputRef.current.click();
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = e => {
     if (e.target.files.length) {
       setImage({
         preview: URL.createObjectURL(e.target.files[0]),
@@ -199,12 +199,12 @@ const ProfileSetting = ({ uid }) => {
     }
   };
 
-  const handleUpload = async (e) => {
-    const path = `profile/${uid}`;
+  const handleUpload = async e => {
+    const path = `profile/${currentUserId}`;
     const url = await firebase.uploadFile(path, image.raw).then(() => {
       return firebase.getDownloadURL(path);
     });
-    firebase.updateUserInfo(uid, { photo_url: url }).then(() => {
+    firebase.updateUserInfo(currentUserId, { photo_url: url }).then(() => {
       alert('照片更新成功！');
     });
     setImage({
@@ -221,9 +221,9 @@ const ProfileSetting = ({ uid }) => {
   };
 
   const handleDelete = () => {
-    const path = `profile/${uid}`;
+    const path = `profile/${currentUserId}`;
     firebase.deleteFile(path).then(() => {
-      firebase.updateUserInfo(uid, { photo_url: null });
+      firebase.updateUserInfo(currentUserId, { photo_url: null });
     });
   };
 
@@ -308,8 +308,8 @@ const ProfileSetting = ({ uid }) => {
           <StyledInput
             size="sm"
             value={values.display_name}
-            onChange={(e) =>
-              setValues((prev) => {
+            onChange={e =>
+              setValues(prev => {
                 return { ...prev, display_name: e.target.value };
               })
             }
@@ -320,8 +320,8 @@ const ProfileSetting = ({ uid }) => {
           <StyledInput
             size="sm"
             value={values.title}
-            onChange={(e) =>
-              setValues((prev) => {
+            onChange={e =>
+              setValues(prev => {
                 return { ...prev, title: e.target.value };
               })
             }
@@ -332,8 +332,8 @@ const ProfileSetting = ({ uid }) => {
         <Textarea
           placeholder="請輸入簡短的自我介紹"
           value={values.about_me}
-          onChange={(e) =>
-            setValues((prev) => {
+          onChange={e =>
+            setValues(prev => {
               return { ...prev, about_me: e.target.value };
             })
           }

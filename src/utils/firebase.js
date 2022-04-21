@@ -31,7 +31,6 @@ import {
   uploadBytes,
   getDownloadURL,
   deleteObject,
-  refFromURL,
 } from 'firebase/storage';
 import { formatDistance, formatRelative } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
@@ -59,7 +58,7 @@ const firebase = {
       .then(() => {
         console.log('updated');
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
   },
@@ -84,10 +83,33 @@ const firebase = {
     }
   },
   listenUserProfileChange(uid, callback) {
-    return onSnapshot(doc(db, 'users', uid), async (doc) => {
-      callback((prev) => {
+    return onSnapshot(doc(db, 'users', uid), async doc => {
+      callback(prev => {
         return { ...prev, ...doc.data() };
       });
+    });
+  },
+  listenUserRecordsChange(uid, setAudioRecords ,setVideoRecords) {
+    return onSnapshot(collection(db, 'users', uid, 'records'), async docs => {
+      let data = [];
+      docs.forEach(doc => {
+        data.push(doc.data());
+      });
+      const transformed = data.map(record => {
+        const timeString = `${record.date.toDate().toLocaleDateString(undefined, {
+          month: 'numeric',
+          day: 'numeric',
+        })} ${record.date.toDate().toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        })}`;
+        return { ...record, date: timeString };
+      });
+      const audios = transformed.filter(record => record.type === 0);
+      const videos = transformed.filter(record => record.type === 1);
+      setAudioRecords(audios);
+      setVideoRecords(videos);
     });
   },
   async getNote(uid, docId) {
@@ -181,10 +203,10 @@ const firebase = {
     );
     const querySnapshot = await getDocs(members);
     let data = [];
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(doc => {
       data.push(doc.data());
     });
-    const filteredData = data.filter((item) => item.creator !== uid);
+    const filteredData = data.filter(item => item.creator !== uid);
     return filteredData;
   },
   async uploadFile(path, file) {
@@ -199,16 +221,16 @@ const firebase = {
       .then(() => {
         alert('已刪除檔案');
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
   },
   async getDownloadURL(path) {
     return getDownloadURL(ref(storage, path))
-      .then((url) => {
+      .then(url => {
         return url;
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
   },
@@ -221,17 +243,17 @@ const firebase = {
     );
     const querySnapshot = await getDocs(rooms);
     let data = [];
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(doc => {
       data.push(doc.data());
     });
     const transformedRooms = await Promise.all(
-      data.map(async (room) => {
+      data.map(async room => {
         const timeRelative = formatRelative(
           new Date(room.latest_timestamp.seconds * 1000),
           new Date(),
           { locale: zhTW, addSuffix: true }
         );
-        const friendId = room.members.filter((id) => id !== uid);
+        const friendId = room.members.filter(id => id !== uid);
         const userData = await this.getUserName(friendId[0]);
         return { ...room, members: userData, latest_timestamp: timeRelative };
       })
@@ -242,16 +264,16 @@ const firebase = {
     const docSnap = await getDoc(doc(db, 'users', uid));
     const name = docSnap.data().display_name;
     const photo = docSnap.data().photo_url ? docSnap.data().photo_url : '';
-    return {name , photo_url: photo};
+    return { name, photo_url: photo };
   },
   listenRoomsChange(uid, callback) {
     const q = query(
       collection(db, 'chatrooms'),
       where('members', 'array-contains', uid)
     );
-    return onSnapshot(q, async (snapshot) => {
+    return onSnapshot(q, async snapshot => {
       let data;
-      snapshot.docChanges().forEach((change) => {
+      snapshot.docChanges().forEach(change => {
         if (change.type === 'modified') {
           data = change.doc.data();
         }
@@ -262,11 +284,11 @@ const firebase = {
         new Date(),
         { locale: zhTW, addSuffix: true }
       );
-      const friendId = data.members.filter((id) => id !== uid);
+      const friendId = data.members.filter(id => id !== uid);
       const name = await this.getUserName(friendId[0]);
       data = { ...data, latest_timestamp: timeRelative, members: name };
-      callback((prev) => {
-        const filtered = prev.filter((room) => room.id !== data.id);
+      callback(prev => {
+        const filtered = prev.filter(room => room.id !== data.id);
         return [data, ...filtered];
       });
     });
@@ -282,7 +304,7 @@ const firebase = {
       )
     );
     let data = [];
-    docsSnap.forEach((doc) => {
+    docsSnap.forEach(doc => {
       data.push(doc.data());
     });
     data.sort((a, b) => !b.create_at - a.create_at);
@@ -297,7 +319,7 @@ const firebase = {
       )
     );
     let data = [];
-    docsSnap.forEach((doc) => {
+    docsSnap.forEach(doc => {
       data.push(doc.data());
     });
     data.sort((a, b) => !b.create_at - a.create_at);
@@ -311,16 +333,16 @@ const firebase = {
     );
     return onSnapshot(
       q,
-      async (snapshot) => {
+      async snapshot => {
         let data = [];
-        snapshot.docChanges().forEach((change) => {
+        snapshot.docChanges().forEach(change => {
           if (change.type === 'added') {
             data.push(change.doc.data());
           }
         });
         data.sort((a, b) => !b.create_at - a.create_at);
         console.log('data', data);
-        callback((prev) => {
+        callback(prev => {
           if (!prev[room.id]) {
             return {
               ...prev,
@@ -333,7 +355,7 @@ const firebase = {
         if (!room.id || uid === room.latest_sender) return;
         this.updateRoom(room.id, { receiver_has_read: true });
       },
-      (error) => {
+      error => {
         console.error(error);
       }
     );

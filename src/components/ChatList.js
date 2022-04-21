@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
@@ -76,7 +76,9 @@ const NewMessage = styled.div`
   display: ${(props) => (props.isRead ? 'none' : 'block')};
 `;
 
-const ChatList = ({ rooms, active, setActive, uid, isCorner }) => {
+const ChatList = ({ rooms, active, setActive, isCorner }) => {
+  const { currentUserId } = useOutletContext();
+
   return (
     <ThemeProvider theme={{ isCorner }}>
       <Container>
@@ -92,14 +94,14 @@ const ChatList = ({ rooms, active, setActive, uid, isCorner }) => {
             <BriefContent>
               <Name>{room.members.name}</Name>
               <LatestMessage
-                isRead={room.receiver_has_read || uid === room.latest_sender}
+                isRead={room.receiver_has_read || currentUserId === room.latest_sender}
               >
                 {room.latest_message}
               </LatestMessage>
             </BriefContent>
             <DateText>{room.latest_timestamp}</DateText>
             <NewMessage
-              isRead={room.receiver_has_read || uid === room.latest_sender}
+              isRead={room.receiver_has_read || currentUserId === room.latest_sender}
             />
           </ChatWrapper>
         ))}

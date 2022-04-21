@@ -23,17 +23,17 @@ const StyledNote = styled(NoteElement)`
   cursor: pointer;
 `;
 
-const Note = ({ note, databaseNotes, setRenderNotes, setDatabaseNotes }) => {
+const Note = ({ note, currentUserId, databaseNotes, setRenderNotes, setDatabaseNotes }) => {
   const { pathname } = useLocation();
-  const user = firebase.auth.currentUser;
 
   const handleDeleteNote = () => {
-    firebase.deleteNote(user.uid, note.note_id);
-    const update = databaseNotes.filter(
-      (item) => item.note_id !== note.note_id
-    );
-    setDatabaseNotes(update);
-    setRenderNotes(update);
+    firebase.deleteNote(currentUserId, note.note_id).then(() => {
+      const update = databaseNotes.filter(
+        (item) => item.note_id !== note.note_id
+      );
+      setDatabaseNotes(update);
+      setRenderNotes(update);
+    });
   };
 
   return (
