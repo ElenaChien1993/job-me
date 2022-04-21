@@ -10,7 +10,6 @@ const PracticeParent = () => {
   const [recordType, setRecordType] = useState('錄影');
 
   const user = firebase.auth.currentUser;
-  console.log('parent');
 
   useEffect(() => {
     // if (!user) return;

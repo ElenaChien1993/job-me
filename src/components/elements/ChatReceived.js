@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -23,13 +24,13 @@ const Content = styled.div`
   line-height: 1.4;
 `;
 
-const ChatReceived = ({text, observeTargetRef}) => {
+const ChatReceived = React.forwardRef((props, ref) => {
   return (
-    <Wrapper ref={observeTargetRef}>
+    <Wrapper ref={ref}>
       <ImageWrapper />
-      <Content>{text}</Content>
+      <Content>{props.text}</Content>
     </Wrapper>
   );
-};
+});
 
 export default ChatReceived;

@@ -63,7 +63,7 @@ const Recording = ({
       practiceQuestions[current].question
     }-${uuid()}`;
 
-    const url = await firebase.uplaodFile(path, fileBlob).then(() => {
+    const url = await firebase.uploadFile(path, fileBlob).then(() => {
       return firebase.getDownloadURL(path);
     });
 

@@ -25,7 +25,14 @@ import {
   limit,
   addDoc,
 } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+  refFromURL,
+} from 'firebase/storage';
 import { formatDistance, formatRelative } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
 
@@ -52,7 +59,7 @@ const firebase = {
       .then(() => {
         console.log('updated');
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   },
@@ -77,8 +84,8 @@ const firebase = {
     }
   },
   listenUserProfileChange(uid, callback) {
-    return onSnapshot(doc(db, 'users', uid), async doc => {
-      callback(prev => {
+    return onSnapshot(doc(db, 'users', uid), async (doc) => {
+      callback((prev) => {
         return { ...prev, ...doc.data() };
       });
     });
@@ -174,24 +181,34 @@ const firebase = {
     );
     const querySnapshot = await getDocs(members);
     let data = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       data.push(doc.data());
     });
-    const filteredData = data.filter(item => item.creator !== uid);
+    const filteredData = data.filter((item) => item.creator !== uid);
     return filteredData;
   },
-  async uplaodFile(path, file) {
+  async uploadFile(path, file) {
     const fileRef = ref(storage, path);
     return uploadBytes(fileRef, file).then(() => {
       console.log('Uploaded a blob or file!');
     });
   },
+  async deleteFile(path) {
+    const fileRef = ref(storage, path);
+    deleteObject(fileRef)
+      .then(() => {
+        alert('已刪除檔案');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
   async getDownloadURL(path) {
     return getDownloadURL(ref(storage, path))
-      .then(url => {
+      .then((url) => {
         return url;
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   },
@@ -204,17 +221,17 @@ const firebase = {
     );
     const querySnapshot = await getDocs(rooms);
     let data = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       data.push(doc.data());
     });
     const transformedRooms = await Promise.all(
-      data.map(async room => {
+      data.map(async (room) => {
         const timeRelative = formatRelative(
           new Date(room.latest_timestamp.seconds * 1000),
           new Date(),
           { locale: zhTW, addSuffix: true }
         );
-        const friendId = room.members.filter(id => id !== uid);
+        const friendId = room.members.filter((id) => id !== uid);
         const name = await this.getUserName(friendId[0]);
         return { ...room, members: name, latest_timestamp: timeRelative };
       })
@@ -231,9 +248,9 @@ const firebase = {
       collection(db, 'chatrooms'),
       where('members', 'array-contains', uid)
     );
-    return onSnapshot(q, async snapshot => {
+    return onSnapshot(q, async (snapshot) => {
       let data;
-      snapshot.docChanges().forEach(change => {
+      snapshot.docChanges().forEach((change) => {
         if (change.type === 'modified') {
           data = change.doc.data();
         }
@@ -244,11 +261,11 @@ const firebase = {
         new Date(),
         { locale: zhTW, addSuffix: true }
       );
-      const friendId = data.members.filter(id => id !== uid);
+      const friendId = data.members.filter((id) => id !== uid);
       const name = await this.getUserName(friendId[0]);
       data = { ...data, latest_timestamp: timeRelative, members: name };
-      callback(prev => {
-        const filtered = prev.filter(room => room.id !== data.id);
+      callback((prev) => {
+        const filtered = prev.filter((room) => room.id !== data.id);
         return [data, ...filtered];
       });
     });
@@ -264,7 +281,7 @@ const firebase = {
       )
     );
     let data = [];
-    docsSnap.forEach(doc => {
+    docsSnap.forEach((doc) => {
       data.push(doc.data());
     });
     data.sort((a, b) => !b.create_at - a.create_at);
@@ -279,7 +296,7 @@ const firebase = {
       )
     );
     let data = [];
-    docsSnap.forEach(doc => {
+    docsSnap.forEach((doc) => {
       data.push(doc.data());
     });
     data.sort((a, b) => !b.create_at - a.create_at);
@@ -293,16 +310,16 @@ const firebase = {
     );
     return onSnapshot(
       q,
-      async snapshot => {
+      async (snapshot) => {
         let data = [];
-        snapshot.docChanges().forEach(change => {
+        snapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
             data.push(change.doc.data());
           }
         });
         data.sort((a, b) => !b.create_at - a.create_at);
         console.log('data', data);
-        callback(prev => {
+        callback((prev) => {
           if (!prev[room.id]) {
             return {
               ...prev,
@@ -315,7 +332,7 @@ const firebase = {
         if (!room.id || uid === room.latest_sender) return;
         this.updateRoom(room.id, { receiver_has_read: true });
       },
-      error => {
+      (error) => {
         console.error(error);
       }
     );

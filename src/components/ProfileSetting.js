@@ -6,11 +6,12 @@ import {
   Textarea,
   IconButton,
 } from '@chakra-ui/react';
-import { EditIcon } from '@chakra-ui/icons';
+import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons';
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import firebase from '../utils/firebase';
 import useClickOutside from '../hooks/useClickOutside';
+import ChatCorner from './ChatCorner';
 
 const Container = styled.div`
   margin: 20px 10%;
@@ -36,14 +37,22 @@ const ImageWrapper = styled.div`
   height: 200px;
   border-radius: 100px;
   border: 5px solid #ee9c91;
+  overflow: hidden;
 `;
 
-const StyledIcon = styled(IconButton)`
-  && {
-    position: absolute;
-    bottom: 17px;
-    right: 6px;
-  }
+const StyledImg = styled.img`
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+`;
+
+const IconGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  right: -50px;
 `;
 
 const NameWrapper = styled.div`
@@ -51,6 +60,7 @@ const NameWrapper = styled.div`
   line-height: 65px;
   color: #000000;
   margin-top: 20px;
+  text-align: center;
 `;
 
 const JobTitle = styled.div`
@@ -143,15 +153,15 @@ const MenuWrapper = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 1;
-`
+`;
 
 const Option = styled.div`
   padding: 10px 15px;
   cursor: pointer;
   &:hover {
-    background: #E3E3E3;
+    background: #e3e3e3;
   }
-`
+`;
 
 const ProfileSetting = ({ uid }) => {
   const [userInfo, setUserInfo] = useState(null);
@@ -161,7 +171,9 @@ const ProfileSetting = ({ uid }) => {
     title: '',
     about_me: '',
   });
+  const [image, setImage] = useState({ preview: '', raw: '' });
   const menuRef = useRef();
+  const hiddenInputRef = useRef();
 
   useEffect(() => {
     const unsubscribe = firebase.listenUserProfileChange(uid, setUserInfo);
@@ -169,7 +181,7 @@ const ProfileSetting = ({ uid }) => {
     return () => unsubscribe();
   }, [uid]);
 
-  useClickOutside(menuRef, () => isMenuOpen && setIsMenuOpen(false))
+  useClickOutside(menuRef, () => isMenuOpen && setIsMenuOpen(false));
 
   const handleSubmit = () => {
     const entries = Object.entries(values);
@@ -179,17 +191,91 @@ const ProfileSetting = ({ uid }) => {
     setValues({ display_name: '', title: '', about_me: '' });
   };
 
+  const handleChooseFile = (e) => {
+    hiddenInputRef.current.click();
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files.length) {
+      setImage({
+        preview: URL.createObjectURL(e.target.files[0]),
+        raw: e.target.files[0],
+      });
+    }
+  };
+
+  const handleUpload = async (e) => {
+    const path = `profile/${uid}`;
+    const url = await firebase.uploadFile(path, image.raw).then(() => {
+      return firebase.getDownloadURL(path);
+    });
+    firebase.updateUserInfo(uid, { photo_url: url }).then(() => {
+      alert('照片更新成功！');
+    });
+    setImage({
+      preview: '',
+      raw: '',
+    });
+  };
+
+  const handleCancel = () => {
+    setImage({
+      preview: '',
+      raw: '',
+    });
+  };
+
+  const handleDelete = () => {
+    const path = `profile/${uid}`;
+    firebase.deleteFile(path).then(() => {
+      firebase.updateUserInfo(uid, { photo_url: null });
+    });
+  };
+
   return (
     <Container>
       <LeftWrapper>
         <ImageContainer>
-          <ImageWrapper />
-          {isMenuOpen && <MenuWrapper ref={menuRef}>
-            <Option>上傳照片</Option>
-            <Option>刪除照片</Option>
-          </MenuWrapper>}
+          <ImageWrapper>
+            <StyledImg
+              src={
+                userInfo && !image.preview ? userInfo.photo_url : image.preview
+              }
+              alt="head-shot"
+            />
+          </ImageWrapper>
+          {isMenuOpen && (
+            <MenuWrapper ref={menuRef}>
+              <Option onClick={handleChooseFile}>上傳照片</Option>
+              <input
+                type="file"
+                ref={hiddenInputRef}
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+              <Option onClick={handleDelete}>刪除照片</Option>
+            </MenuWrapper>
+          )}
+          {image.preview !== '' && (
+            <IconGroup>
+              <IconButton
+                icon={<CheckIcon />}
+                aria-label="confirm upload"
+                onClick={handleUpload}
+              />
+              <IconButton
+                icon={<CloseIcon />}
+                aria-label="cancel upload"
+                onClick={handleCancel}
+              />
+            </IconGroup>
+          )}
           <IconWrapper>
-            <IconButton aria-label="Edit profile image" icon={<EditIcon />} onClick={() => setIsMenuOpen(true)}/>
+            <IconButton
+              aria-label="Edit profile image"
+              icon={<EditIcon />}
+              onClick={() => setIsMenuOpen(true)}
+            />
           </IconWrapper>
         </ImageContainer>
         <NameWrapper>{userInfo && userInfo.display_name}</NameWrapper>
@@ -258,6 +344,7 @@ const ProfileSetting = ({ uid }) => {
           }
         />
       </RightWrapper>
+      <ChatCorner />
     </Container>
   );
 };

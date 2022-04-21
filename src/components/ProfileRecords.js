@@ -1,6 +1,7 @@
 import { Tabs, TabList, TabPanels, Tab, TabPanel, Button, Divider } from '@chakra-ui/react';
 import { FaMicrophone, FaFilm } from "react-icons/fa";
 import styled from 'styled-components';
+import ChatCorner from './ChatCorner';
 
 const Container = styled.div`
   margin: 20px 10%;
@@ -116,6 +117,7 @@ const ProfileRecords = () => {
         <Divider />
         <Reminder>檔案刪除後就無法再讀取，請記得先下載</Reminder>
       </RightWrapper>
+      <ChatCorner />
     </Container>
   )
 }

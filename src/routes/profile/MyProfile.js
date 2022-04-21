@@ -1,5 +1,7 @@
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import styled from 'styled-components';
+
+import ChatCorner from '../../components/ChatCorner'
 import ProfileRecords from '../../components/ProfileRecords';
 import ProfileSetting from '../../components/ProfileSetting';
 

@@ -20,10 +20,10 @@ const Content = styled.div`
   line-height: 1.4;
 `;
 
-const ChatSent = React.memo(({ text, observeTargetRef }) => {
+const ChatSent = React.forwardRef(( props, ref ) => {
   return (
-    <Wrapper ref={observeTargetRef}>
-      <Content>{text}</Content>
+    <Wrapper ref={ref}>
+      <Content>{props.text}</Content>
     </Wrapper>
   );
 })

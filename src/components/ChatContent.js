@@ -17,38 +17,43 @@ const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
   console.log('In Content', bottomRef.current);
 
   useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView();
+    }
+  }, []);
+
+  useEffect(() => {
     if (!messages[room.id]) return;
     firstMessageRef.current = messages[room.id][0];
   }, [messages, room.id]);
 
   useEffect(() => {
     // bottomRef.current.scrollIntoView(false, { behavior: 'auto' });
-
     if (messages[room.id]) return;
     firstRenderRef.current = true;
     lastMessagesRef.current = false;
   }, [room]);
-  
-  console.log(rootRef.current.scrollTop, rootRef.current.scrollHeight)
+
+  console.log(bottomRef.current);
+
   useEffect(() => {
     let unsubscribe;
     const callback = ([entry]) => {
       if (!entry || !entry.isIntersecting) return;
       if (lastMessagesRef.current) return;
-      console.log('observer fire', firstRenderRef.current, firstMessageRef);
 
       if (firstRenderRef.current) {
-        firebase.listenMessagesChange(room, setMessages, uid).then(res => {
+        firebase.listenMessagesChange(room, setMessages, uid).then((res) => {
           unsubscribe = res;
-          rootRef.current.scrollTop = rootRef.current.scrollHeight;
+          // rootRef.current.scrollTop = rootRef.current.scrollHeight;
           // rootRef.current.scrollTo(0, rootRef.current.scrollHeight)
-          // bottomRef.current.scrollIntoView();
+          bottomRef.current.scrollIntoView();
           firstRenderRef.current = false;
         });
       } else {
         firebase
           .getMoreMessages(room.id, firstMessageRef.current)
-          .then(messages => {
+          .then((messages) => {
             console.log(messages);
             setMessages((prev) => {
               return { ...prev, [room.id]: [...messages, ...prev[room.id]] };
@@ -59,8 +64,6 @@ const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
           });
       }
     };
-
-    console.log(unsubscribe);
 
     const options = {
       root: rootRef.current,
@@ -83,14 +86,22 @@ const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
     <div ref={containerRef}>
       <div ref={observeTargetRef}></div>
       {messages[room.id] &&
-        messages[room.id].map(message =>
-          message.uid !== uid ? (
-            <ChatReceived key={uuid()} text={message.text} />
-          ) : (
-            <ChatSent key={uuid()} text={message.text} />
-          )
-        )}
-      <div ref={bottomRef}></div>
+        messages[room.id].map((message, index) => {
+          if (index === messages[room.id].length - 1) {
+            return message.uid !== uid ? (
+              <ChatReceived ref={bottomRef} key={uuid()} text={message.text} />
+            ) : (
+              <ChatSent ref={bottomRef} key={uuid()} text={message.text} />
+            );
+          } else {
+            return message.uid !== uid ? (
+              <ChatReceived key={uuid()} text={message.text} />
+            ) : (
+              <ChatSent key={uuid()} text={message.text} />
+            );
+          }
+        })}
+      {/* <div ref={bottomRef}></div> */}
     </div>
   );
 };
