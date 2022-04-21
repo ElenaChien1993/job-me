@@ -232,8 +232,8 @@ const firebase = {
           { locale: zhTW, addSuffix: true }
         );
         const friendId = room.members.filter((id) => id !== uid);
-        const name = await this.getUserName(friendId[0]);
-        return { ...room, members: name, latest_timestamp: timeRelative };
+        const userData = await this.getUserName(friendId[0]);
+        return { ...room, members: userData, latest_timestamp: timeRelative };
       })
     );
     return transformedRooms;
@@ -241,7 +241,8 @@ const firebase = {
   async getUserName(uid) {
     const docSnap = await getDoc(doc(db, 'users', uid));
     const name = docSnap.data().display_name;
-    return name;
+    const photo = docSnap.data().photo_url ? docSnap.data().photo_url : '';
+    return {name , photo_url: photo};
   },
   listenRoomsChange(uid, callback) {
     const q = query(

@@ -12,6 +12,7 @@ import styled from 'styled-components';
 import firebase from '../utils/firebase';
 import useClickOutside from '../hooks/useClickOutside';
 import ChatCorner from './ChatCorner';
+import { useOutletContext } from 'react-router-dom';
 
 const Container = styled.div`
   margin: 20px 10%;
@@ -164,7 +165,6 @@ const Option = styled.div`
 `;
 
 const ProfileSetting = ({ uid }) => {
-  const [userInfo, setUserInfo] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [values, setValues] = useState({
     display_name: '',
@@ -174,12 +174,7 @@ const ProfileSetting = ({ uid }) => {
   const [image, setImage] = useState({ preview: '', raw: '' });
   const menuRef = useRef();
   const hiddenInputRef = useRef();
-
-  useEffect(() => {
-    const unsubscribe = firebase.listenUserProfileChange(uid, setUserInfo);
-
-    return () => unsubscribe();
-  }, [uid]);
+  const userInfo = useOutletContext();
 
   useClickOutside(menuRef, () => isMenuOpen && setIsMenuOpen(false));
 

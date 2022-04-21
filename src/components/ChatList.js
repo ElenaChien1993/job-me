@@ -26,6 +26,13 @@ const ImageWrapper = styled.div`
   border-radius: 25px;
   background: #f5cdc5;
   margin-right: 13px;
+  overflow: hidden;
+`;
+
+const StyledImg = styled.img`
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
 `;
 
 const BriefContent = styled.div`
@@ -79,9 +86,11 @@ const ChatList = ({ rooms, active, setActive, uid, isCorner }) => {
             key={uuid()}
             onClick={() => setActive(room)}
           >
-            <ImageWrapper />
+            <ImageWrapper>
+              <StyledImg src={room.members.photo_url} alt="head-shot"/>
+            </ImageWrapper>
             <BriefContent>
-              <Name>{room.members}</Name>
+              <Name>{room.members.name}</Name>
               <LatestMessage
                 isRead={room.receiver_has_read || uid === room.latest_sender}
               >

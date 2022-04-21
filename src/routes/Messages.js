@@ -13,7 +13,6 @@ import styled, { ThemeProvider } from 'styled-components';
 import ChatList from '../components/ChatList';
 import firebase from '../utils/firebase';
 import ChatContent from '../components/ChatContent';
-import { ca } from 'date-fns/locale';
 
 const Container = styled.div`
   width: ${(props) => (props.theme.isCorner ? '40vw' : '')};
@@ -77,6 +76,13 @@ const ImageWrapper = styled.div`
   border-radius: 18px;
   background: #f5cdc5;
   margin-right: 13px;
+  overflow: hidden;
+`;
+
+const StyledImg = styled.img`
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
 `;
 
 const Name = styled.div`
@@ -191,52 +197,6 @@ const Messages = () => {
   };
 
   console.log('In Msgs', active);
-  
-  // useEffect(() => {
-  //   let isFetching = false;
-  //   const callback = ([entry]) => {
-  //     if (isFetching || !active.id) return;
-  //     if (!entry || !entry.isIntersecting) return;
-
-
-  //     isFetching = true;
-  //     console.log('observer fire')
-  //     console.log(!messages[active.id])
-
-  //     if (!messages[active.id]) {
-  //       unsubscribeRef.current = firebase.listenMessagesChange(active, setMessages, uid);
-  //       bottomRef.current.scrollIntoView({ behavior: 'auto' });
-  //       isFetching = false;
-  //     } else {
-  //       // console.log('before', messages)
-  //       firebase.getMoreMessages(active.id, messages).then((messages) => {
-  //         // console.log('return', messages)
-  //         setMessages((prev) => {
-  //           // console.log(prev)
-  //           return { ...prev, [active.id]: [...messages, ...prev[active.id]] };
-  //         });
-  //       });
-  //     }
-
-      
-  //   };
-
-  //   const options = {
-  //     root: rootRef.current,
-  //     rootMargin: '100px',
-  //     threshold: 1,
-  //   };
-
-  //   const observer = new IntersectionObserver(callback, options);
-  //   if (!observeTargetRef.current) return;
-  //   observer.observe(observeTargetRef.current);
-    
-  //   return () => {
-  //     unsubscribeRef.current();
-  //     observer.unobserve(observeTargetRef.current);
-  //   };
-    
-  // }, [active, uid]);
 
   return (
     <ThemeProvider theme={{ isCorner }}>
@@ -268,8 +228,15 @@ const Messages = () => {
         </LeftWrapper>
         <RightWrapper>
           <TopWrapper>
-            <ImageWrapper />
-            <Name>{active?.members}</Name>
+            <ImageWrapper>
+              <StyledImg
+                src={
+                  active?.members.photo_url
+                }
+                alt="head-shot"
+              />
+            </ImageWrapper>
+            <Name>{active?.members.name}</Name>
           </TopWrapper>
           <Content ref={rootRef} >
             {active ? (

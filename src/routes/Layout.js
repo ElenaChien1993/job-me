@@ -1,5 +1,7 @@
+import { useEffect, useRef, useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import useClickOutside from '../hooks/useClickOutside';
 
 import firebase from '../utils/firebase';
 
@@ -41,9 +43,55 @@ const Logout = styled.button`
   margin-right: 20px;
 `;
 
-const Nav = ({ isLogin }) => {
-  const currentUserId = firebase.auth.currentUser?.uid
+const ImageWrapper = styled.div`
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  background: #f5cdc5;
+  margin-right: 13px;
+  overflow: hidden;
+  margin-left: auto;
+  margin-right: 20px;
+  cursor: pointer;
+`;
+
+const StyledImg = styled.img`
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+`;
+
+const MenuWrapper = styled.div`
+  position: absolute;
+  right: 0;
+  top: 55px;
+  width: 120px;
+  height: 100px;
+  background-color: white;
+  box-shadow: 4px 4px 4px 1px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+`;
+
+const Option = styled.div`
+  padding: 10px 15px;
+  cursor: pointer;
+  &:hover {
+    background: #e3e3e3;
+  }
+`;
+
+const Nav = ({ isLogin, userInfo, currentUserId }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const menuRef = useRef();
+
+  useClickOutside(menuRef, () => isMenuOpen && setIsMenuOpen(false));
 
   const handleLogout = () => {
     firebase
@@ -56,6 +104,11 @@ const Nav = ({ isLogin }) => {
         console.log(error);
       });
   };
+
+  const goToProfile = () => {
+    setIsMenuOpen(false);
+    navigate(`/profile/${currentUserId}`)
+  }
 
   return (
     <StyledNav>
@@ -72,18 +125,36 @@ const Nav = ({ isLogin }) => {
         <NavItem>
           <Link to="/messages">Messages</Link>
         </NavItem>
-        {!isLogin && <Logout onClick={handleLogout}>Log out</Logout>}
+        <ImageWrapper onClick={() => setIsMenuOpen(true)}>
+          <StyledImg src={userInfo && userInfo.photo_url} alt="head-shot"/>
+        </ImageWrapper>
+        {isMenuOpen && (
+          <MenuWrapper ref={menuRef}>
+            <Option onClick={goToProfile}>Profile</Option>
+            {!isLogin && <Option onClick={handleLogout}>登出</Option>}
+          </MenuWrapper>
+        )}
+        {/* {!isLogin && <Logout onClick={handleLogout}>Log out</Logout>} */}
       </Ul>
     </StyledNav>
   );
 };
 
 const Layout = ({ isLogin }) => {
+  const currentUserId = firebase.auth.currentUser?.uid;
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = firebase.listenUserProfileChange(currentUserId, setUserInfo);
+
+    return () => unsubscribe();
+  }, [currentUserId]);
+
   return (
     <Container>
-      <Nav isLogin={isLogin} />
+      <Nav isLogin={isLogin} userInfo={userInfo} currentUserId={currentUserId}/>
       <ContentContainer>
-        <Outlet />
+        <Outlet context={userInfo}/>
       </ContentContainer>
     </Container>
   );
