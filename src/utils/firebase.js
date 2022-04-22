@@ -171,10 +171,24 @@ const firebase = {
   },
   async setRecord(uid, data) {
     const newDocRef = doc(collection(db, `users/${uid}/records`));
-    console.log('in setRecord!');
     try {
       await setDoc(newDocRef, { ...data, record_id: newDocRef.id });
-      // return newDocRef.id;
+      return newDocRef.id;
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  async updateRecord(uid, recordId, data) {
+    const newDocRef = doc(db, `users/${uid}/records/${recordId}`);
+    try {
+      await updateDoc(newDocRef, data);
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  async deleteRecord(uid, recordId) {
+    try {
+      await deleteDoc(doc(db, 'users', uid, 'records', recordId));
     } catch (err) {
       console.log(err);
     }

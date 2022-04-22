@@ -136,6 +136,18 @@ const ProfileRecords = () => {
     URL.revokeObjectURL(recordURL);
   };
 
+  const handleDelete = () => {
+    let path;
+    if (tabIndex === 0) {
+      path = `audios/${currentUserId}/${activeAudio.record_job}/${activeAudio.record_name}-${activeAudio.record_id}`;
+    } else {
+      path = `videos/${currentUserId}/${activeVideo.record_job}/${activeVideo.record_name}-${activeVideo.record_id}`;
+    }
+    firebase.deleteFile(path).then(() => {
+      firebase.deleteRecord(currentUserId, tabIndex === 0 ? activeAudio.record_id : activeVideo.record_id);
+    });
+  };
+
   return (
     <Container>
       <LeftWrapper>
@@ -207,7 +219,7 @@ const ProfileRecords = () => {
               ? activeAudio?.record_name
               : activeVideo?.record_name}
           </SectionTitle>
-          <Button variant="outline" colorScheme="teal">
+          <Button variant="outline" colorScheme="teal" onClick={handleDelete}>
             刪除
           </Button>
         </SelectionWrapper>
@@ -228,7 +240,9 @@ const ProfileRecords = () => {
           onClick={() =>
             handleDownload(
               tabIndex === 0 ? activeAudio?.link : activeVideo?.link,
-              'test'
+              tabIndex === 0
+                ? activeAudio?.record_name
+                : activeVideo?.record_name
             )
           }
           icon={<MdSaveAlt />}
