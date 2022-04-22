@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
   Tabs,
@@ -101,6 +101,7 @@ const ProfileRecords = () => {
   const [activeAudio, setActiveAudio] = useState(null);
   const [activeVideo, setActiveVideo] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
+  const anchorRef = useRef();
   const { currentUserId } = useOutletContext();
 
   useEffect(() => {
@@ -120,9 +121,20 @@ const ProfileRecords = () => {
     setActiveVideo(videoRecords[0]);
   }, [audioRecords, videoRecords]);
 
-  // handleDownload = () => {
+  const handleDownload = async (url, name) => {
+    const record = await fetch(url);
+    const recordBlob = await record.blob();
+    const recordURL = URL.createObjectURL(recordBlob);
 
-  // }
+    const anchor = document.createElement('a');
+    anchor.href = recordURL;
+    anchor.download = name;
+
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(recordURL);
+  };
 
   return (
     <Container>
@@ -205,18 +217,23 @@ const ProfileRecords = () => {
         ) : (
           <video src={activeVideo?.link} controls />
         )}
-        <a href={tabIndex === 0 ? activeAudio?.link : activeVideo?.link} type="audio/mpeg" download>
-          <IconButton
-            isRound
-            color="white"
-            bg="#306172"
-            aria-label="Save Recording"
-            fontSize="20px"
-            _hover={{ filter: 'brightness(150%)', color: 'black' }}
-            // onClick={handleDownload}
-            icon={<MdSaveAlt />}
-          />
-        </a> 
+        {/* <a ref={anchorRef} download style={{display: 'none'}}> */}
+        <IconButton
+          isRound
+          color="white"
+          bg="#306172"
+          aria-label="Save Recording"
+          fontSize="20px"
+          _hover={{ filter: 'brightness(150%)', color: 'black' }}
+          onClick={() =>
+            handleDownload(
+              tabIndex === 0 ? activeAudio?.link : activeVideo?.link,
+              'test'
+            )
+          }
+          icon={<MdSaveAlt />}
+        />
+        {/* </a>  */}
         <Reminder>檔案刪除後就無法再讀取，請記得先下載</Reminder>
       </RightWrapper>
       <ChatCorner />
