@@ -70,6 +70,9 @@ const GlobalStyle = createGlobalStyle`
     border: none;
     background: none;
   }
+  html {
+    background-color: #ffeade;
+  }
 `;
 
 export default GlobalStyle;

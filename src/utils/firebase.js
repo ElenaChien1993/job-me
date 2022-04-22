@@ -274,6 +274,15 @@ const firebase = {
     );
     return transformedRooms;
   },
+  async setChatroom(data) {
+    const newDocRef = doc(collection(db, 'chatrooms'));
+    try {
+      await setDoc(newDocRef, { ...data, id: newDocRef.id });
+      return newDocRef.id;
+    } catch (err) {
+      console.log(err);
+    }
+  },
   async getUserName(uid) {
     const docSnap = await getDoc(doc(db, 'users', uid));
     const name = docSnap.data().display_name;

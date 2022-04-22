@@ -132,6 +132,7 @@ const Nav = ({ isLogin, userInfo, currentUserId }) => {
 const Layout = ({ isLogin }) => {
   const currentUserId = firebase.auth.currentUser?.uid;
   const [userInfo, setUserInfo] = useState(null);
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -146,6 +147,8 @@ const Layout = ({ isLogin }) => {
   const props = {
     currentUserId,
     userInfo,
+    chatOpen,
+    setChatOpen
   };
 
   return (

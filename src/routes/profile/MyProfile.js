@@ -5,6 +5,7 @@ import ProfileRecords from '../../components/ProfileRecords';
 import ProfileSetting from '../../components/ProfileSetting';
 
 const Container = styled.div`
+  background-color: #ffeade;
   height: 100%;
   padding-top: 70px;
 `;
