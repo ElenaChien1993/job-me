@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
   Tabs,
@@ -8,14 +8,15 @@ import {
   TabPanel,
   Button,
   Divider,
+  IconButton,
 } from '@chakra-ui/react';
 import { FaMicrophone, FaFilm } from 'react-icons/fa';
 import { v4 as uuid } from 'uuid';
 import styled from 'styled-components';
 
 import ChatCorner from './ChatCorner';
-import { useEffect } from 'react';
 import firebase from '../utils/firebase';
+import { MdSaveAlt } from 'react-icons/md';
 
 const Container = styled.div`
   margin: 20px 10%;
@@ -56,8 +57,8 @@ const Record = styled.div`
   justify-content: space-between;
   padding: 10px 20px;
   cursor: pointer;
-  color: ${props => (props.isSelected ? 'black' : '#999999')};
-  font-weight: ${props => (props.isSelected ? '700' : '400')};
+  color: ${(props) => (props.isSelected ? 'black' : '#999999')};
+  font-weight: ${(props) => (props.isSelected ? '700' : '400')};
   &:hover {
     font-weight: 700;
     color: black;
@@ -119,6 +120,10 @@ const ProfileRecords = () => {
     setActiveVideo(videoRecords[0]);
   }, [audioRecords, videoRecords]);
 
+  // handleDownload = () => {
+
+  // }
+
   return (
     <Container>
       <LeftWrapper>
@@ -129,7 +134,7 @@ const ProfileRecords = () => {
           variant="solid-rounded"
           colorScheme="teal"
           size="lg"
-          onChange={index => setTabIndex(index)}
+          onChange={(index) => setTabIndex(index)}
         >
           <TabList mb="3em">
             <Tab>
@@ -143,7 +148,7 @@ const ProfileRecords = () => {
             <TabPanel>
               <RecordsList>
                 {audioRecords &&
-                  audioRecords.map(record => {
+                  audioRecords.map((record) => {
                     return (
                       <Record
                         key={uuid()}
@@ -163,7 +168,7 @@ const ProfileRecords = () => {
             <TabPanel>
               <RecordsList>
                 {videoRecords &&
-                  videoRecords.map(record => {
+                  videoRecords.map((record) => {
                     return (
                       <Record
                         key={uuid()}
@@ -186,14 +191,32 @@ const ProfileRecords = () => {
       <RightWrapper>
         <SelectionWrapper>
           <SectionTitle>
-            {tabIndex === 0 ? activeAudio?.record_name : activeVideo?.record_name}
+            {tabIndex === 0
+              ? activeAudio?.record_name
+              : activeVideo?.record_name}
           </SectionTitle>
           <Button variant="outline" colorScheme="teal">
             刪除
           </Button>
         </SelectionWrapper>
         <Divider />
-        {tabIndex === 0 ? <audio src={activeAudio.link} controls/> : <video src={activeVideo.link} controls/> }
+        {tabIndex === 0 ? (
+          <audio src={activeAudio?.link} controls />
+        ) : (
+          <video src={activeVideo?.link} controls />
+        )}
+        <a href={tabIndex === 0 ? activeAudio?.link : activeVideo?.link} type="audio/mpeg" download>
+          <IconButton
+            isRound
+            color="white"
+            bg="#306172"
+            aria-label="Save Recording"
+            fontSize="20px"
+            _hover={{ filter: 'brightness(150%)', color: 'black' }}
+            // onClick={handleDownload}
+            icon={<MdSaveAlt />}
+          />
+        </a> 
         <Reminder>檔案刪除後就無法再讀取，請記得先下載</Reminder>
       </RightWrapper>
       <ChatCorner />
