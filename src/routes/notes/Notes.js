@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
+import { v4 as uuid } from 'uuid';
 
 import firebase from '../../utils/firebase';
 import Note from '../../components/NoteCard';
@@ -9,8 +10,7 @@ import ChatCorner from '../../components/ChatCorner';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 0 10%;
-  padding-top: 90px;
+  margin: 30px 10% 0;
 `;
 
 const SearchBar = styled.div`
@@ -53,11 +53,10 @@ const ButtonWrapper = styled.div`
 const Notes = () => {
   const [databaseNotes, setDatabaseNotes] = useState([]);
   const [renderNotes, setRenderNotes] = useState([]);
-  const user = firebase.auth.currentUser;
+  const { currentUserId } = useOutletContext();
 
   useEffect(() => {
-    // if (!user) return;
-    firebase.getNotes(user.uid).then((snaps) => {
+    firebase.getNotes(currentUserId).then((snaps) => {
       const notesArray = [];
       snaps.forEach((doc) => {
         notesArray.push(doc.data());
@@ -65,7 +64,7 @@ const Notes = () => {
       setDatabaseNotes(notesArray);
       setRenderNotes(notesArray);
     });
-  }, []);
+  }, [currentUserId]);
 
   const handleSearch = (e) => {
     const term = e.target.value;
@@ -92,11 +91,12 @@ const Notes = () => {
       </ButtonWrapper>
       <NotesWrapper>
         {databaseNotes.length !== 0 &&
-          renderNotes.map((note, i) => {
+          renderNotes.map((note) => {
             return (
               <Note
+                currentUserId={currentUserId}
                 note={note}
-                key={i}
+                key={uuid()}
                 databaseNotes={databaseNotes}
                 setRenderNotes={setRenderNotes}
                 setDatabaseNotes={setDatabaseNotes}

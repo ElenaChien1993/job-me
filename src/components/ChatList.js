@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import React from 'react';
+import { useOutletContext } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
 import { v4 as uuid } from 'uuid';
+
+import ProfileImage from './ProfileImage';
 
 const Container = styled.div`
   display: flex;
@@ -18,14 +21,6 @@ const ChatWrapper = styled.div`
   &:hover {
     background-color: #d5f4f7;
   }
-`;
-
-const ImageWrapper = styled.div`
-  min-width: 50px;
-  min-height: 50px;
-  border-radius: 25px;
-  background: #f5cdc5;
-  margin-right: 13px;
 `;
 
 const BriefContent = styled.div`
@@ -69,7 +64,9 @@ const NewMessage = styled.div`
   display: ${(props) => (props.isRead ? 'none' : 'block')};
 `;
 
-const ChatList = ({ rooms, active, setActive, uid, isCorner }) => {
+const ChatList = React.memo(({ rooms, active, setActive, isCorner }) => {
+  const { currentUserId } = useOutletContext();
+
   return (
     <ThemeProvider theme={{ isCorner }}>
       <Container>
@@ -79,24 +76,29 @@ const ChatList = ({ rooms, active, setActive, uid, isCorner }) => {
             key={uuid()}
             onClick={() => setActive(room)}
           >
-            <ImageWrapper />
+            <ProfileImage
+              user={room.members}
+              size={50}
+              hasBorder={false}
+              marginRight={13}
+            />
             <BriefContent>
-              <Name>{room.members}</Name>
+              <Name>{room.members.display_name}</Name>
               <LatestMessage
-                isRead={room.receiver_has_read || uid === room.latest_sender}
+                isRead={room.receiver_has_read || currentUserId === room.latest_sender}
               >
-                {room.latest_message}
+                {room.latest.message_type === 0 ? room.latest.message : '傳送了一張照片'}
               </LatestMessage>
             </BriefContent>
-            <DateText>{room.latest_timestamp}</DateText>
+            <DateText>{room.latest.timestamp}</DateText>
             <NewMessage
-              isRead={room.receiver_has_read || uid === room.latest_sender}
+              isRead={room.receiver_has_read || currentUserId === room.latest_sender}
             />
           </ChatWrapper>
         ))}
       </Container>
     </ThemeProvider>
   );
-};
+});
 
 export default ChatList;

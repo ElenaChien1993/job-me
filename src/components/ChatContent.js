@@ -1,18 +1,26 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
-import firebase from '../utils/firebase';
 
+import firebase from '../utils/firebase';
 import ChatReceived from './elements/ChatReceived';
 import ChatSent from './elements/ChatSent';
 
-const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
+const ChatContent = React.memo(({ room, rootRef, bottomRef, isCorner }) => {
   const [messages, setMessages] = useState({});
   // const unsubscribeRef = useRef();
   const observeTargetRef = useRef();
   const firstMessageRef = useRef();
   const firstRenderRef = useRef(true);
+  const lastMessagesRef = useRef(false);
+  const containerRef = useRef();
+  const { currentUserId } = useOutletContext();
 
-  console.log('In Content', messages);
+  // useEffect(() => {
+  //   if (bottomRef.current) {
+  //     bottomRef.current.scrollIntoView();
+  //   }
+  // }, [bottomRef]);
 
   useEffect(() => {
     if (!messages[room.id]) return;
@@ -20,37 +28,37 @@ const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
   }, [messages, room.id]);
 
   useEffect(() => {
-    bottomRef.current.scrollIntoView(false, { behavior: 'auto' });
-
+    // bottomRef.current.scrollIntoView(false, { behavior: 'auto' });
     if (messages[room.id]) return;
-  }, [room, bottomRef]);
+    firstRenderRef.current = true;
+    lastMessagesRef.current = false;
+  }, [room]);
 
   useEffect(() => {
     let unsubscribe;
     const callback = ([entry]) => {
       if (!entry || !entry.isIntersecting) return;
-
-      console.log('observer fire', firstRenderRef.current, firstMessageRef);
+      if (lastMessagesRef.current) return;
 
       if (firstRenderRef.current) {
-        firebase.listenMessagesChange(room, setMessages, uid).then(res => {
+        firebase.listenMessagesChange(room, setMessages, currentUserId).then((res) => {
           unsubscribe = res;
-          bottomRef.current.scrollIntoView(false, { behavior: 'auto' });
+          // bottomRef.current.scrollIntoView();
           firstRenderRef.current = false;
         });
       } else {
         firebase
           .getMoreMessages(room.id, firstMessageRef.current)
-          .then(messages => {
-            console.log(messages);
-            // setMessages((prev) => {
-            //   return { ...prev, [room.id]: [...messages, ...prev[room.id]] };
-            // });
+          .then((messages) => {
+            setMessages((prev) => {
+              return { ...prev, [room.id]: [...messages, ...prev[room.id]] };
+            });
+            if (messages.length < 20) {
+              lastMessagesRef.current = true;
+            }
           });
       }
     };
-
-    console.log(unsubscribe);
 
     const options = {
       root: rootRef.current,
@@ -67,22 +75,30 @@ const ChatContent = ({ room, uid, rootRef, bottomRef }) => {
       // unsubscribe();
       observer.unobserve(observeTargetRef.current);
     };
-  }, [observeTargetRef, firstRenderRef, bottomRef, room, rootRef, uid]);
+  }, [observeTargetRef, firstRenderRef, bottomRef, room, rootRef, currentUserId]);
 
   return (
-    <>
+    <div ref={containerRef}>
       <div ref={observeTargetRef}></div>
       {messages[room.id] &&
-        messages[room.id].map(message =>
-          message.uid !== uid ? (
-            <ChatReceived key={uuid()} text={message.text} />
-          ) : (
-            <ChatSent key={uuid()} text={message.text} />
-          )
-        )}
-      <div ref={bottomRef}></div>
-    </>
+        messages[room.id].map((message, index) => {
+          if (index === messages[room.id].length - 1) {
+            return message.uid !== currentUserId ? (
+              <ChatReceived isCorner={isCorner} member={room.members} ref={bottomRef} key={uuid()} message={message} />
+            ) : (
+              <ChatSent ref={bottomRef} key={uuid()} message={message} />
+            );
+          } else {
+            return message.uid !== currentUserId ? (
+              <ChatReceived isCorner={isCorner} member={room.members} key={uuid()} message={message} />
+            ) : (
+              <ChatSent key={uuid()} message={message} />
+            );
+          }
+        })}
+      {/* <div ref={bottomRef}></div> */}
+    </div>
   );
-};
+});
 
 export default ChatContent;

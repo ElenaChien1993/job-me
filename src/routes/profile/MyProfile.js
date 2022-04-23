@@ -1,11 +1,12 @@
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import styled from 'styled-components';
+
 import ProfileRecords from '../../components/ProfileRecords';
 import ProfileSetting from '../../components/ProfileSetting';
 
 const Container = styled.div`
+  background-color: #ffeade;
   height: 100%;
-  padding-top: 70px;
 `;
 
 const Upper = styled.div`
@@ -24,7 +25,7 @@ const WebTitle = styled.div`
 
 const StyledTabList = styled(TabList)`
   position: absolute;
-  top: 226px;
+  top: 218px;
   padding-left: 100px;
   width: 100%;
 `
@@ -33,14 +34,14 @@ const Bottom = styled.div`
   height: 100%;
 `;
 
-const MyProfile = ({ uid }) => {
+const MyProfile = () => {
   return (
     <Container>
       <Upper>
         <WebTitle>Profile</WebTitle>
       </Upper>
       <Bottom>
-        <Tabs size="lg" height="100%">
+        <Tabs size="lg" height="100%" isLazy>
           <StyledTabList>
             <Tab>Setting</Tab>
             <Tab>Records</Tab>
@@ -48,10 +49,10 @@ const MyProfile = ({ uid }) => {
 
           <TabPanels height="100%">
             <TabPanel height="100%">
-              <ProfileSetting uid={uid}/>
+              <ProfileSetting />
             </TabPanel>
             <TabPanel height="100%">
-              <ProfileRecords uid={uid}/>
+              <ProfileRecords />
             </TabPanel>
           </TabPanels>
         </Tabs>

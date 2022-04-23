@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import {
   Button,
   ButtonGroup,
@@ -6,11 +8,14 @@ import {
   Textarea,
   IconButton,
 } from '@chakra-ui/react';
-import { EditIcon } from '@chakra-ui/icons';
-import { useEffect, useRef, useState } from 'react';
+import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
+
 import firebase from '../utils/firebase';
 import useClickOutside from '../hooks/useClickOutside';
+import Loader from '../components/Loader'
+import ChatCorner from './ChatCorner';
+import ProfileImage from './ProfileImage';
 
 const Container = styled.div`
   margin: 20px 10%;
@@ -36,14 +41,22 @@ const ImageWrapper = styled.div`
   height: 200px;
   border-radius: 100px;
   border: 5px solid #ee9c91;
+  overflow: hidden;
 `;
 
-const StyledIcon = styled(IconButton)`
-  && {
-    position: absolute;
-    bottom: 17px;
-    right: 6px;
-  }
+const StyledImg = styled.img`
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+`;
+
+const IconGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  right: -50px;
 `;
 
 const NameWrapper = styled.div`
@@ -51,6 +64,7 @@ const NameWrapper = styled.div`
   line-height: 65px;
   color: #000000;
   margin-top: 20px;
+  text-align: center;
 `;
 
 const JobTitle = styled.div`
@@ -85,7 +99,7 @@ const Number = styled.div`
 const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 0 50px;
+  padding-left: 50px;
   width: 62%;
 `;
 
@@ -143,53 +157,124 @@ const MenuWrapper = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 1;
-`
+`;
 
 const Option = styled.div`
   padding: 10px 15px;
   cursor: pointer;
   &:hover {
-    background: #E3E3E3;
+    background: #e3e3e3;
   }
-`
+`;
 
-const ProfileSetting = ({ uid }) => {
-  const [userInfo, setUserInfo] = useState(null);
+const ProfileSetting = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [values, setValues] = useState({
     display_name: '',
     title: '',
     about_me: '',
   });
+  const [image, setImage] = useState({ preview: '', raw: '' });
   const menuRef = useRef();
+  const hiddenInputRef = useRef();
+  const { userInfo, currentUserId } = useOutletContext();
 
-  useEffect(() => {
-    const unsubscribe = firebase.listenUserProfileChange(uid, setUserInfo);
-
-    return () => unsubscribe();
-  }, [uid]);
-
-  useClickOutside(menuRef, () => isMenuOpen && setIsMenuOpen(false))
+  useClickOutside(menuRef, () => isMenuOpen && setIsMenuOpen(false));
 
   const handleSubmit = () => {
     const entries = Object.entries(values);
-    const filtered = entries.filter((entry) => entry[1] !== '');
+    const filtered = entries.filter(entry => entry[1] !== '');
     const filteredObject = Object.fromEntries(filtered);
-    firebase.updateUserInfo(uid, filteredObject);
+    firebase.updateUserInfo(currentUserId, filteredObject);
     setValues({ display_name: '', title: '', about_me: '' });
   };
+
+  const handleChooseFile = e => {
+    hiddenInputRef.current.click();
+  };
+
+  const handleFileChange = e => {
+    if (e.target.files.length) {
+      setImage({
+        preview: URL.createObjectURL(e.target.files[0]),
+        raw: e.target.files[0],
+      });
+    }
+  };
+
+  const handleUpload = async e => {
+    const path = `profile/${currentUserId}`;
+    const url = await firebase.uploadFile(path, image.raw).then(() => {
+      return firebase.getDownloadURL(path);
+    });
+    firebase.updateUserInfo(currentUserId, { photo_url: url }).then(() => {
+      alert('照片更新成功！');
+    });
+    setImage({
+      preview: '',
+      raw: '',
+    });
+  };
+
+  const handleCancel = () => {
+    setImage({
+      preview: '',
+      raw: '',
+    });
+  };
+
+  const handleDelete = () => {
+    const path = `profile/${currentUserId}`;
+    firebase.deleteFile(path).then(() => {
+      firebase.updateUserInfo(currentUserId, { photo_url: null });
+    });
+  };
+
+  if (!userInfo) return <Loader />
 
   return (
     <Container>
       <LeftWrapper>
         <ImageContainer>
-          <ImageWrapper />
-          {isMenuOpen && <MenuWrapper ref={menuRef}>
-            <Option>上傳照片</Option>
-            <Option>刪除照片</Option>
-          </MenuWrapper>}
+          <ProfileImage
+            user={userInfo}
+            size={200}
+            hasBorder
+            marginRight={0}
+            preview={image.preview}
+          />
+          {isMenuOpen && (
+            <MenuWrapper ref={menuRef}>
+              <Option onClick={handleChooseFile}>上傳照片</Option>
+              <input
+                type="file"
+                ref={hiddenInputRef}
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+              <Option onClick={handleDelete}>刪除照片</Option>
+            </MenuWrapper>
+          )}
+          {image.preview !== '' && (
+            <IconGroup>
+              <IconButton
+                icon={<CheckIcon />}
+                aria-label="confirm upload"
+                onClick={handleUpload}
+              />
+              <IconButton
+                icon={<CloseIcon />}
+                aria-label="cancel upload"
+                onClick={handleCancel}
+              />
+            </IconGroup>
+          )}
           <IconWrapper>
-            <IconButton aria-label="Edit profile image" icon={<EditIcon />} onClick={() => setIsMenuOpen(true)}/>
+            <IconButton
+              aria-label="Edit profile image"
+              icon={<EditIcon />}
+              onClick={() => setIsMenuOpen(true)}
+            />
           </IconWrapper>
         </ImageContainer>
         <NameWrapper>{userInfo && userInfo.display_name}</NameWrapper>
@@ -227,8 +312,8 @@ const ProfileSetting = ({ uid }) => {
           <StyledInput
             size="sm"
             value={values.display_name}
-            onChange={(e) =>
-              setValues((prev) => {
+            onChange={e =>
+              setValues(prev => {
                 return { ...prev, display_name: e.target.value };
               })
             }
@@ -239,8 +324,8 @@ const ProfileSetting = ({ uid }) => {
           <StyledInput
             size="sm"
             value={values.title}
-            onChange={(e) =>
-              setValues((prev) => {
+            onChange={e =>
+              setValues(prev => {
                 return { ...prev, title: e.target.value };
               })
             }
@@ -251,13 +336,14 @@ const ProfileSetting = ({ uid }) => {
         <Textarea
           placeholder="請輸入簡短的自我介紹"
           value={values.about_me}
-          onChange={(e) =>
-            setValues((prev) => {
+          onChange={e =>
+            setValues(prev => {
               return { ...prev, about_me: e.target.value };
             })
           }
         />
       </RightWrapper>
+      <ChatCorner />
     </Container>
   );
 };

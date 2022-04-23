@@ -1,5 +1,6 @@
+import { useRef } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { IconButton } from '@chakra-ui/react';
-import { useRef, useState } from 'react';
 import { IoChatbubbleEllipsesSharp } from 'react-icons/io5';
 import styled from 'styled-components';
 
@@ -20,8 +21,8 @@ const IconWrapper = styled.div`
 `;
 
 const ChatCorner = () => {
-  const [chatOpen, setChatOpen] = useState(false);
   const cornerRef = useRef();
+  const { chatOpen, setChatOpen } = useOutletContext();
 
   useClickOutside(cornerRef, () => chatOpen && setChatOpen(false));
 

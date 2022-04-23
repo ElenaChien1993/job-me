@@ -14,6 +14,7 @@ import { v4 as uuid } from 'uuid';
 import { Audio, Video } from './elements/MediaRecorder';
 import CountDown from './elements/CountDown';
 import firebase from '../utils/firebase';
+import { identity } from 'lodash';
 
 const ButtonsWrapper = styled.div`
   display: flex;
@@ -55,15 +56,15 @@ const Recording = ({
   const { company_name, job_title } = brief;
   const user = firebase.auth.currentUser;
 
-  const getDownloadURL = async (type) => {
+  const getDownloadURL = async (type, id) => {
     const fileBlob = await fetch(mediaBlobUrl).then((r) => r.blob());
     const path = `${type === 0 ? 'audios' : 'videos'}/${
       user.uid
     }/${company_name}｜${job_title}/${
       practiceQuestions[current].question
-    }-${uuid()}`;
+    }-${id}`;
 
-    const url = await firebase.uplaodFile(path, fileBlob).then(() => {
+    const url = await firebase.uploadFile(path, fileBlob).then(() => {
       return firebase.getDownloadURL(path);
     });
 
@@ -71,16 +72,17 @@ const Recording = ({
   };
 
   const handleSave = async (type) => {
-    const url = await getDownloadURL(type);
-
     const recordData = {
       date: firebase.Timestamp.fromDate(new Date()),
       type: type,
-      link: url,
       record_name: practiceQuestions[current].question,
+      record_job: `${company_name}｜${job_title}`,
     };
-
-    firebase.setRecord(user.uid, recordData).then(() => alert('已成功儲存！'));
+    firebase.setRecord(user.uid, recordData).then(async (id) => {
+      const url = await getDownloadURL(type, id);
+      firebase.updateRecord(user.uid, id, { link: url });
+      alert('已成功儲存！');
+    });
   };
 
   const goNext = () => {
@@ -94,7 +96,7 @@ const Recording = ({
     setProgress('before');
   };
 
-  console.log('status', status)
+  console.log('status', status);
 
   return (
     <>
@@ -118,8 +120,8 @@ const Recording = ({
         <Button
           size="sm"
           onClick={() => {
-            console.log('press start')
-            startRecording()
+            console.log('press start');
+            startRecording();
           }}
           rightIcon={<ArrowForwardIcon />}
         >

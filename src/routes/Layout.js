@@ -1,6 +1,9 @@
+import { useEffect, useRef, useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import Avatar from 'boring-avatars';
 
+import useClickOutside from '../hooks/useClickOutside';
 import firebase from '../utils/firebase';
 
 const Container = styled.div`
@@ -12,6 +15,7 @@ const ContentContainer = styled.div`
   width: 100%;
   height: 100%;
   background-color: #ffeade;
+  padding-top: 70px;
 `;
 
 const StyledNav = styled.nav`
@@ -34,27 +38,72 @@ const NavItem = styled.li`
   margin: 10px 20px;
 `;
 
-const Logout = styled.button`
-  color: white;
-  background-color: #306172;
+const ImageWrapper = styled.div`
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  background: #f5cdc5;
+  margin-right: 13px;
+  overflow: hidden;
   margin-left: auto;
   margin-right: 20px;
+  cursor: pointer;
 `;
 
-const Nav = ({ isLogin }) => {
-  const currentUserId = firebase.auth.currentUser.uid
+const StyledImg = styled.img`
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+`;
+
+const MenuWrapper = styled.div`
+  position: absolute;
+  right: 0;
+  top: 55px;
+  width: 120px;
+  height: 100px;
+  background-color: white;
+  box-shadow: 4px 4px 4px 1px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+`;
+
+const Option = styled.div`
+  padding: 10px 15px;
+  cursor: pointer;
+  &:hover {
+    background: #e3e3e3;
+  }
+`;
+
+const Nav = ({ isLogin, userInfo, currentUserId, setUserInfo }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const menuRef = useRef();
+
+  useClickOutside(menuRef, () => isMenuOpen && setIsMenuOpen(false));
 
   const handleLogout = () => {
     firebase
       .signOut()
       .then(() => {
+        setUserInfo(null);
         alert('已成功登出');
         navigate('/login', { state: { from: { pathname: '/notes' } } });
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
+  };
+
+  const goToProfile = () => {
+    setIsMenuOpen(false);
+    navigate(`/profile/${currentUserId}`);
   };
 
   return (
@@ -67,23 +116,70 @@ const Nav = ({ isLogin }) => {
           <Link to="/practice">Practice</Link>
         </NavItem>
         <NavItem>
-          <Link to={`/profile/${currentUserId}`}>Profile</Link>
-        </NavItem>
-        <NavItem>
           <Link to="/messages">Messages</Link>
         </NavItem>
-        {!isLogin && <Logout onClick={handleLogout}>Log out</Logout>}
+        <ImageWrapper onClick={() => setIsMenuOpen(true)}>
+          {userInfo.photo_url ? (
+            <StyledImg src={userInfo && userInfo.photo_url} alt="head-shot" />
+          ) : (
+            <Avatar
+              size={60}
+              name={userInfo?.display_name}
+              variant="beam"
+              colors={['#C1DDC7', '#F5E8C6', '#BBCD77', '#DC8051', '#F4D279']}
+            />
+          )}
+        </ImageWrapper>
+        {isMenuOpen && (
+          <MenuWrapper ref={menuRef}>
+            <Option onClick={goToProfile}>Profile</Option>
+            {!isLogin && <Option onClick={handleLogout}>登出</Option>}
+          </MenuWrapper>
+        )}
       </Ul>
     </StyledNav>
   );
 };
 
-const Layout = ({ isLogin }) => {
+const Layout = ({ isLogin, isLoading, setIsLoading }) => {
+  const currentUserId = firebase.auth.currentUser?.uid;
+  const [userInfo, setUserInfo] = useState(null);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [active, setActive] = useState(null);
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    const unsubscribe = firebase.listenUserProfileChange(
+      currentUserId,
+      setUserInfo
+    );
+
+    return () => unsubscribe();
+  }, [isLogin, currentUserId]);
+
+  const props = {
+    currentUserId,
+    userInfo,
+    chatOpen,
+    setChatOpen,
+    active,
+    setActive,
+  };
+
+  // if (!currentUserId || !userInfo) return <Loader />
+
   return (
     <Container>
-      <Nav isLogin={isLogin} />
+      {userInfo && (
+        <Nav
+          isLogin={isLogin}
+          userInfo={userInfo}
+          currentUserId={currentUserId}
+          setUserInfo={setUserInfo}
+        />
+      )}
       <ContentContainer>
-        <Outlet />
+        <Outlet context={props} />
       </ContentContainer>
     </Container>
   );

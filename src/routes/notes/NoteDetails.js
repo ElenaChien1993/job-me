@@ -1,6 +1,5 @@
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Editable,
   EditableInput,
@@ -29,8 +28,7 @@ import EditorArea from '../../components/elements/Editor';
 import RecommendModal from '../../components/RecommendModal';
 
 const Background = styled.div`
-  margin: 0 10%;
-  padding-top: 90px;
+  margin: 30px 10% 0;
 `
 
 const Container = styled.div`

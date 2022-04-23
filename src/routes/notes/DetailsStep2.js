@@ -6,7 +6,8 @@ const Container = styled.div`
   height: auto;
   background: #ffffff;
   border-radius: 30px;
-  margin-top: 20px;
+  margin: 40px auto 0;
+  width: 80%;
 `;
 
 const LeftWrapper = styled.div`
