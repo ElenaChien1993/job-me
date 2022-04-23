@@ -1,4 +1,5 @@
 import React from 'react';
+import { Image, CircularProgress } from '@chakra-ui/react';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -20,12 +21,40 @@ const Content = styled.div`
   line-height: 1.4;
 `;
 
-const ChatSent = React.forwardRef(( props, ref ) => {
+const DateText = styled.div`
+  font-size: 14px;
+  color: #999999;
+  margin-right: 10px;
+`;
+
+const Text = ({ text }) => {
+  return <Content>{text}</Content>;
+};
+
+const ImageMessage = ({ url }) => {
+  return (
+    <Image
+      objectFit='contain'
+      alt="message"
+      src={url}
+      boxSize="100px"
+      fallback={<CircularProgress isIndeterminate color='green.300' />}
+    />
+  );
+};
+
+const MESSAGE_TYPE = props => ({
+  0: <Text text={props.message.text} />,
+  1: <ImageMessage url={props.message.text} />,
+});
+
+const ChatSent = React.forwardRef((props, ref) => {
   return (
     <Wrapper ref={ref}>
-      <Content>{props.text}</Content>
+      <DateText>{props.message.create_at}</DateText>
+      {MESSAGE_TYPE(props)[props.message.type]}
     </Wrapper>
   );
-})
+});
 
 export default ChatSent;

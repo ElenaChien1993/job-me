@@ -32,8 +32,9 @@ import {
   getDownloadURL,
   deleteObject,
 } from 'firebase/storage';
-
 import useFormatedTime from '../hooks/useFormatedTime';
+
+import useRelativeTime from '../hooks/useRelativeTime';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBO5LwocKFyWmosZiVyP0uCxNdNbOUYDho',
@@ -96,16 +97,7 @@ const firebase = {
         data.push(doc.data());
       });
       const transformed = data.map(record => {
-        const timeString = `${record.date
-          .toDate()
-          .toLocaleDateString(undefined, {
-            month: 'numeric',
-            day: 'numeric',
-          })} ${record.date.toDate().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        })}`;
+        const timeString = useFormatedTime(record.date);
         return { ...record, date: timeString };
       });
       const audios = transformed.filter(record => record.type === 0);
@@ -283,7 +275,7 @@ const firebase = {
     const q = query(
       collection(db, 'chatrooms'),
       where('members', 'array-contains', uid),
-      orderBy('latest_timestamp', 'desc'),
+      orderBy('latest.timestamp', 'desc'),
       limit(7)
     );
     return new Promise(res => {
@@ -295,10 +287,10 @@ const firebase = {
         console.log(data);
         const rooms = await Promise.all(
           data.map(async room => {
-            const timeRelative = useFormatedTime(room);
+            const timeRelative = useRelativeTime(room);
             const friendId = room.members.filter(id => id !== uid);
             const userData = await this.getUserInfo(friendId[0]);
-            return { ...room, members: userData, latest_timestamp: timeRelative };
+            return { ...room, members: userData, latest: {...room.latest, timestamp: timeRelative} };
           })
         );
         callback(rooms);
@@ -360,14 +352,18 @@ const firebase = {
           }
         });
         data.sort((a, b) => !b.create_at - a.create_at);
+        const transformed = data.map(message => {
+          const timeString = useFormatedTime(message.create_at);
+          return { ...message, create_at: timeString };
+        });
         callback(prev => {
           if (!prev[room.id]) {
             return {
               ...prev,
-              [room.id]: data,
+              [room.id]: transformed,
             };
           } else {
-            return { ...prev, [room.id]: [...prev[room.id], ...data] };
+            return { ...prev, [room.id]: [...prev[room.id], ...transformed] };
           }
         });
         if (!room.id || uid === room.latest_sender) return;
@@ -382,8 +378,11 @@ const firebase = {
     try {
       await addDoc(collection(db, 'chatrooms', roomId, 'messages'), data);
       await updateDoc(doc(db, 'chatrooms', roomId), {
-        latest_timestamp: data.create_at,
-        latest_message: data.text,
+        latest : {
+          timestamp: data.create_at,
+          message: data.text,
+          message_type: data.type,
+        },
         receiver_has_read: false,
         latest_sender: data.uid,
       });

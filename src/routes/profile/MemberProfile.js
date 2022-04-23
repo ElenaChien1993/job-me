@@ -10,7 +10,6 @@ import ProfileImage from '../../components/ProfileImage';
 import firebase from '../../utils/firebase';
 
 const Container = styled.div`
-  padding-top: 70px;
 `;
 
 const Upper = styled.div`
@@ -83,7 +82,9 @@ const MemberProfile = React.memo(() => {
   const createChat = async () => {
     const data = {
       members: [currentUserId, uid],
-      latest_timestamp: '',
+      latest: {
+        timestamp: '',
+      },
     };
     const roomExist = await firebase.checkIsRoomExist(data.members);
     if (roomExist.length !== 0) {

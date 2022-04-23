@@ -1,12 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
-import firebase from '../utils/firebase';
 
+import firebase from '../utils/firebase';
 import ChatReceived from './elements/ChatReceived';
 import ChatSent from './elements/ChatSent';
 
-const ChatContent = ({ room, rootRef, bottomRef }) => {
+const ChatContent = React.memo(({ room, rootRef, bottomRef, isCorner }) => {
   const [messages, setMessages] = useState({});
   // const unsubscribeRef = useRef();
   const observeTargetRef = useRef();
@@ -21,7 +21,6 @@ const ChatContent = ({ room, rootRef, bottomRef }) => {
   //     bottomRef.current.scrollIntoView();
   //   }
   // }, [bottomRef]);
-  console.log(room)
 
   useEffect(() => {
     if (!messages[room.id]) return;
@@ -85,21 +84,21 @@ const ChatContent = ({ room, rootRef, bottomRef }) => {
         messages[room.id].map((message, index) => {
           if (index === messages[room.id].length - 1) {
             return message.uid !== currentUserId ? (
-              <ChatReceived member={room.members} ref={bottomRef} key={uuid()} text={message.text} />
+              <ChatReceived isCorner={isCorner} member={room.members} ref={bottomRef} key={uuid()} message={message} />
             ) : (
-              <ChatSent ref={bottomRef} key={uuid()} text={message.text} />
+              <ChatSent ref={bottomRef} key={uuid()} message={message} />
             );
           } else {
             return message.uid !== currentUserId ? (
-              <ChatReceived member={room.members} key={uuid()} text={message.text} />
+              <ChatReceived isCorner={isCorner} member={room.members} key={uuid()} message={message} />
             ) : (
-              <ChatSent key={uuid()} text={message.text} />
+              <ChatSent key={uuid()} message={message} />
             );
           }
         })}
       {/* <div ref={bottomRef}></div> */}
     </div>
   );
-};
+});
 
 export default ChatContent;

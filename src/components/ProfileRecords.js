@@ -101,7 +101,6 @@ const ProfileRecords = () => {
   const [activeAudio, setActiveAudio] = useState(null);
   const [activeVideo, setActiveVideo] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
-  const anchorRef = useRef();
   const { currentUserId } = useOutletContext();
 
   useEffect(() => {
@@ -229,7 +228,6 @@ const ProfileRecords = () => {
         ) : (
           <video src={activeVideo?.link} controls />
         )}
-        {/* <a ref={anchorRef} download style={{display: 'none'}}> */}
         <IconButton
           isRound
           color="white"
@@ -247,7 +245,6 @@ const ProfileRecords = () => {
           }
           icon={<MdSaveAlt />}
         />
-        {/* </a>  */}
         <Reminder>檔案刪除後就無法再讀取，請記得先下載</Reminder>
       </RightWrapper>
       <ChatCorner />

@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import { Search2Icon } from '@chakra-ui/icons';
-import { BiSend } from 'react-icons/bi';
+import { BiSend, BiImageAdd } from 'react-icons/bi';
 import {
   InputGroup,
   InputLeftElement,
   Input,
   IconButton,
+  useDisclosure,
 } from '@chakra-ui/react';
 import styled, { ThemeProvider } from 'styled-components';
 
@@ -14,6 +15,7 @@ import ChatList from '../components/ChatList';
 import firebase from '../utils/firebase';
 import ChatContent from '../components/ChatContent';
 import ProfileImage from '../components/ProfileImage';
+import AddImageModal from '../components/AddImageModal';
 
 const Container = styled.div`
   width: ${props => (props.theme.isCorner ? '40vw' : '')};
@@ -88,7 +90,7 @@ const BottomWrapper = styled.div`
   align-items: center;
   border-radius: 0 0 20px 0;
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.25);
-  padding-left: 20px;
+  padding: 0 10px;
 `;
 
 const MessageBar = styled(Input)`
@@ -96,7 +98,7 @@ const MessageBar = styled(Input)`
     width: 85%;
     border-radius: 20px;
     border-color: #e8e8e8;
-    margin-right: 20px;
+    margin-right: 10px;
   }
 `;
 
@@ -121,6 +123,8 @@ const Messages = () => {
   // const unsubscribeRef = useRef();
   const { currentUserId, active, setActive } = useOutletContext();
   const { pathname } = useLocation();
+
+  const { onOpen, isOpen, onClose } = useDisclosure({ id: 'addImage' });
 
   useEffect(() => {
     if (pathname === '/messages') {
@@ -148,20 +152,21 @@ const Messages = () => {
     firebase.updateRoom(active.id, { receiver_has_read: true });
   }, [active, currentUserId]);
 
-  const send = () => {
+  const send = (value, type) => {
     const MessageData = {
       uid: currentUserId,
-      text: text,
+      text: value,
       create_at: firebase.Timestamp.fromDate(new Date()),
+      type: type,
     };
     firebase.sendMessage(active.id, MessageData);
     setText('');
     bottomRef.current.scrollIntoView({ behavior: 'auto' });
   };
 
-  const handleEnter = e => {
+  const handleEnter = (e, value, type) => {
     if (e.keyCode === 13) {
-      send();
+      send(value, type);
     }
   };
 
@@ -172,7 +177,9 @@ const Messages = () => {
       return;
     }
     const filtered = databaseRooms.filter(
-      room => room.members.includes(term) || room.latest_message.includes(term)
+      room =>
+        room.members.display_name.toLowerCase().includes(term) ||
+        room.latest_message.toLowerCase().includes(term)
     );
     setRenderRooms(filtered);
   };
@@ -218,13 +225,14 @@ const Messages = () => {
               </>
             )}
           </TopWrapper>
-
+          <AddImageModal isOpen={isOpen} onClose={onClose} room={active} send={send}/>
           <Content ref={rootRef}>
             {active ? (
               <ChatContent
                 room={active}
                 bottomRef={bottomRef}
                 rootRef={rootRef}
+                isCorner={isCorner}
               />
             ) : (
               <div>請選取聊天室</div>
@@ -236,10 +244,16 @@ const Messages = () => {
               placeholder="Type your message"
               value={text}
               onChange={event => setText(event.target.value)}
-              onKeyDown={e => handleEnter(e)}
+              onKeyDown={e => handleEnter(e, text, 0)}
             />
             <StyledIconButton
-              onClick={send}
+              onClick={onOpen}
+              variant="ghost"
+              aria-label="Send Message"
+              icon={<BiImageAdd />}
+            />
+            <StyledIconButton
+              onClick={() => send(text, 0)}
               variant="ghost"
               aria-label="Send Message"
               icon={<BiSend />}

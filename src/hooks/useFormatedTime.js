@@ -1,14 +1,14 @@
-import { formatRelative } from 'date-fns';
-import { zhTW } from 'date-fns/locale';
+const useFormatedTime = date => {
+  const timeString = `${date.toDate().toLocaleDateString(undefined, {
+    month: 'numeric',
+    day: 'numeric',
+  })} ${date.toDate().toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })}`;
 
-const useFormatedTime = (room) => {
-  if (room.latest_timestamp === '') return;
-  const timeRelative = formatRelative(
-    new Date(room.latest_timestamp.seconds * 1000),
-    new Date(),
-    { locale: zhTW, addSuffix: true }
-  );
-  return timeRelative;
+  return timeString;
 };
 
 export default useFormatedTime;
