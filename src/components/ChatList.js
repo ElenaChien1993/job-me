@@ -1,3 +1,4 @@
+import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
 import { v4 as uuid } from 'uuid';
@@ -76,7 +77,7 @@ const NewMessage = styled.div`
   display: ${(props) => (props.isRead ? 'none' : 'block')};
 `;
 
-const ChatList = ({ rooms, active, setActive, isCorner }) => {
+const ChatList = React.memo(({ rooms, active, setActive, isCorner }) => {
   const { currentUserId } = useOutletContext();
 
   return (
@@ -108,6 +109,6 @@ const ChatList = ({ rooms, active, setActive, isCorner }) => {
       </Container>
     </ThemeProvider>
   );
-};
+});
 
 export default ChatList;

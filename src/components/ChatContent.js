@@ -16,14 +16,11 @@ const ChatContent = ({ room, rootRef, bottomRef }) => {
   const containerRef = useRef();
   const { currentUserId } = useOutletContext();
 
-
-  console.log('In Content', bottomRef.current);
-
   useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView();
     }
-  }, []);
+  }, [bottomRef]);
 
   useEffect(() => {
     if (!messages[room.id]) return;
@@ -37,8 +34,6 @@ const ChatContent = ({ room, rootRef, bottomRef }) => {
     lastMessagesRef.current = false;
   }, [room]);
 
-  console.log(bottomRef.current);
-
   useEffect(() => {
     let unsubscribe;
     const callback = ([entry]) => {
@@ -48,8 +43,6 @@ const ChatContent = ({ room, rootRef, bottomRef }) => {
       if (firstRenderRef.current) {
         firebase.listenMessagesChange(room, setMessages, currentUserId).then((res) => {
           unsubscribe = res;
-          // rootRef.current.scrollTop = rootRef.current.scrollHeight;
-          // rootRef.current.scrollTo(0, rootRef.current.scrollHeight)
           bottomRef.current.scrollIntoView();
           firstRenderRef.current = false;
         });
@@ -57,7 +50,6 @@ const ChatContent = ({ room, rootRef, bottomRef }) => {
         firebase
           .getMoreMessages(room.id, firstMessageRef.current)
           .then((messages) => {
-            console.log(messages);
             setMessages((prev) => {
               return { ...prev, [room.id]: [...messages, ...prev[room.id]] };
             });

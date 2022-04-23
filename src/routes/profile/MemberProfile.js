@@ -80,25 +80,31 @@ const Number = styled.div`
 
 const MemberProfile = () => {
   const [info, setInfo] = useState(null);
-  const { currentUserId, setChatOpen } = useOutletContext();
+  const { currentUserId, setChatOpen, setActive } = useOutletContext();
   let params = useParams();
   const uid = params.uid;
 
   useEffect(() => {
     if (!uid) return;
-    firebase.getUser(uid).then((doc) => {
+    firebase.getUser(uid).then(doc => {
       setInfo(doc.data());
     });
   }, [uid]);
 
-  const createChat = () => {
+  const createChat = async () => {
     const data = {
       members: [currentUserId, uid],
+      latest_timestamp: '',
     };
-    firebase.setChatroom(data).then((id) => {
+    const roomExist = await firebase.checkIsRoomExist(data.members);
+    if (roomExist.length !== 0) {
+      await setActive(...roomExist);
       setChatOpen(true);
-      console.log('create')
-    });
+    } else {
+      firebase.setChatroom(data).then(() => {
+        setChatOpen(true);
+      });
+    }
   };
 
   return (

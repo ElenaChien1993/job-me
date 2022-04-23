@@ -128,13 +128,12 @@ const Messages = () => {
   const [text, setText] = useState('');
   const [databaseRooms, setDatabaseRooms] = useState([]);
   const [renderRooms, setRenderRooms] = useState([]);
-  const [active, setActive] = useState(null);
   const [isCorner, setIsCorner] = useState(true);
   // const observeTargetRef = useRef();
   const rootRef = useRef();
   const bottomRef = useRef();
   // const unsubscribeRef = useRef();
-  const { currentUserId } = useOutletContext();
+  const { currentUserId, active, setActive } = useOutletContext();
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -151,11 +150,15 @@ const Messages = () => {
       setDatabaseRooms(rooms);
     };
 
-    const unsubscribe = firebase.listenRoomsChange(currentUserId, setDatabaseRooms);
+    let unsubscribe;
+    firebase.listenRoomsChange(currentUserId, setDatabaseRooms).then((res) => {
+      unsubscribe = res;
+      // setDatabaseRooms(res.rooms)
+    });
 
-    fetchRooms(currentUserId);
+    // fetchRooms(currentUserId);
     return unsubscribe;
-  }, []);
+  }, [currentUserId]);
 
   useEffect(() => {
     setRenderRooms(databaseRooms);
@@ -195,8 +198,6 @@ const Messages = () => {
     );
     setRenderRooms(filtered);
   };
-
-  console.log('In Msgs', active);
 
   return (
     <ThemeProvider theme={{ isCorner }}>

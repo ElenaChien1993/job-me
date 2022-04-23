@@ -32,8 +32,8 @@ import {
   getDownloadURL,
   deleteObject,
 } from 'firebase/storage';
-import { formatDistance, formatRelative } from 'date-fns';
-import { zhTW } from 'date-fns/locale';
+
+import useFormatedTime from '../hooks/useFormatedTime';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBO5LwocKFyWmosZiVyP0uCxNdNbOUYDho',
@@ -89,17 +89,19 @@ const firebase = {
       });
     });
   },
-  listenUserRecordsChange(uid, setAudioRecords ,setVideoRecords) {
+  listenUserRecordsChange(uid, setAudioRecords, setVideoRecords) {
     return onSnapshot(collection(db, 'users', uid, 'records'), async docs => {
       let data = [];
       docs.forEach(doc => {
         data.push(doc.data());
       });
       const transformed = data.map(record => {
-        const timeString = `${record.date.toDate().toLocaleDateString(undefined, {
-          month: 'numeric',
-          day: 'numeric',
-        })} ${record.date.toDate().toLocaleTimeString([], {
+        const timeString = `${record.date
+          .toDate()
+          .toLocaleDateString(undefined, {
+            month: 'numeric',
+            day: 'numeric',
+          })} ${record.date.toDate().toLocaleTimeString([], {
           hour: '2-digit',
           minute: '2-digit',
           hour12: false,
@@ -169,6 +171,9 @@ const firebase = {
       console.log(err);
     }
   },
+  listenDetailsChange(noteId, callback) {
+    return onSnapshot(doc(db, 'details', noteId), callback);
+  },
   async setRecord(uid, data) {
     const newDocRef = doc(collection(db, `users/${uid}/records`));
     try {
@@ -192,9 +197,6 @@ const firebase = {
     } catch (err) {
       console.log(err);
     }
-  },
-  listenDetailsChange(noteId, callback) {
-    return onSnapshot(doc(db, 'details', noteId), callback);
   },
   checklogin(callback) {
     onAuthStateChanged(auth, callback);
@@ -248,32 +250,6 @@ const firebase = {
         console.log(error);
       });
   },
-  async getChatrooms(uid) {
-    const rooms = query(
-      collection(db, 'chatrooms'),
-      where('members', 'array-contains', uid),
-      orderBy('latest_timestamp', 'desc'),
-      limit(7)
-    );
-    const querySnapshot = await getDocs(rooms);
-    let data = [];
-    querySnapshot.forEach(doc => {
-      data.push(doc.data());
-    });
-    const transformedRooms = await Promise.all(
-      data.map(async room => {
-        const timeRelative = formatRelative(
-          new Date(room.latest_timestamp.seconds * 1000),
-          new Date(),
-          { locale: zhTW, addSuffix: true }
-        );
-        const friendId = room.members.filter(id => id !== uid);
-        const userData = await this.getUserName(friendId[0]);
-        return { ...room, members: userData, latest_timestamp: timeRelative };
-      })
-    );
-    return transformedRooms;
-  },
   async setChatroom(data) {
     const newDocRef = doc(collection(db, 'chatrooms'));
     try {
@@ -283,38 +259,52 @@ const firebase = {
       console.log(err);
     }
   },
+  async checkIsRoomExist(ids) {
+    const myRooms = query(
+      collection(db, 'chatrooms'),
+      where('members', 'array-contains', ids[0])
+    );
+    const querySnapshot = await getDocs(myRooms);
+    let data = [];
+    querySnapshot.forEach(doc => {
+      if (doc.data().members.includes(ids[1])) {
+        data.push(doc.data());
+      }
+    });
+    return data;
+  },
+  listenRoomsChange(uid, callback) {
+    const q = query(
+      collection(db, 'chatrooms'),
+      where('members', 'array-contains', uid),
+      orderBy('latest_timestamp', 'desc'),
+      limit(7)
+    );
+    return new Promise(res => {
+      const unsubscribe = onSnapshot(q, async snapshot => {
+        let data = [];
+        snapshot.forEach(snap => {
+          data.push(snap.data());
+        });
+        console.log(data);
+        const rooms = await Promise.all(
+          data.map(async room => {
+            const timeRelative = useFormatedTime(room);
+            const friendId = room.members.filter(id => id !== uid);
+            const userData = await this.getUserName(friendId[0]);
+            return { ...room, members: userData, latest_timestamp: timeRelative };
+          })
+        );
+        callback(rooms);
+        res(unsubscribe);
+      });
+    });
+  },
   async getUserName(uid) {
     const docSnap = await getDoc(doc(db, 'users', uid));
     const name = docSnap.data().display_name;
     const photo = docSnap.data().photo_url ? docSnap.data().photo_url : '';
     return { name, photo_url: photo };
-  },
-  listenRoomsChange(uid, callback) {
-    const q = query(
-      collection(db, 'chatrooms'),
-      where('members', 'array-contains', uid)
-    );
-    return onSnapshot(q, async snapshot => {
-      let data;
-      snapshot.docChanges().forEach(change => {
-        if (change.type === 'modified') {
-          data = change.doc.data();
-        }
-      });
-      if (!data) return;
-      const timeRelative = formatRelative(
-        new Date(data.latest_timestamp.seconds * 1000),
-        new Date(),
-        { locale: zhTW, addSuffix: true }
-      );
-      const friendId = data.members.filter(id => id !== uid);
-      const name = await this.getUserName(friendId[0]);
-      data = { ...data, latest_timestamp: timeRelative, members: name };
-      callback(prev => {
-        const filtered = prev.filter(room => room.id !== data.id);
-        return [data, ...filtered];
-      });
-    });
   },
   async getMoreMessages(roomId, message) {
     if (!message) return;
@@ -364,7 +354,6 @@ const firebase = {
           }
         });
         data.sort((a, b) => !b.create_at - a.create_at);
-        console.log('data', data);
         callback(prev => {
           if (!prev[room.id]) {
             return {

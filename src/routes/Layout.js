@@ -133,6 +133,8 @@ const Layout = ({ isLogin }) => {
   const currentUserId = firebase.auth.currentUser?.uid;
   const [userInfo, setUserInfo] = useState(null);
   const [chatOpen, setChatOpen] = useState(false);
+  const [active, setActive] = useState(null);
+
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -148,7 +150,9 @@ const Layout = ({ isLogin }) => {
     currentUserId,
     userInfo,
     chatOpen,
-    setChatOpen
+    setChatOpen,
+    active,
+    setActive,
   };
 
   return (

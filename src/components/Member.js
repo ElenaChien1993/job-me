@@ -1,4 +1,5 @@
 import { Button } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -46,6 +47,11 @@ const Status = styled.p`
 `;
 
 const Member = ({ note }) => {
+  const navigate = useNavigate();
+  const goToProfile = id => {
+    navigate(`/profile/${id}`);
+  };
+
   return (
     <Container>
       <ImageWrapper />
@@ -54,7 +60,9 @@ const Member = ({ note }) => {
         <JobTitle>{note.creator_name}</JobTitle>
         <Status>{note.job_title}</Status>
       </ContentWrapper>
-      <Button colorScheme="blue">查看個人檔案</Button>
+      <Button colorScheme="blue" onClick={() => goToProfile(note.creator)}>
+        查看個人檔案
+      </Button>
     </Container>
   );
 };
