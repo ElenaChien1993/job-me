@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import {
   Button,
   ButtonGroup,
@@ -7,12 +9,13 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons';
-import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+
 import firebase from '../utils/firebase';
 import useClickOutside from '../hooks/useClickOutside';
+import Loader from '../components/Loader'
 import ChatCorner from './ChatCorner';
-import { useOutletContext } from 'react-router-dom';
+import ProfileImage from './ProfileImage';
 
 const Container = styled.div`
   margin: 20px 10%;
@@ -227,18 +230,19 @@ const ProfileSetting = () => {
     });
   };
 
+  if (!userInfo) return <Loader />
+
   return (
     <Container>
       <LeftWrapper>
         <ImageContainer>
-          <ImageWrapper>
-            <StyledImg
-              src={
-                userInfo && !image.preview ? userInfo.photo_url : image.preview
-              }
-              alt="head-shot"
-            />
-          </ImageWrapper>
+          <ProfileImage
+            user={userInfo}
+            size={200}
+            hasBorder
+            marginRight={0}
+            preview={image.preview}
+          />
           {isMenuOpen && (
             <MenuWrapper ref={menuRef}>
               <Option onClick={handleChooseFile}>上傳照片</Option>

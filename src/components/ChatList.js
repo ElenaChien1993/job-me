@@ -3,6 +3,8 @@ import { useOutletContext } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
+import ProfileImage from './ProfileImage';
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -19,21 +21,6 @@ const ChatWrapper = styled.div`
   &:hover {
     background-color: #d5f4f7;
   }
-`;
-
-const ImageWrapper = styled.div`
-  min-width: 50px;
-  min-height: 50px;
-  border-radius: 25px;
-  background: #f5cdc5;
-  margin-right: 13px;
-  overflow: hidden;
-`;
-
-const StyledImg = styled.img`
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
 `;
 
 const BriefContent = styled.div`
@@ -89,11 +76,14 @@ const ChatList = React.memo(({ rooms, active, setActive, isCorner }) => {
             key={uuid()}
             onClick={() => setActive(room)}
           >
-            <ImageWrapper>
-              <StyledImg src={room.members.photo_url} alt="head-shot"/>
-            </ImageWrapper>
+            <ProfileImage
+              user={room.members}
+              size={50}
+              hasBorder={false}
+              marginRight={13}
+            />
             <BriefContent>
-              <Name>{room.members.name}</Name>
+              <Name>{room.members.display_name}</Name>
               <LatestMessage
                 isRead={room.receiver_has_read || currentUserId === room.latest_sender}
               >

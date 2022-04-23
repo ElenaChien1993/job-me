@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import useClickOutside from '../hooks/useClickOutside';
+import Avatar from 'boring-avatars';
 
+import useClickOutside from '../hooks/useClickOutside';
 import firebase from '../utils/firebase';
 
 const Container = styled.div`
@@ -14,6 +15,7 @@ const ContentContainer = styled.div`
   width: 100%;
   height: 100%;
   background-color: #ffeade;
+  padding-top: 70px;
 `;
 
 const StyledNav = styled.nav`
@@ -79,7 +81,7 @@ const Option = styled.div`
   }
 `;
 
-const Nav = ({ isLogin, userInfo, currentUserId }) => {
+const Nav = ({ isLogin, userInfo, currentUserId, setUserInfo }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const menuRef = useRef();
@@ -90,6 +92,7 @@ const Nav = ({ isLogin, userInfo, currentUserId }) => {
     firebase
       .signOut()
       .then(() => {
+        setUserInfo(null);
         alert('已成功登出');
         navigate('/login', { state: { from: { pathname: '/notes' } } });
       })
@@ -116,7 +119,16 @@ const Nav = ({ isLogin, userInfo, currentUserId }) => {
           <Link to="/messages">Messages</Link>
         </NavItem>
         <ImageWrapper onClick={() => setIsMenuOpen(true)}>
-          <StyledImg src={userInfo && userInfo.photo_url} alt="head-shot" />
+          {userInfo.photo_url ? (
+            <StyledImg src={userInfo && userInfo.photo_url} alt="head-shot" />
+          ) : (
+            <Avatar
+              size={60}
+              name={userInfo?.display_name}
+              variant="beam"
+              colors={['#C1DDC7', '#F5E8C6', '#BBCD77', '#DC8051', '#F4D279']}
+            />
+          )}
         </ImageWrapper>
         {isMenuOpen && (
           <MenuWrapper ref={menuRef}>
@@ -129,12 +141,11 @@ const Nav = ({ isLogin, userInfo, currentUserId }) => {
   );
 };
 
-const Layout = ({ isLogin }) => {
+const Layout = ({ isLogin, isLoading, setIsLoading }) => {
   const currentUserId = firebase.auth.currentUser?.uid;
   const [userInfo, setUserInfo] = useState(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [active, setActive] = useState(null);
-
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -144,7 +155,7 @@ const Layout = ({ isLogin }) => {
     );
 
     return () => unsubscribe();
-  }, [currentUserId]);
+  }, [isLogin, currentUserId]);
 
   const props = {
     currentUserId,
@@ -155,13 +166,18 @@ const Layout = ({ isLogin }) => {
     setActive,
   };
 
+  // if (!currentUserId || !userInfo) return <Loader />
+
   return (
     <Container>
-      <Nav
-        isLogin={isLogin}
-        userInfo={userInfo}
-        currentUserId={currentUserId}
-      />
+      {userInfo && (
+        <Nav
+          isLogin={isLogin}
+          userInfo={userInfo}
+          currentUserId={currentUserId}
+          setUserInfo={setUserInfo}
+        />
+      )}
       <ContentContainer>
         <Outlet context={props} />
       </ContentContainer>

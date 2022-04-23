@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import ProfileImage from '../ProfileImage';
 
 const Wrapper = styled.div`
   display: flex;
@@ -27,7 +28,12 @@ const Content = styled.div`
 const ChatReceived = React.forwardRef((props, ref) => {
   return (
     <Wrapper ref={ref}>
-      <ImageWrapper />
+      <ProfileImage
+        user={props.member}
+        size={48}
+        hasBorder={false}
+        marginRight={16}
+      />
       <Content>{props.text}</Content>
     </Wrapper>
   );

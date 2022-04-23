@@ -61,7 +61,7 @@ const Login = () => {
         // Signed in
         const user = userCredential.user;
         firebase.updateUser(values.name);
-        firebase.signUp(user.uid, user.email);
+        firebase.signUp(user.uid, values.name === '' ? user.email : values.name);
         alert('註冊成功！');
         navigate(from);
       })

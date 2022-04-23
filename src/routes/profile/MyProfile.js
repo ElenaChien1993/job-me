@@ -7,7 +7,6 @@ import ProfileSetting from '../../components/ProfileSetting';
 const Container = styled.div`
   background-color: #ffeade;
   height: 100%;
-  padding-top: 70px;
 `;
 
 const Upper = styled.div`
@@ -26,7 +25,7 @@ const WebTitle = styled.div`
 
 const StyledTabList = styled(TabList)`
   position: absolute;
-  top: 226px;
+  top: 218px;
   padding-left: 100px;
   width: 100%;
 `

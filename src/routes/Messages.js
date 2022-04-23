@@ -13,16 +13,17 @@ import styled, { ThemeProvider } from 'styled-components';
 import ChatList from '../components/ChatList';
 import firebase from '../utils/firebase';
 import ChatContent from '../components/ChatContent';
+import ProfileImage from '../components/ProfileImage';
 
 const Container = styled.div`
-  width: ${(props) => (props.theme.isCorner ? '40vw' : '')};
-  height: ${(props) => (props.theme.isCorner ? '400px' : '650px')};
+  width: ${props => (props.theme.isCorner ? '40vw' : '')};
+  height: ${props => (props.theme.isCorner ? '400px' : '650px')};
   background-color: white;
   border-radius: 20px;
   position: relative;
   z-index: 1;
-  margin: ${(props) => (props.theme.isCorner ? '' : '0 10%')};
-  top: ${(props) => (props.theme.isCorner ? '' : '110px')}
+  margin: ${props => (props.theme.isCorner ? '' : '0 10%')};
+  top: ${props => (props.theme.isCorner ? '' : '70px')};
 `;
 
 const LeftWrapper = styled.div`
@@ -58,7 +59,7 @@ const RightWrapper = styled.div`
 const SearchBar = styled.div`
   width: 90%;
   margin-bottom: 30px;
-  display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
+  display: ${props => (props.theme.isCorner ? 'none' : 'block')};
 `;
 
 const TopWrapper = styled.div`
@@ -70,21 +71,6 @@ const TopWrapper = styled.div`
   padding-left: 20px;
 `;
 
-const ImageWrapper = styled.div`
-  width: 36px;
-  height: 36px;
-  border-radius: 18px;
-  background: #f5cdc5;
-  margin-right: 13px;
-  overflow: hidden;
-`;
-
-const StyledImg = styled.img`
-  width: 36px;
-  height: 36px;
-  object-fit: cover;
-`;
-
 const Name = styled.div`
   font-weight: 600;
   font-size: 20px;
@@ -92,7 +78,7 @@ const Name = styled.div`
 `;
 
 const Content = styled.div`
-  height: ${(props) => (props.theme.isCorner ? '272px' : '522px')};
+  height: ${props => (props.theme.isCorner ? '272px' : '522px')};
   overflow: scroll;
 `;
 
@@ -145,18 +131,11 @@ const Messages = () => {
   }, [pathname]);
 
   useEffect(() => {
-    const fetchRooms = async (uid) => {
-      const rooms = await firebase.getChatrooms(uid);
-      setDatabaseRooms(rooms);
-    };
-
     let unsubscribe;
-    firebase.listenRoomsChange(currentUserId, setDatabaseRooms).then((res) => {
+    firebase.listenRoomsChange(currentUserId, setDatabaseRooms).then(res => {
       unsubscribe = res;
-      // setDatabaseRooms(res.rooms)
     });
 
-    // fetchRooms(currentUserId);
     return unsubscribe;
   }, [currentUserId]);
 
@@ -180,21 +159,20 @@ const Messages = () => {
     bottomRef.current.scrollIntoView({ behavior: 'auto' });
   };
 
-  const handleEnter = (e) => {
+  const handleEnter = e => {
     if (e.keyCode === 13) {
       send();
     }
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     const term = e.target.value;
     if (!term) {
       setRenderRooms(databaseRooms);
       return;
     }
     const filtered = databaseRooms.filter(
-      (room) =>
-        room.members.includes(term) || room.latest_message.includes(term)
+      room => room.members.includes(term) || room.latest_message.includes(term)
     );
     setRenderRooms(filtered);
   };
@@ -228,17 +206,20 @@ const Messages = () => {
         </LeftWrapper>
         <RightWrapper>
           <TopWrapper>
-            <ImageWrapper>
-              <StyledImg
-                src={
-                  active?.members.photo_url
-                }
-                alt="head-shot"
-              />
-            </ImageWrapper>
-            <Name>{active?.members.name}</Name>
+            {active && (
+              <>
+                <ProfileImage
+                  user={active.members}
+                  size={36}
+                  hasBorder={false}
+                  marginRight={13}
+                />
+                <Name>{active.members.display_name}</Name>
+              </>
+            )}
           </TopWrapper>
-          <Content ref={rootRef} >
+
+          <Content ref={rootRef}>
             {active ? (
               <ChatContent
                 room={active}
@@ -254,8 +235,8 @@ const Messages = () => {
               type="text"
               placeholder="Type your message"
               value={text}
-              onChange={(event) => setText(event.target.value)}
-              onKeyDown={(e) => handleEnter(e)}
+              onChange={event => setText(event.target.value)}
+              onKeyDown={e => handleEnter(e)}
             />
             <StyledIconButton
               onClick={send}

@@ -28,8 +28,7 @@ import EditorArea from '../../components/elements/Editor';
 import RecommendModal from '../../components/RecommendModal';
 
 const Background = styled.div`
-  margin: 0 10%;
-  padding-top: 90px;
+  margin: 30px 10% 0;
 `
 
 const Container = styled.div`

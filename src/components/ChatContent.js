@@ -16,11 +16,12 @@ const ChatContent = ({ room, rootRef, bottomRef }) => {
   const containerRef = useRef();
   const { currentUserId } = useOutletContext();
 
-  useEffect(() => {
-    if (bottomRef.current) {
-      bottomRef.current.scrollIntoView();
-    }
-  }, [bottomRef]);
+  // useEffect(() => {
+  //   if (bottomRef.current) {
+  //     bottomRef.current.scrollIntoView();
+  //   }
+  // }, [bottomRef]);
+  console.log(room)
 
   useEffect(() => {
     if (!messages[room.id]) return;
@@ -43,7 +44,7 @@ const ChatContent = ({ room, rootRef, bottomRef }) => {
       if (firstRenderRef.current) {
         firebase.listenMessagesChange(room, setMessages, currentUserId).then((res) => {
           unsubscribe = res;
-          bottomRef.current.scrollIntoView();
+          // bottomRef.current.scrollIntoView();
           firstRenderRef.current = false;
         });
       } else {
@@ -84,13 +85,13 @@ const ChatContent = ({ room, rootRef, bottomRef }) => {
         messages[room.id].map((message, index) => {
           if (index === messages[room.id].length - 1) {
             return message.uid !== currentUserId ? (
-              <ChatReceived ref={bottomRef} key={uuid()} text={message.text} />
+              <ChatReceived member={room.members} ref={bottomRef} key={uuid()} text={message.text} />
             ) : (
               <ChatSent ref={bottomRef} key={uuid()} text={message.text} />
             );
           } else {
             return message.uid !== currentUserId ? (
-              <ChatReceived key={uuid()} text={message.text} />
+              <ChatReceived member={room.members} key={uuid()} text={message.text} />
             ) : (
               <ChatSent key={uuid()} text={message.text} />
             );

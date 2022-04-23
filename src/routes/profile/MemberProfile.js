@@ -1,8 +1,11 @@
 import { Button } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useOutletContext, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+
 import ChatCorner from '../../components/ChatCorner';
+import Loader from '../../components/Loader';
+import ProfileImage from '../../components/ProfileImage';
 
 import firebase from '../../utils/firebase';
 
@@ -24,20 +27,6 @@ const InfoContainer = styled.div`
   top: 220px;
   left: 50%;
   transform: translate(-50%, 0);
-`;
-
-const ImageWrapper = styled.div`
-  width: 200px;
-  height: 200px;
-  border-radius: 100px;
-  border: 5px solid #ee9c91;
-  overflow: hidden;
-`;
-
-const StyledImg = styled.img`
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
 `;
 
 const NameWrapper = styled.div`
@@ -78,7 +67,7 @@ const Number = styled.div`
   color: black;
 `;
 
-const MemberProfile = () => {
+const MemberProfile = React.memo(() => {
   const [info, setInfo] = useState(null);
   const { currentUserId, setChatOpen, setActive } = useOutletContext();
   let params = useParams();
@@ -107,16 +96,16 @@ const MemberProfile = () => {
     }
   };
 
+  if (!info) return <Loader />;
+
   return (
     <Container>
       <Upper></Upper>
       <InfoContainer>
-        <ImageWrapper>
-          <StyledImg src={info?.photo_url} alt="head-shot" />
-        </ImageWrapper>
-        <NameWrapper>{info?.display_name}</NameWrapper>
-        <JobTitle>{info?.title || '尚未提供'}</JobTitle>
-        <About>{info?.about_me || '尚未提供'}</About>
+        <ProfileImage user={info} size={200} hasBorder marginRight={0} />
+        <NameWrapper>{info.display_name}</NameWrapper>
+        <JobTitle>{info.title || '尚未提供'}</JobTitle>
+        <About>{info.about_me || '尚未提供'}</About>
         <Counts>
           <Number>12</Number>
           <p>Notes</p>
@@ -134,6 +123,6 @@ const MemberProfile = () => {
       <ChatCorner />
     </Container>
   );
-};
+});
 
 export default MemberProfile;

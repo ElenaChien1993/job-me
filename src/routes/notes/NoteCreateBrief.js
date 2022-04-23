@@ -7,10 +7,11 @@ import styled from 'styled-components';
 import firebase from '../../utils/firebase';
 
 const Container = styled.div`
+  width: 80%;
   height: 750px;
   background: #ffffff;
   border-radius: 30px;
-  margin-top: 20px;
+  margin: 40px auto 0;
 `;
 
 const LeftWrapper = styled.div`

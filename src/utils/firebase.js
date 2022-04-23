@@ -201,9 +201,9 @@ const firebase = {
   checklogin(callback) {
     onAuthStateChanged(auth, callback);
   },
-  async signUp(uid, email) {
+  async signUp(uid, value) {
     try {
-      await setDoc(doc(db, 'users', uid), { display_name: email });
+      await setDoc(doc(db, 'users', uid), { display_name: value });
     } catch (err) {
       console.log(err);
     }
@@ -222,7 +222,13 @@ const firebase = {
     querySnapshot.forEach(doc => {
       data.push(doc.data());
     });
-    const filteredData = data.filter(item => item.creator !== uid);
+    const users = await Promise.all(
+      data.map(async note => {
+        const userData = await this.getUserInfo(note.creator);
+        return { ...note, creator_info: userData };
+      })
+    );
+    const filteredData = users.filter(item => item.creator !== uid);
     return filteredData;
   },
   async uploadFile(path, file) {
@@ -291,7 +297,7 @@ const firebase = {
           data.map(async room => {
             const timeRelative = useFormatedTime(room);
             const friendId = room.members.filter(id => id !== uid);
-            const userData = await this.getUserName(friendId[0]);
+            const userData = await this.getUserInfo(friendId[0]);
             return { ...room, members: userData, latest_timestamp: timeRelative };
           })
         );
@@ -300,11 +306,11 @@ const firebase = {
       });
     });
   },
-  async getUserName(uid) {
+  async getUserInfo(uid) {
     const docSnap = await getDoc(doc(db, 'users', uid));
-    const name = docSnap.data().display_name;
+    const display_name = docSnap.data().display_name;
     const photo = docSnap.data().photo_url ? docSnap.data().photo_url : '';
-    return { name, photo_url: photo };
+    return { display_name, photo_url: photo };
   },
   async getMoreMessages(roomId, message) {
     if (!message) return;

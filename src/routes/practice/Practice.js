@@ -5,8 +5,7 @@ import styled from 'styled-components';
 import Note from '../../components/NoteCard';
 
 const Background = styled.div`
-  margin: 0 10%;
-  padding-top: 90px;
+  margin: 30px 10% 0;
 `
 
 const SearchBar = styled.div`

@@ -1,6 +1,7 @@
 import { Button } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import ProfileImage from './ProfileImage';
 
 const Container = styled.div`
   display: flex;
@@ -13,19 +14,13 @@ const Container = styled.div`
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
 `;
 
-const ImageWrapper = styled.div`
-  width: 140px;
-  height: 140px;
-  border-radius: 70px;
-  background: #f5cdc5;
-  margin-right: 30px;
-`;
-
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 112px;
   justify-content: space-between;
+  white-space: nowrap;
+  overflow: hidden;
 `;
 
 const CompanyName = styled.p`
@@ -38,6 +33,7 @@ const JobTitle = styled.p`
   font-weight: 700;
   font-size: 25px;
   color: black;
+  text-overflow: ellipsis;
 `;
 
 const Status = styled.p`
@@ -54,10 +50,15 @@ const Member = ({ note }) => {
 
   return (
     <Container>
-      <ImageWrapper />
+      <ProfileImage
+        user={note.creator_info}
+        size={140}
+        hasBorder={false}
+        marginRight={30}
+      />
       <ContentWrapper>
         <CompanyName>{note.company_name}</CompanyName>
-        <JobTitle>{note.creator_name}</JobTitle>
+        <JobTitle>{note.creator_info.display_name}</JobTitle>
         <Status>{note.job_title}</Status>
       </ContentWrapper>
       <Button colorScheme="blue" onClick={() => goToProfile(note.creator)}>
