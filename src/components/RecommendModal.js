@@ -20,6 +20,7 @@ const RecommendModal = ({isOpen, onClose, recommend}) => {
           <ModalHeader>可以認識一下～</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {recommend.length === 0 && <p>這份筆記的公司或職稱還沒有人分享耶 QQ</p>}
             {recommend.map((member, i) => {
               return (
                 <Member key={i} note={member}/>

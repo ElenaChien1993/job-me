@@ -8,18 +8,33 @@ const StyledInput = styled(Input)`
   }
 `;
 
+const StyledList = styled.div`
+  width: 100%;
+  padding-left: 17px;
+`
+
+const StyledListItem = styled.div`
+  cursor: pointer;
+  width: 100%;
+  margin: 3px 0;
+  &:hover {
+    background-color: #999999
+  }
+`;
+
 const RenderList = ({ companies, value, setValues, toggle, setToggle }) => {
   if (value && companies) {
-    const filteredList = companies.filter(company =>
-      company.name.includes(value)
-    );
+    const filteredList = companies.filter(company => {
+      const regex = new RegExp(value, "gi");
+      return company.name.match(regex);
+    });
     if (filteredList.length) {
       return (
         toggle && (
-          <div>
+          <StyledList>
             {filteredList.map(company => {
               return (
-                <li
+                <StyledListItem
                   key={company.id}
                   onClick={() => {
                     setToggle(false);
@@ -29,10 +44,10 @@ const RenderList = ({ companies, value, setValues, toggle, setToggle }) => {
                   }}
                 >
                   {company.name}
-                </li>
+                </StyledListItem>
               );
             })}
-          </div>
+          </StyledList>
         )
       );
     }

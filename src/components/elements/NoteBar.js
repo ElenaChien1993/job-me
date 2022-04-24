@@ -28,7 +28,7 @@ const JobTitle = styled.p`
 `;
 
 const NoteBar = ({ brief, className }) => {
-  if (!brief) return;
+  if (!brief || brief === {}) return null;
   return (
     <NoteWrapper className={className}>
       <CompanyName>{brief.company_name}</CompanyName>

@@ -1,5 +1,5 @@
-import { useParams, Link } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import { useParams, Link, useOutletContext } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Editable,
   EditableInput,
@@ -137,19 +137,20 @@ const NoteDetails = () => {
   const [details, setDetails] = useState();
   const [isFilesEditing, setIsFilesEditing] = useState(false);
   const [recommend, setRecommend] = useState([]);
+  const { currentUserId } = useOutletContext();
+  const submitRef = useRef();
 
   const { onOpen, isOpen, onClose } = useDisclosure({ id: 'recommend' });
   let params = useParams();
   const noteId = params.noteId;
-  const user = firebase.auth.currentUser;
 
   useEffect(() => {
-    firebase.getNote(user.uid, noteId).then(snap => {
+    firebase.getNote(currentUserId, noteId).then(snap => {
       setBrief(snap.data());
     });
-    firebase.getNoteDetails(noteId).then(snap => {
-      setDetails(snap.data());
-    });
+    // firebase.getNoteDetails(noteId).then(snap => {
+    //   setDetails(snap.data());
+    // });
     const unsubscribe = firebase.listenDetailsChange(noteId, doc => {
       setDetails(doc.data());
       console.log('database changed', doc.data());
@@ -157,6 +158,11 @@ const NoteDetails = () => {
 
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (!submitRef.current) return;
+    onBlurSubmit(submitRef.current.key);
+  }, [submitRef.current])
 
   // ------- Helper Function
   const getArrayChangedValue = (value, index, objectKey) => {
@@ -211,7 +217,7 @@ const NoteDetails = () => {
     });
   };
 
-  console.log('state', details);
+  console.log('state', details, 'ref', submitRef.current);
   // ------- Handle Array of Maps
   const handleMapArrayInputChange = (e, index, objectKey, targetKey) => {
     const update = getObjectInArrayChangedValue(
@@ -233,9 +239,7 @@ const NoteDetails = () => {
   };
 
   const handleDelete = (i, objectKey) => {
-    console.log(i, objectKey, details[objectKey]);
     const newData = details[objectKey].filter((_, index) => index !== i);
-    console.log(newData);
     firebase.updateNoteDetails(noteId, { [objectKey]: newData });
   };
 
@@ -256,7 +260,7 @@ const NoteDetails = () => {
 
   const showConnectModal = () => {
     firebase
-      .getRecommendedUsers(brief.company_name, brief.job_title, user.uid)
+      .getRecommendedUsers(brief.company_name, brief.job_title, currentUserId)
       .then(members => {
         setRecommend(members);
         onOpen();
@@ -289,7 +293,7 @@ const NoteDetails = () => {
       </ButtonWrapper>
       {brief && (
         <NoteElement
-          uid={user.uid}
+          uid={currentUserId}
           noteId={noteId}
           note={brief}
           setNote={setBrief}
@@ -355,6 +359,7 @@ const NoteDetails = () => {
                       onBlurSubmit={onBlurSubmit}
                       handleArrayInputChange={handleArrayInputChange}
                       i={i}
+                      submitRef={submitRef}
                     />
                     <DeleteButton
                       w={4}

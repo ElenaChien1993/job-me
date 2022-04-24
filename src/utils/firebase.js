@@ -244,6 +244,9 @@ const firebase = {
     Snapshots.forEach(doc => {
       data.push(doc.data());
     });
+    // const unique = data.filter((user, index, array) => {
+    //   return index === array.indexOf(user.creator);
+    // });
     const users = await Promise.all(
       data.map(async note => {
         const userData = await this.getUserInfo(note.creator);

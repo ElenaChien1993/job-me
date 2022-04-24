@@ -28,18 +28,18 @@ const EditableControls = () => {
 
 const EditableInputField = ({
   value,
-  onBlurSubmit,
   handleArrayInputChange,
   i,
+  submitRef,
 }) => {
   return (
     <Editable
       defaultValue={value === '' ? '尚未填寫資料' : value}
       isPreviewFocusable
       selectAllOnFocus={false}
-      onSubmit={(value) => {
-        handleArrayInputChange(value, i, 'responsibilities')
-        onBlurSubmit('responsibilities')
+      onSubmit={value => {
+        handleArrayInputChange(value, i, 'responsibilities');
+        submitRef.current = { key: 'responsibilities', index: i };
       }}
     >
       <Tooltip label="Click to edit">

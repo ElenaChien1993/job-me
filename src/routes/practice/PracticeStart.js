@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Link,
   useOutletContext,
@@ -66,6 +66,13 @@ const PracticeStart = () => {
   const [timer, setTimer] = useState(180);
   const [progress, setProgress] = useState('before');
   const props = useOutletContext();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (props.practiceQuestions === [] || props.brief === []) {
+      navigate('/practice');
+    }
+  }, [])
 
   return (
     <Container>
@@ -74,7 +81,7 @@ const PracticeStart = () => {
         <StyledNoteBar brief={props.brief} />
       </TitleWrapper>
       {progress !== 'finished' && (
-        <Question>{props.practiceQuestions[current].question}</Question>
+        <Question>{props.practiceQuestions[current]?.question}</Question>
       )}
       {progress === 'before' && (
         <BeforeRecord
