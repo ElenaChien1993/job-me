@@ -9,7 +9,7 @@ const StyledInput = styled(Input)`
 `;
 
 const RenderList = ({ companies, value, setValues, toggle, setToggle }) => {
-  if (value) {
+  if (value && companies) {
     const filteredList = companies.filter(company =>
       company.name.includes(value)
     );

@@ -92,7 +92,7 @@ const LoginButton = styled.div`
   }
 `;
 
-const Nav = ({ isLogin, userInfo, currentUserId, setUserInfo }) => {
+const Nav = ({ isLogIn, userInfo, currentUserId, setUserInfo }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const menuRef = useRef();
@@ -121,8 +121,6 @@ const Nav = ({ isLogin, userInfo, currentUserId, setUserInfo }) => {
     navigate(`/profile/${currentUserId}`);
   };
 
-  console.log('nav', isLogin)
-
   return (
     <StyledNav>
       <Ul>
@@ -135,9 +133,9 @@ const Nav = ({ isLogin, userInfo, currentUserId, setUserInfo }) => {
         <NavItem>
           <Link to="/messages">Messages</Link>
         </NavItem>
-        {isLogin ? (
+        {isLogIn ? (
           <ImageWrapper onClick={() => setIsMenuOpen(true)}>
-            {userInfo.photo_url ? (
+            {userInfo?.photo_url ? (
               <StyledImg src={userInfo && userInfo.photo_url} alt="head-shot" />
             ) : (
               <Avatar
@@ -162,22 +160,27 @@ const Nav = ({ isLogin, userInfo, currentUserId, setUserInfo }) => {
   );
 };
 
-const Layout = ({ isLogin, isLoading, setIsLoading }) => {
+const Layout = ({ isLogIn, isLoading, setIsLoading }) => {
   const currentUserId = firebase.auth.currentUser?.uid;
   const [userInfo, setUserInfo] = useState(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [active, setActive] = useState(null);
 
-  console.log('layout', isLogin)
   useEffect(() => {
     if (!currentUserId) return;
-    const unsubscribe = firebase.listenUserProfileChange(
-      currentUserId,
-      setUserInfo
-    );
+    let unsubscribe;
+    const fetchInfo = async () => {
+      unsubscribe = await firebase.listenUserProfileChange(
+        currentUserId,
+        setUserInfo
+      );
+    };
 
-    return () => unsubscribe();
-  }, [isLogin, currentUserId]);
+    fetchInfo();
+    console.log(unsubscribe);
+
+    return unsubscribe;
+  }, [isLogIn, currentUserId]);
 
   const props = {
     currentUserId,
@@ -193,7 +196,7 @@ const Layout = ({ isLogin, isLoading, setIsLoading }) => {
   return (
     <Container>
       <Nav
-        isLogin={isLogin}
+        isLogIn={isLogIn}
         userInfo={userInfo}
         currentUserId={currentUserId}
         setUserInfo={setUserInfo}

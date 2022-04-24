@@ -119,9 +119,7 @@ const NoteCreateBrief = ({
   noteDataBrief,
   noteDetails,
 }) => {
-  const [test, setTest] = useState('');
   const [databaseCompanies, setDatabaseCompanies] = useState(null);
-  const [renderCompanies, setRenderCompanies] = useState(null);
   const user = firebase.auth.currentUser;
   const navigate = useNavigate();
   const statusArray = [
@@ -137,7 +135,6 @@ const NoteCreateBrief = ({
     firebase.getCompanies().then(data => {
       console.log(data);
       setDatabaseCompanies(data);
-      setRenderCompanies(data);
     });
   }, []);
 

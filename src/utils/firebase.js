@@ -84,10 +84,13 @@ const firebase = {
     }
   },
   listenUserProfileChange(uid, callback) {
-    return onSnapshot(doc(db, 'users', uid), async doc => {
-      callback(prev => {
-        return { ...prev, ...doc.data() };
+    return new Promise(res => {
+      const unsubscribe = onSnapshot(doc(db, 'users', uid), async doc => {
+        callback(prev => {
+          return { ...prev, ...doc.data() };
+        });
       });
+      res(unsubscribe);
     });
   },
   listenUserRecordsChange(uid, setAudioRecords, setVideoRecords) {
@@ -219,15 +222,26 @@ const firebase = {
   signOut() {
     return signOut(auth);
   },
-  async getRecommendedUsers(company, uid) {
-    const members = query(
+  async getRecommendedUsers(company, job ,uid) {
+    const membersByCompany = query(
       collectionGroup(db, 'notes'),
       where('company_name', '==', company),
-      where('is_share', '==', true)
+      where('is_share', '==', true),
+      limit(5)
     );
-    const querySnapshot = await getDocs(members);
+    const querySnapshot = await getDocs(membersByCompany);
     let data = [];
     querySnapshot.forEach(doc => {
+      data.push(doc.data());
+    });
+    const membersByJob = query(
+      collectionGroup(db, 'notes'),
+      where('job_title', '==', job),
+      where('is_share', '==', true),
+      limit(5)
+    );
+    const Snapshots = await getDocs(membersByJob);
+    Snapshots.forEach(doc => {
       data.push(doc.data());
     });
     const users = await Promise.all(
@@ -306,7 +320,11 @@ const firebase = {
             const timeRelative = useRelativeTime(room);
             const friendId = room.members.filter(id => id !== uid);
             const userData = await this.getUserInfo(friendId[0]);
-            return { ...room, members: userData, latest: {...room.latest, timestamp: timeRelative} };
+            return {
+              ...room,
+              members: userData,
+              latest: { ...room.latest, timestamp: timeRelative },
+            };
           })
         );
         callback(rooms);
@@ -394,7 +412,7 @@ const firebase = {
     try {
       await addDoc(collection(db, 'chatrooms', roomId, 'messages'), data);
       await updateDoc(doc(db, 'chatrooms', roomId), {
-        latest : {
+        latest: {
           timestamp: data.create_at,
           message: data.text,
           message_type: data.type,

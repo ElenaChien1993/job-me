@@ -38,7 +38,6 @@ const App = () => {
   }, []);
 
   if (isLoading) return <Loader isLoading={isLoading} />;
-  console.log('app', isLogIn);
 
   return (
     <ChakraProvider>

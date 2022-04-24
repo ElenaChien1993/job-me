@@ -26,10 +26,11 @@ import AddField from '../../components/elements/AddField';
 import EditFiles from '../../components/elements/EditFiles';
 import EditorArea from '../../components/elements/Editor';
 import RecommendModal from '../../components/RecommendModal';
+import EditableInputField from '../../components/EditableInputField';
 
 const Background = styled.div`
   margin: 30px 10% 0;
-`
+`;
 
 const Container = styled.div`
   display: flex;
@@ -41,8 +42,10 @@ const Container = styled.div`
 `;
 
 const DeleteButton = styled(IconButton)`
-  && {
+  ${
+    '' /* && {
     display: none;
+  } */
   }
 `;
 
@@ -187,7 +190,8 @@ const NoteDetails = () => {
     return updatedChecked;
   };
 
-  const onBlurSubmit = (objectKey) => {
+  const onBlurSubmit = objectKey => {
+    console.log('onBlurSubmit', details[objectKey]);
     // handleMapArrayInputChange(e, i, 'questions', 'question');
     firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
   };
@@ -199,14 +203,15 @@ const NoteDetails = () => {
   };
 
   //-------- Handle Array of Strings
-  const handleArrayInputChange = (e, index, objectKey) => {
-    const update = getArrayChangedValue(e.target.value, index, objectKey);
-    console.log('checkme', update)
+  const handleArrayInputChange = (value, index, objectKey) => {
+    const update = getArrayChangedValue(value, index, objectKey);
+    console.log('handleArrayInputChange function', update);
     setDetails(prev => {
       return { ...prev, [objectKey]: update };
     });
   };
 
+  console.log('state', details);
   // ------- Handle Array of Maps
   const handleMapArrayInputChange = (e, index, objectKey, targetKey) => {
     const update = getObjectInArrayChangedValue(
@@ -250,10 +255,12 @@ const NoteDetails = () => {
   };
 
   const showConnectModal = () => {
-    firebase.getRecommendedUsers(brief.company_name, user.uid).then(members => {
-      setRecommend(members);
-      onOpen();
-    });
+    firebase
+      .getRecommendedUsers(brief.company_name, brief.job_title, user.uid)
+      .then(members => {
+        setRecommend(members);
+        onOpen();
+      });
   };
 
   return (
@@ -342,28 +349,22 @@ const NoteDetails = () => {
             <Content>
               {details.responsibilities.map((item, i) => {
                 return (
-                  <Editable
-                    value={item === '' ? '尚未填寫資料' : item}
-                    key={uuid()}
-                    onSubmit={() => onBlurSubmit('responsibilities')}
-                  >
-                    <StyledListItem>
-                      <EditablePreview />
-                      <EditableInput
-                        onChange={e =>
-                          handleArrayInputChange(e, i, 'responsibilities')
-                        }
-                      />
-                      <DeleteButton
-                        w={4}
-                        h={4}
-                        ml={5}
-                        aria-label="delete item"
-                        icon={<SmallCloseIcon />}
-                        onClick={() => handleDelete(i, 'responsibilities')}
-                      />
-                    </StyledListItem>
-                  </Editable>
+                  <div key={uuid()}>
+                    <EditableInputField
+                      value={item}
+                      onBlurSubmit={onBlurSubmit}
+                      handleArrayInputChange={handleArrayInputChange}
+                      i={i}
+                    />
+                    <DeleteButton
+                      w={4}
+                      h={4}
+                      ml={5}
+                      aria-label="delete item"
+                      icon={<SmallCloseIcon />}
+                      onClick={() => handleDelete(i, 'responsibilities')}
+                    />
+                  </div>
                 );
               })}
             </Content>
@@ -389,6 +390,7 @@ const NoteDetails = () => {
                         ? '尚未填寫資料'
                         : item.description
                     }
+                    onSubmit={() => onBlurSubmit('requirements')}
                   >
                     <EditablePreview />
                     <EditableInput
@@ -400,8 +402,6 @@ const NoteDetails = () => {
                           'description'
                         )
                       }
-                      onBlur={() => onBlurSubmit('requirements')}
-                      onKeyDown={e => handlePressEnter(e, 'requirements')}
                     />
                   </Editable>
                   <DeleteButton
