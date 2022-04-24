@@ -9,12 +9,10 @@ import {
 } from 'react-icons/vsc';
 import { MdSaveAlt, MdNavigateNext } from 'react-icons/md';
 import styled from 'styled-components';
-import { v4 as uuid } from 'uuid';
 
 import { Audio, Video } from './elements/MediaRecorder';
 import CountDown from './elements/CountDown';
 import firebase from '../utils/firebase';
-import { identity } from 'lodash';
 
 const ButtonsWrapper = styled.div`
   display: flex;

@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid';
 import firebase from '../../utils/firebase';
 import Note from '../../components/NoteCard';
 import ChatCorner from '../../components/ChatCorner';
+import { initMap } from '../../components/GoogleSearch';
 
 const Container = styled.div`
   display: flex;
@@ -56,9 +57,9 @@ const Notes = () => {
   const { currentUserId } = useOutletContext();
 
   useEffect(() => {
-    firebase.getNotes(currentUserId).then((snaps) => {
+    firebase.getNotes(currentUserId).then(snaps => {
       const notesArray = [];
-      snaps.forEach((doc) => {
+      snaps.forEach(doc => {
         notesArray.push(doc.data());
       });
       setDatabaseNotes(notesArray);
@@ -66,15 +67,14 @@ const Notes = () => {
     });
   }, [currentUserId]);
 
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     const term = e.target.value;
     if (!term) {
       setRenderNotes(databaseNotes);
       return;
     }
     const filtered = databaseNotes.filter(
-      (note) =>
-        note.company_name.includes(term) || note.job_title.includes(term)
+      note => note.company_name.includes(term) || note.job_title.includes(term)
     );
     setRenderNotes(filtered);
   };
@@ -91,7 +91,7 @@ const Notes = () => {
       </ButtonWrapper>
       <NotesWrapper>
         {databaseNotes.length !== 0 &&
-          renderNotes.map((note) => {
+          renderNotes.map(note => {
             return (
               <Note
                 currentUserId={currentUserId}

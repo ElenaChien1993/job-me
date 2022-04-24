@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@chakra-ui/react';
-
 import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
+import SearchableSelect from '../../components/SearchableSelect';
+import SearchableInput from '../../components/SearchableInput';
 
 const Container = styled.div`
   width: 80%;
@@ -118,6 +119,9 @@ const NoteCreateBrief = ({
   noteDataBrief,
   noteDetails,
 }) => {
+  const [test, setTest] = useState('');
+  const [databaseCompanies, setDatabaseCompanies] = useState(null);
+  const [renderCompanies, setRenderCompanies] = useState(null);
   const user = firebase.auth.currentUser;
   const navigate = useNavigate();
   const statusArray = [
@@ -129,6 +133,14 @@ const NoteCreateBrief = ({
     '等待中',
   ];
 
+  useEffect(() => {
+    firebase.getCompanies().then(data => {
+      console.log(data);
+      setDatabaseCompanies(data);
+      setRenderCompanies(data);
+    });
+  }, []);
+
   const handleCheckboxChange = () => {
     setValues(prev => {
       return { ...prev, is_share: !values.is_share };
@@ -137,11 +149,18 @@ const NoteCreateBrief = ({
 
   const createNote = () => {
     firebase
-      .setNoteBrief(user.uid, { ...noteDataBrief, creator: user.uid, creator_name: user.displayName || '未提供名字' })
+      .setNoteBrief(user.uid, {
+        ...noteDataBrief,
+        creator: user.uid,
+        creator_name: user.displayName || '未提供名字',
+      })
       .then(id => {
         firebase.setNoteDetails(id, noteDetails).then(() => {
           navigate(`/notes/details/${id}`);
         });
+      })
+      .then(() => {
+        firebase.setCompanies({ name: values.company_name });
       });
   };
 
@@ -152,6 +171,8 @@ const NoteCreateBrief = ({
     });
   };
 
+  console.log(values);
+
   return (
     <Container>
       <LeftWrapper></LeftWrapper>
@@ -159,11 +180,17 @@ const NoteCreateBrief = ({
         <StyledForm>
           <InputWrap>
             <label>公司名稱</label>
+            <SearchableInput
+              value={values.company_name}
+              setValues={setValues}
+              companies={databaseCompanies}
+            />
+            {/* <label>找不到公司？請由此輸入公司名稱</label>
             <StyledInput
               size="sm"
               defaultValue={values.company_name}
               onChange={handleChange('company_name')}
-            />
+            /> */}
           </InputWrap>
           <InputWrap>
             <label>應徵職務</label>

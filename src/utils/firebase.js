@@ -118,6 +118,22 @@ const firebase = {
       console.log(err);
     }
   },
+  async getCompanies() {
+    const docsSnap = await getDocs(collection(db, 'companies'));
+    const data = [];
+    docsSnap.forEach(doc => {
+      data.push(doc.data());
+    });
+    return data;
+  },
+  async setCompanies(data) {
+    const newDocRef = doc(collection(db, 'companies'));
+    try {
+      await setDoc(newDocRef, { ...data, id: newDocRef.id });
+    } catch (err) {
+      console.log(err);
+    }
+  },
   async setNoteBrief(uid, data) {
     const newDocRef = doc(collection(db, `users/${uid}/notes`));
     try {
