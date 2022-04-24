@@ -81,6 +81,17 @@ const Option = styled.div`
   }
 `;
 
+const LoginButton = styled.div`
+  margin-left: auto;
+  padding: 10px 30px;
+  cursor: pointer;
+  color: white;
+  font-weight: 700;
+  &:hover {
+    background: #e3e3e3;
+  }
+`;
+
 const Nav = ({ isLogin, userInfo, currentUserId, setUserInfo }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -101,10 +112,16 @@ const Nav = ({ isLogin, userInfo, currentUserId, setUserInfo }) => {
       });
   };
 
+  const handleLogIn = () => {
+    navigate('/login', { state: { from: { pathname: '/notes' } } });
+  };
+
   const goToProfile = () => {
     setIsMenuOpen(false);
     navigate(`/profile/${currentUserId}`);
   };
+
+  console.log('nav', isLogin)
 
   return (
     <StyledNav>
@@ -118,22 +135,26 @@ const Nav = ({ isLogin, userInfo, currentUserId, setUserInfo }) => {
         <NavItem>
           <Link to="/messages">Messages</Link>
         </NavItem>
-        <ImageWrapper onClick={() => setIsMenuOpen(true)}>
-          {userInfo.photo_url ? (
-            <StyledImg src={userInfo && userInfo.photo_url} alt="head-shot" />
-          ) : (
-            <Avatar
-              size={60}
-              name={userInfo?.display_name}
-              variant="beam"
-              colors={['#C1DDC7', '#F5E8C6', '#BBCD77', '#DC8051', '#F4D279']}
-            />
-          )}
-        </ImageWrapper>
+        {isLogin ? (
+          <ImageWrapper onClick={() => setIsMenuOpen(true)}>
+            {userInfo.photo_url ? (
+              <StyledImg src={userInfo && userInfo.photo_url} alt="head-shot" />
+            ) : (
+              <Avatar
+                size={60}
+                name={userInfo?.display_name}
+                variant="beam"
+                colors={['#C1DDC7', '#F5E8C6', '#BBCD77', '#DC8051', '#F4D279']}
+              />
+            )}
+          </ImageWrapper>
+        ) : (
+          <LoginButton onClick={handleLogIn}>登入</LoginButton>
+        )}
         {isMenuOpen && (
           <MenuWrapper ref={menuRef}>
             <Option onClick={goToProfile}>Profile</Option>
-            {!isLogin && <Option onClick={handleLogout}>登出</Option>}
+            <Option onClick={handleLogout}>登出</Option>
           </MenuWrapper>
         )}
       </Ul>
@@ -147,6 +168,7 @@ const Layout = ({ isLogin, isLoading, setIsLoading }) => {
   const [chatOpen, setChatOpen] = useState(false);
   const [active, setActive] = useState(null);
 
+  console.log('layout', isLogin)
   useEffect(() => {
     if (!currentUserId) return;
     const unsubscribe = firebase.listenUserProfileChange(
@@ -170,14 +192,12 @@ const Layout = ({ isLogin, isLoading, setIsLoading }) => {
 
   return (
     <Container>
-      {userInfo && (
-        <Nav
-          isLogin={isLogin}
-          userInfo={userInfo}
-          currentUserId={currentUserId}
-          setUserInfo={setUserInfo}
-        />
-      )}
+      <Nav
+        isLogin={isLogin}
+        userInfo={userInfo}
+        currentUserId={currentUserId}
+        setUserInfo={setUserInfo}
+      />
       <ContentContainer>
         <Outlet context={props} />
       </ContentContainer>

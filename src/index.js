@@ -38,6 +38,7 @@ const App = () => {
   }, []);
 
   if (isLoading) return <Loader isLoading={isLoading} />;
+  console.log('app', isLogIn);
 
   return (
     <ChakraProvider>
@@ -84,13 +85,13 @@ const App = () => {
                     <Route path=":noteId" element={<PracticeStart />} />
                   </Route>
                 </Route>
+                <Route path="messages" element={<Messages />} />
               </Route>
 
               <Route path="profile">
                 <Route path=":uid" element={<Profile />} />
               </Route>
 
-              <Route path="messages" element={<Messages />} />
               {/* <Route path="*" element={<NotFound />}/> */}
               <Route
                 path="login"

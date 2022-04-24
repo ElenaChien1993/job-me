@@ -1,6 +1,6 @@
 import { Button } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
-import { useOutletContext, useParams } from 'react-router-dom';
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import ChatCorner from '../../components/ChatCorner';
@@ -9,8 +9,7 @@ import ProfileImage from '../../components/ProfileImage';
 
 import firebase from '../../utils/firebase';
 
-const Container = styled.div`
-`;
+const Container = styled.div``;
 
 const Upper = styled.div`
   background-color: #f5cdc5;
@@ -69,6 +68,7 @@ const Number = styled.div`
 const MemberProfile = React.memo(() => {
   const [info, setInfo] = useState(null);
   const { currentUserId, setChatOpen, setActive } = useOutletContext();
+  const navigate = useNavigate();
   let params = useParams();
   const uid = params.uid;
 
@@ -80,6 +80,11 @@ const MemberProfile = React.memo(() => {
   }, [uid]);
 
   const createChat = async () => {
+    if (!currentUserId) {
+      alert('請先登入才能傳送訊息給其他會員');
+      navigate('/login', { state: { from: { pathname: `/profile/${uid}` } } });
+      return;
+    }
     const data = {
       members: [currentUserId, uid],
       latest: {
@@ -121,7 +126,7 @@ const MemberProfile = React.memo(() => {
           傳送訊息
         </Button>
       </InfoContainer>
-      <ChatCorner />
+      {currentUserId && <ChatCorner />}
     </Container>
   );
 });
