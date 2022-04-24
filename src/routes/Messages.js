@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import { Search2Icon } from '@chakra-ui/icons';
 import { BiSend, BiImageAdd } from 'react-icons/bi';
+import { BsFillEmojiHeartEyesFill } from 'react-icons/bs';
 import {
   InputGroup,
   InputLeftElement,
@@ -10,12 +11,15 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import styled, { ThemeProvider } from 'styled-components';
+import 'emoji-mart/css/emoji-mart.css';
+import { Picker } from 'emoji-mart';
 
 import ChatList from '../components/ChatList';
 import firebase from '../utils/firebase';
 import ChatContent from '../components/ChatContent';
 import ProfileImage from '../components/ProfileImage';
 import AddImageModal from '../components/AddImageModal';
+import useClickOutside from '../hooks/useClickOutside';
 
 const Container = styled.div`
   width: ${props => (props.theme.isCorner ? '40vw' : '')};
@@ -112,14 +116,23 @@ const StyledIconButton = styled(IconButton)`
   }
 `;
 
+const EmojisPicker = styled.span`
+  position: absolute;
+  bottom: 10px;
+  right: 0;
+  z-index: 1;
+`
+
 const Messages = () => {
   const [text, setText] = useState('');
   const [databaseRooms, setDatabaseRooms] = useState([]);
   const [renderRooms, setRenderRooms] = useState([]);
   const [isCorner, setIsCorner] = useState(true);
+  const [showEmojis, setShowEmojis] = useState(false);
   // const observeTargetRef = useRef();
   const rootRef = useRef();
   const bottomRef = useRef();
+  const emojisRef = useRef();
   // const unsubscribeRef = useRef();
   const { currentUserId, active, setActive } = useOutletContext();
   const { pathname } = useLocation();
@@ -184,6 +197,14 @@ const Messages = () => {
     setRenderRooms(filtered);
   };
 
+  const addEmoji = e => {
+    let emoji = e.native;
+    setText(prev => prev + emoji);
+    setShowEmojis(false);
+  };
+
+  useClickOutside(emojisRef, () => setShowEmojis(false));
+
   return (
     <ThemeProvider theme={{ isCorner }}>
       <Container>
@@ -225,7 +246,12 @@ const Messages = () => {
               </>
             )}
           </TopWrapper>
-          <AddImageModal isOpen={isOpen} onClose={onClose} room={active} send={send}/>
+          <AddImageModal
+            isOpen={isOpen}
+            onClose={onClose}
+            room={active}
+            send={send}
+          />
           <Content ref={rootRef}>
             {active ? (
               <ChatContent
@@ -246,11 +272,22 @@ const Messages = () => {
               onChange={event => setText(event.target.value)}
               onKeyDown={e => handleEnter(e, text, 0)}
             />
+            {showEmojis && (
+              <EmojisPicker ref={emojisRef}>
+                <Picker onSelect={addEmoji} emojiTooltip={true} title="JobMe" />
+              </EmojisPicker>
+            )}
             <StyledIconButton
               onClick={onOpen}
               variant="ghost"
               aria-label="Send Message"
               icon={<BiImageAdd />}
+            />
+            <StyledIconButton
+              onClick={() => setShowEmojis(!showEmojis)}
+              variant="ghost"
+              aria-label="Open Emojis"
+              icon={<BsFillEmojiHeartEyesFill />}
             />
             <StyledIconButton
               onClick={() => send(text, 0)}
