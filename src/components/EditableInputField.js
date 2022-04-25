@@ -28,7 +28,8 @@ const EditableControls = () => {
 
 const EditableInputField = ({
   value,
-  handleArrayInputChange,
+  onSubmitCallback,
+  callbackArgs,
   i,
   submitRef,
 }) => {
@@ -38,8 +39,8 @@ const EditableInputField = ({
       isPreviewFocusable
       selectAllOnFocus={false}
       onSubmit={value => {
-        handleArrayInputChange(value, i, 'responsibilities');
-        submitRef.current = { key: 'responsibilities', index: i };
+        onSubmitCallback(value, i, callbackArgs.objectKey, callbackArgs.subKey);
+        submitRef.current = { key: callbackArgs.objectKey, index: i };
       }}
     >
       <Tooltip label="Click to edit">
@@ -55,7 +56,6 @@ const EditableInputField = ({
         py={2}
         px={4}
         as={EditableInput}
-        // onChange={e => console.log(e.target.value)}
       />
       <EditableControls />
     </Editable>

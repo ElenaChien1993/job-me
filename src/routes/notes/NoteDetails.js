@@ -146,13 +146,13 @@ const NoteDetails = () => {
   const noteId = params.noteId;
 
   useEffect(() => {
-    firebase.getNote(currentUserId, noteId).then(snap => {
+    firebase.getNote(currentUserId, noteId).then((snap) => {
       setBrief(snap.data());
     });
     // firebase.getNoteDetails(noteId).then(snap => {
     //   setDetails(snap.data());
     // });
-    const unsubscribe = firebase.listenDetailsChange(noteId, doc => {
+    const unsubscribe = firebase.listenDetailsChange(noteId, (doc) => {
       setDetails(doc.data());
       console.log('database changed', doc.data());
     });
@@ -163,7 +163,7 @@ const NoteDetails = () => {
   useEffect(() => {
     if (!submitRef.current) return;
     onBlurSubmit(submitRef.current.key);
-  }, [submitRef.current])
+  }, [submitRef.current]);
 
   // ------- Helper Function
   const getArrayChangedValue = (value, index, objectKey) => {
@@ -197,7 +197,7 @@ const NoteDetails = () => {
     return updatedChecked;
   };
 
-  const onBlurSubmit = objectKey => {
+  const onBlurSubmit = (objectKey) => {
     console.log('onBlurSubmit', details[objectKey]);
     // handleMapArrayInputChange(e, i, 'questions', 'question');
     firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
@@ -213,21 +213,20 @@ const NoteDetails = () => {
   const handleArrayInputChange = (value, index, objectKey) => {
     const update = getArrayChangedValue(value, index, objectKey);
     console.log('handleArrayInputChange function', update);
-    setDetails(prev => {
+    setDetails((prev) => {
       return { ...prev, [objectKey]: update };
     });
   };
 
-  console.log('state', details, 'ref', submitRef.current);
   // ------- Handle Array of Maps
-  const handleMapArrayInputChange = (e, index, objectKey, targetKey) => {
+  const handleMapArrayInputChange = (value, index, objectKey, targetKey) => {
     const update = getObjectInArrayChangedValue(
-      e.target.value,
+      value,
       index,
       objectKey,
       targetKey
     );
-    setDetails(prev => {
+    setDetails((prev) => {
       return { ...prev, [objectKey]: update };
     });
   };
@@ -245,7 +244,7 @@ const NoteDetails = () => {
   };
 
   const handleInputSalaryChange = (e, type) => {
-    setDetails(prev => {
+    setDetails((prev) => {
       return { ...prev, salary: { ...details.salary, [type]: e.target.value } };
     });
   };
@@ -264,7 +263,7 @@ const NoteDetails = () => {
     onOpen();
     firebase
       .getRecommendedUsers(brief.company_name, brief.job_title, currentUserId)
-      .then(members => {
+      .then((members) => {
         setRecommend(members);
         setIsLoading(false);
       });
@@ -272,7 +271,12 @@ const NoteDetails = () => {
 
   return (
     <Background>
-      <RecommendModal isOpen={isOpen} onClose={onClose} recommend={recommend} isLoading={isLoading}/>
+      <RecommendModal
+        isOpen={isOpen}
+        onClose={onClose}
+        recommend={recommend}
+        isLoading={isLoading}
+      />
       <ButtonWrapper>
         <Link to="/notes">
           <Button
@@ -314,8 +318,8 @@ const NoteDetails = () => {
             >
               <EditablePreview />
               <EditableInput
-                onChange={e =>
-                  setDetails(prev => {
+                onChange={(e) =>
+                  setDetails((prev) => {
                     return { ...prev, product: e.target.value };
                   })
                 }
@@ -335,7 +339,7 @@ const NoteDetails = () => {
               >
                 <EditablePreview />
                 <EditableInput
-                  onChange={e => handleInputSalaryChange(e, 'range')}
+                  onChange={(e) => handleInputSalaryChange(e, 'range')}
                 />
               </StyledEditable>
               <Content> K </Content>
@@ -343,7 +347,7 @@ const NoteDetails = () => {
                 variant="outline"
                 isFullWidth={false}
                 maxWidth="100px"
-                onChange={e => handleInputSalaryChange(e, 'type')}
+                onChange={(e) => handleInputSalaryChange(e, 'type')}
                 onBlur={() => onBlurSubmit('salary')}
               >
                 <option value="年薪">年薪</option>
@@ -360,7 +364,8 @@ const NoteDetails = () => {
                     <EditableInputField
                       value={item}
                       onBlurSubmit={onBlurSubmit}
-                      handleArrayInputChange={handleArrayInputChange}
+                      onSubmitCallback={handleArrayInputChange}
+                      callbackArgs={{objectKey: 'responsibilities'}}
                       i={i}
                       submitRef={submitRef}
                     />
@@ -392,26 +397,14 @@ const NoteDetails = () => {
                     checked={details.requirements[i].is_qualified}
                     onChange={() => handleCheckboxChange(i, 'requirements')}
                   />
-                  <Editable
-                    value={
-                      item.description === ''
-                        ? '尚未填寫資料'
-                        : item.description
-                    }
-                    onSubmit={() => onBlurSubmit('requirements')}
-                  >
-                    <EditablePreview />
-                    <EditableInput
-                      onChange={e =>
-                        handleMapArrayInputChange(
-                          e,
-                          i,
-                          'requirements',
-                          'description'
-                        )
-                      }
-                    />
-                  </Editable>
+                  <EditableInputField
+                    value={item.description}
+                    onBlurSubmit={onBlurSubmit}
+                    onSubmitCallback={handleMapArrayInputChange}
+                    callbackArgs={{objectKey: 'requirements', subKey: 'description'}}
+                    i={i}
+                    submitRef={submitRef}
+                  />
                   <DeleteButton
                     w={4}
                     h={4}
@@ -442,22 +435,14 @@ const NoteDetails = () => {
                     checked={details.bonus[i].is_qualified}
                     onChange={() => handleCheckboxChange(i, 'bonus')}
                   />
-                  <Editable
-                    value={
-                      item.description === ''
-                        ? '尚未填寫資料'
-                        : item.description
-                    }
-                  >
-                    <EditablePreview />
-                    <EditableInput
-                      onChange={e =>
-                        handleMapArrayInputChange(e, i, 'bonus', 'description')
-                      }
-                      onBlur={() => onBlurSubmit('bonus')}
-                      onKeyDown={e => handlePressEnter(e, 'bonus')}
-                    />
-                  </Editable>
+                  <EditableInputField
+                    value={item.description}
+                    onBlurSubmit={onBlurSubmit}
+                    onSubmitCallback={handleMapArrayInputChange}
+                    callbackArgs={{objectKey: 'bonus', subKey: 'description'}}
+                    i={i}
+                    submitRef={submitRef}
+                  />
                   <DeleteButton
                     w={4}
                     h={4}
@@ -547,42 +532,30 @@ const NoteDetails = () => {
               {details.questions.map((q, i) => {
                 return (
                   <QuestionWrapper key={uuid()}>
-                    <Editable
-                      value={q.question === '' ? '尚未填寫資料' : q.question}
-                      onSubmit={() => onBlurSubmit('questions')}
-                    >
-                      <StyledListItem>
-                        <EditablePreview />
-                        <EditableInput
-                          onChange={e =>
-                            handleMapArrayInputChange(
-                              e,
-                              i,
-                              'questions',
-                              'question'
-                            )
-                          }
-                        />
-                        <DeleteButton
-                          w={4}
-                          h={4}
-                          ml={5}
-                          aria-label="delete item"
-                          icon={<SmallCloseIcon />}
-                          onClick={() => handleDelete(i, 'questions')}
-                        />
-                      </StyledListItem>
-                    </Editable>
-                    <Editable value={q.answer || '請輸入練習回答'}>
-                      <EditablePreview />
-                      <EditableTextarea
-                        onChange={e =>
-                          handleMapArrayInputChange(e, i, 'questions', 'answer')
-                        }
-                        onBlur={() => onBlurSubmit('questions')}
-                        onKeyDown={e => handlePressEnter(e, 'questions')}
-                      />
-                    </Editable>
+                    <EditableInputField
+                      value={q.question}
+                      onBlurSubmit={onBlurSubmit}
+                      onSubmitCallback={handleMapArrayInputChange}
+                      callbackArgs={{objectKey: 'questions', subKey: 'question'}}
+                      i={i}
+                      submitRef={submitRef}
+                    />
+                    <DeleteButton
+                      w={4}
+                      h={4}
+                      ml={5}
+                      aria-label="delete item"
+                      icon={<SmallCloseIcon />}
+                      onClick={() => handleDelete(i, 'questions')}
+                    />
+                    <EditableInputField
+                      value={q.answer}
+                      onBlurSubmit={onBlurSubmit}
+                      onSubmitCallback={handleMapArrayInputChange}
+                      callbackArgs={{objectKey: 'questions', subKey: 'answer'}}
+                      i={i}
+                      submitRef={submitRef}
+                    />
                   </QuestionWrapper>
                 );
               })}

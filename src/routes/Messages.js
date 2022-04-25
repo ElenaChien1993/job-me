@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import { Search2Icon } from '@chakra-ui/icons';
-import { BiSend, BiImageAdd } from 'react-icons/bi';
+import { BiSend, BiImageAdd, BiGame } from 'react-icons/bi';
 import { BsFillEmojiHeartEyesFill } from 'react-icons/bs';
 import {
   InputGroup,
@@ -9,6 +9,8 @@ import {
   Input,
   IconButton,
   useDisclosure,
+  Flex,
+  Icon,
 } from '@chakra-ui/react';
 import styled, { ThemeProvider } from 'styled-components';
 import 'emoji-mart/css/emoji-mart.css';
@@ -22,14 +24,14 @@ import AddImageModal from '../components/AddImageModal';
 import useClickOutside from '../hooks/useClickOutside';
 
 const Container = styled.div`
-  width: ${props => (props.theme.isCorner ? '40vw' : '')};
-  height: ${props => (props.theme.isCorner ? '400px' : '650px')};
+  width: ${(props) => (props.theme.isCorner ? '40vw' : '')};
+  height: ${(props) => (props.theme.isCorner ? '400px' : '650px')};
   background-color: white;
   border-radius: 20px;
   position: relative;
   z-index: 1;
-  margin: ${props => (props.theme.isCorner ? '' : '0 10%')};
-  top: ${props => (props.theme.isCorner ? '' : '70px')};
+  margin: ${(props) => (props.theme.isCorner ? '' : '0 10%')};
+  top: ${(props) => (props.theme.isCorner ? '' : '70px')};
 `;
 
 const LeftWrapper = styled.div`
@@ -65,7 +67,7 @@ const RightWrapper = styled.div`
 const SearchBar = styled.div`
   width: 90%;
   margin-bottom: 30px;
-  display: ${props => (props.theme.isCorner ? 'none' : 'block')};
+  display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
 `;
 
 const TopWrapper = styled.div`
@@ -84,7 +86,7 @@ const Name = styled.div`
 `;
 
 const Content = styled.div`
-  height: ${props => (props.theme.isCorner ? '272px' : '522px')};
+  height: ${(props) => (props.theme.isCorner ? '272px' : '522px')};
   overflow: scroll;
 `;
 
@@ -121,6 +123,11 @@ const EmojisPicker = styled.span`
   bottom: 10px;
   right: 0;
   z-index: 1;
+`;
+
+const EmptyText = styled.div`
+  color: #A0AEC0;
+  font-size: 30px;
 `
 
 const Messages = () => {
@@ -149,15 +156,15 @@ const Messages = () => {
 
   useEffect(() => {
     let unsubscribe;
-    firebase.listenRoomsChange(currentUserId, setDatabaseRooms).then(res => {
+    firebase.listenRoomsChange(currentUserId, setDatabaseRooms).then((res) => {
       unsubscribe = res;
     });
 
     return unsubscribe;
   }, [currentUserId]);
 
-  console.log(renderRooms)
-  
+  console.log(renderRooms);
+
   useEffect(() => {
     setRenderRooms(databaseRooms);
   }, [databaseRooms]);
@@ -185,23 +192,23 @@ const Messages = () => {
     }
   };
 
-  const handleSearch = e => {
+  const handleSearch = (e) => {
     const term = e.target.value;
     if (!term) {
       setRenderRooms(databaseRooms);
       return;
     }
     const filtered = databaseRooms.filter(
-      room =>
+      (room) =>
         room.members.display_name.toLowerCase().includes(term) ||
         room.latest_message.toLowerCase().includes(term)
     );
     setRenderRooms(filtered);
   };
 
-  const addEmoji = e => {
+  const addEmoji = (e) => {
     let emoji = e.native;
-    setText(prev => prev + emoji);
+    setText((prev) => prev + emoji);
     setShowEmojis(false);
   };
 
@@ -235,9 +242,9 @@ const Messages = () => {
           />
         </LeftWrapper>
         <RightWrapper>
-          <TopWrapper>
-            {active && (
-              <>
+          {active ? (
+            <>
+              <TopWrapper>
                 <ProfileImage
                   user={active.members}
                   size={36}
@@ -245,59 +252,64 @@ const Messages = () => {
                   marginRight={13}
                 />
                 <Name>{active.members.display_name}</Name>
-              </>
-            )}
-          </TopWrapper>
-          <AddImageModal
-            isOpen={isOpen}
-            onClose={onClose}
-            room={active}
-            send={send}
-          />
-          <Content ref={rootRef}>
-            {active ? (
-              <ChatContent
+              </TopWrapper>
+              <AddImageModal
+                isOpen={isOpen}
+                onClose={onClose}
                 room={active}
-                bottomRef={bottomRef}
-                rootRef={rootRef}
-                isCorner={isCorner}
+                send={send}
               />
-            ) : (
-              <div>請選取聊天室</div>
-            )}
-          </Content>
-          <BottomWrapper>
-            <MessageBar
-              type="text"
-              placeholder="Type your message"
-              value={text}
-              onChange={event => setText(event.target.value)}
-              onKeyDown={e => handleEnter(e, text, 0)}
-            />
-            {showEmojis && (
-              <EmojisPicker ref={emojisRef}>
-                <Picker onSelect={addEmoji} emojiTooltip={true} title="JobMe" />
-              </EmojisPicker>
-            )}
-            <StyledIconButton
-              onClick={onOpen}
-              variant="ghost"
-              aria-label="Send Message"
-              icon={<BiImageAdd />}
-            />
-            <StyledIconButton
-              onClick={() => setShowEmojis(!showEmojis)}
-              variant="ghost"
-              aria-label="Open Emojis"
-              icon={<BsFillEmojiHeartEyesFill />}
-            />
-            <StyledIconButton
-              onClick={() => send(text, 0)}
-              variant="ghost"
-              aria-label="Send Message"
-              icon={<BiSend />}
-            />
-          </BottomWrapper>
+              <Content ref={rootRef}>
+                <ChatContent
+                  room={active}
+                  bottomRef={bottomRef}
+                  rootRef={rootRef}
+                  isCorner={isCorner}
+                />
+              </Content>
+              <BottomWrapper>
+                <MessageBar
+                  type="text"
+                  placeholder="Type your message"
+                  value={text}
+                  onChange={(event) => setText(event.target.value)}
+                  onKeyDown={(e) => handleEnter(e, text, 0)}
+                />
+                {showEmojis && (
+                  <EmojisPicker ref={emojisRef}>
+                    <Picker
+                      onSelect={addEmoji}
+                      emojiTooltip={true}
+                      title="JobMe"
+                    />
+                  </EmojisPicker>
+                )}
+                <StyledIconButton
+                  onClick={onOpen}
+                  variant="ghost"
+                  aria-label="Send Message"
+                  icon={<BiImageAdd />}
+                />
+                <StyledIconButton
+                  onClick={() => setShowEmojis(!showEmojis)}
+                  variant="ghost"
+                  aria-label="Open Emojis"
+                  icon={<BsFillEmojiHeartEyesFill />}
+                />
+                <StyledIconButton
+                  onClick={() => send(text, 0)}
+                  variant="ghost"
+                  aria-label="Send Message"
+                  icon={<BiSend />}
+                />
+              </BottomWrapper>
+            </>
+          ) : (
+            <Flex flexDir="column" align="center" justify="center" mt="100px">
+              <Icon w="200px" h="200px" color="#A0AEC0" as={BiGame}/>
+              <EmptyText>請選取聊天室</EmptyText>
+            </Flex>
+          )}
         </RightWrapper>
       </Container>
     </ThemeProvider>

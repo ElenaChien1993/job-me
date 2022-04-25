@@ -112,12 +112,12 @@ const NoteCreateBrief = ({
     '等待中',
   ];
 
-  // useEffect(() => {
-  //   firebase.getCompanies().then(data => {
-  //     console.log(data);
-  //     setDatabaseCompanies(data);
-  //   });
-  // }, []);
+  useEffect(() => {
+    firebase.getCompanies().then(data => {
+      console.log(data);
+      setDatabaseCompanies(data);
+    });
+  }, []);
 
   const handleCheckboxChange = () => {
     setValues((prev) => {
