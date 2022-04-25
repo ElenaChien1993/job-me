@@ -1,24 +1,5 @@
 import styled from 'styled-components';
-import { Input, Textarea } from '@chakra-ui/react';
-
-const Container = styled.div`
-  min-height: 750px;
-  height: auto;
-  background: #ffffff;
-  border-radius: 30px;
-  margin: 40px auto 0;
-  width: 80%;
-`;
-
-const LeftWrapper = styled.div`
-  position: absolute;
-  width: 350px;
-  height: 750px;
-  left: 110px;
-  top: 110px;
-  background: #306172;
-  border-radius: 30px 0px 0px 30px;
-`;
+import { Input } from '@chakra-ui/react';
 
 const RightWrapper = styled.div`
   width: 65%;
@@ -195,93 +176,91 @@ const DetailsStep2 = ({
     setValues((prev) => {
       return {
         ...prev,
-        attached_files: [...prev.attached_files, { file_name: '', file_link: '' }],
+        attached_files: [
+          ...prev.attached_files,
+          { file_name: '', file_link: '' },
+        ],
       };
     });
   };
 
   return (
-    <Container>
-      <LeftWrapper></LeftWrapper>
-      <RightWrapper>
-        <StyledForm>
-          <InputWrap>
-            <label>Bonus（加分項目）</label>
-            {values.bonus.map((req, i) => {
-              return (
-                <RequirementWrapper key={i}>
-                  <CheckBox
-                    type="checkbox"
-                    checked={values.bonus[i].is_qualified}
-                    onChange={() => handleCheckboxChange(req, i)}
-                  />
+    <RightWrapper>
+      <StyledForm>
+        <InputWrap>
+          <label>Bonus（加分項目）</label>
+          {values.bonus.map((req, i) => {
+            return (
+              <RequirementWrapper key={i}>
+                <CheckBox
+                  type="checkbox"
+                  checked={values.bonus[i].is_qualified}
+                  onChange={() => handleCheckboxChange(req, i)}
+                />
+                <StyledInput
+                  type="text"
+                  defaultValue={values.bonus[i].description}
+                  onChange={handleInputChange(i)}
+                />
+              </RequirementWrapper>
+            );
+          })}
+          <StyledAddButton onClick={handleAddField}>＋新增欄位</StyledAddButton>
+        </InputWrap>
+        <InputWrap>
+          <label>職缺連結</label>
+          <StyledInput
+            type="text"
+            defaultValue={values.job_link}
+            onChange={handleChange('job_link')}
+          />
+        </InputWrap>
+        <InputWrap>
+          <label>我的履歷連結</label>
+          <StyledInput
+            type="text"
+            defaultValue={values.resume_link}
+            onChange={handleChange('resume_link')}
+          />
+        </InputWrap>
+        <InputWrap>
+          <label>
+            我的其他檔案連結
+            <SideNote>
+              {' '}
+              Ex: 個人網站 / 作品集 / CV / github 頁面.....等
+            </SideNote>
+          </label>
+          {values.attached_files.map((file, i) => {
+            return (
+              <FilesWrap key={i}>
+                <FileName>
+                  <label>檔名</label>
                   <StyledInput
                     type="text"
-                    defaultValue={values.bonus[i].description}
-                    onChange={handleInputChange(i)}
+                    defaultValue={values.attached_files[i].file_name}
+                    onChange={handleFileNameInputChange(i)}
                   />
-                </RequirementWrapper>
-              );
-            })}
-            <StyledAddButton onClick={handleAddField}>
-              ＋新增欄位
-            </StyledAddButton>
-          </InputWrap>
-          <InputWrap>
-            <label>職缺連結</label>
-            <StyledInput
-              type="text"
-              defaultValue={values.job_link}
-              onChange={handleChange('job_link')}
-            />
-          </InputWrap>
-          <InputWrap>
-            <label>我的履歷連結</label>
-            <StyledInput
-              type="text"
-              defaultValue={values.resume_link}
-              onChange={handleChange('resume_link')}
-            />
-          </InputWrap>
-          <InputWrap>
-            <label>
-              我的其他檔案連結
-              <SideNote>
-                {' '}
-                Ex: 個人網站 / 作品集 / CV / github 頁面.....等
-              </SideNote>
-            </label>
-            {values.attached_files.map((file, i) => {
-              return (
-                <FilesWrap key={i}>
-                  <FileName>
-                    <label>檔名</label>
-                    <StyledInput
-                      type="text"
-                      defaultValue={values.attached_files[i].file_name}
-                      onChange={handleFileNameInputChange(i)}
-                    />
-                  </FileName>
-                  <FileLink>
-                    <label>連結</label>
-                    <StyledInput
-                      type="text"
-                      defaultValue={values.attached_files[i].file_link}
-                      onChange={handleFileLinkInputChange(i)}
-                    />
-                  </FileLink>
-                </FilesWrap>
-              );
-            })}
-            <StyledAddButton onClick={handleFileAddField}>
-              ＋新增欄位
-            </StyledAddButton>
-          </InputWrap>
-        </StyledForm>
-        <StyledButton onClick={prevStep}>上一頁</StyledButton>
-        <StyledButton onClick={nextStep}>下一頁</StyledButton>
-      </RightWrapper>
-    </Container>
+                </FileName>
+                <FileLink>
+                  <label>連結</label>
+                  <StyledInput
+                    type="text"
+                    defaultValue={values.attached_files[i].file_link}
+                    onChange={handleFileLinkInputChange(i)}
+                  />
+                </FileLink>
+              </FilesWrap>
+            );
+          })}
+          <StyledAddButton onClick={handleFileAddField}>
+            ＋新增欄位
+          </StyledAddButton>
+        </InputWrap>
+      </StyledForm>
+      <StyledButton onClick={prevStep}>上一頁</StyledButton>
+      <StyledButton onClick={nextStep}>下一頁</StyledButton>
+    </RightWrapper>
   );
 };
 

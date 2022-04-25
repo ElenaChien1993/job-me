@@ -1,9 +1,57 @@
 import { useState } from 'react';
+import { Flex, Button, Icon } from '@chakra-ui/react';
+import { BiCircle } from 'react-icons/bi';
+import { BsCheckCircleFill } from 'react-icons/bs';
+import styled from 'styled-components';
 
 import NoteCreateBrief from './NoteCreateBrief';
 import DetailsStep1 from './DetailsStep1';
 import DetailsStep2 from './DetailsStep2';
 import DetailsStep3 from './DetailsStep3';
+
+const Container = styled.div`
+  width: 80%;
+  height: 750px;
+  background: #ffffff;
+  border-radius: 30px;
+  margin: 40px auto 0;
+`;
+
+const LeftWrapper = styled.div`
+  position: absolute;
+  width: 350px;
+  height: 750px;
+  left: 110px;
+  top: 110px;
+  background: #306172;
+  border-radius: 30px 0px 0px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 10px;
+  justify-content: space-around;
+`;
+
+const StyledIcon = styled(Icon)`
+  width: 35px;
+  height: 35px;
+  margin-right: 10px;
+  color: ${props => props.isComplete ? 'white' : '#214552'};
+`
+
+const StepText = styled.p`
+  color: ${props => props.isComplete ? 'white' : '#214552'};
+  font-size: 20px;
+  font-weight: bold;
+`;
+
+const StraightLine = styled.div`
+  width: 3px;
+  height: 30px;
+  margin: 3px 0;
+  margin-left: 16px;
+  background-color: ${props => props.isComplete ? 'white' : '#214552'};
+`;
 
 const NoteCreate = () => {
   const [step, setStep] = useState(1);
@@ -70,7 +118,31 @@ const NoteCreate = () => {
   };
 
   return (
-    <>
+    <Container>
+      <LeftWrapper>
+        <Flex flexDir="column" align="start">
+          <Flex align="center" justify="center">
+            <StyledIcon as={BsCheckCircleFill} isComplete/>
+            <StepText isComplete>基本資料</StepText>
+          </Flex>
+          <StraightLine isComplete/>
+          <Flex align="center" justify="center">
+            <StyledIcon as={step !== 1 ? BsCheckCircleFill : BiCircle} isComplete={step !== 1}/>
+            <StepText isComplete={step !== 1}>詳細資訊</StepText>
+          </Flex>
+          <StraightLine isComplete={step !== 1}/>
+          <Flex align="center" justify="center">
+            <StyledIcon as={step === 4 ? BsCheckCircleFill : BiCircle} isComplete={step === 4}/>
+            <StepText isComplete={step === 4}>事前準備小記</StepText>
+          </Flex>
+        </Flex>
+        <Flex align="center" textAlign="center" color="white">
+          基本資料頁為創建筆記的必填項目，<br />其餘資訊可日後再編輯新增唷
+        </Flex>
+        <Button variant="outline" onClick w="50%" style={{ color: 'white' }}>
+          取消
+        </Button>
+      </LeftWrapper>
       {(() => {
         switch (step) {
           case 1:
@@ -119,7 +191,7 @@ const NoteCreate = () => {
             console.log('This is a multi-step form built with React.');
         }
       })()}
-    </>
+    </Container>
   );
 };
 

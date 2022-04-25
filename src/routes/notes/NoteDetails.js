@@ -137,6 +137,7 @@ const NoteDetails = () => {
   const [details, setDetails] = useState();
   const [isFilesEditing, setIsFilesEditing] = useState(false);
   const [recommend, setRecommend] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { currentUserId } = useOutletContext();
   const submitRef = useRef();
 
@@ -259,17 +260,19 @@ const NoteDetails = () => {
   };
 
   const showConnectModal = () => {
+    setIsLoading(true);
+    onOpen();
     firebase
       .getRecommendedUsers(brief.company_name, brief.job_title, currentUserId)
       .then(members => {
         setRecommend(members);
-        onOpen();
+        setIsLoading(false);
       });
   };
 
   return (
     <Background>
-      <RecommendModal isOpen={isOpen} onClose={onClose} recommend={recommend} />
+      <RecommendModal isOpen={isOpen} onClose={onClose} recommend={recommend} isLoading={isLoading}/>
       <ButtonWrapper>
         <Link to="/notes">
           <Button

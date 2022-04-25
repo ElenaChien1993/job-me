@@ -5,25 +5,6 @@ import { Input, Textarea } from '@chakra-ui/react';
 
 import firebase from '../../utils/firebase';
 
-const Container = styled.div`
-  min-height: 750px;
-  height: auto;
-  background: #ffffff;
-  border-radius: 30px;
-  margin: 40px auto 0;
-  width: 80%;
-`;
-
-const LeftWrapper = styled.div`
-  position: absolute;
-  width: 350px;
-  height: 750px;
-  left: 110px;
-  top: 110px;
-  background: #306172;
-  border-radius: 30px 0px 0px 30px;
-`;
-
 const RightWrapper = styled.div`
   width: 65%;
   margin-left: 350px;
@@ -102,7 +83,7 @@ const DetailsStep3 = ({
   const user = firebase.auth.currentUser;
   const navigate = useNavigate();
 
-  const handleInputChange = i => e => {
+  const handleInputChange = (i) => (e) => {
     const updated = values.questions.map((q, index) =>
       index === i
         ? {
@@ -112,14 +93,14 @@ const DetailsStep3 = ({
         : q
     );
 
-    setValues(prev => {
+    setValues((prev) => {
       return { ...prev, questions: updated };
     });
   };
 
-  const handleAddField = e => {
+  const handleAddField = (e) => {
     e.preventDefault();
-    setValues(prev => {
+    setValues((prev) => {
       return {
         ...prev,
         questions: [...prev.questions, { question: '', answer: '' }],
@@ -130,7 +111,7 @@ const DetailsStep3 = ({
   const createNote = () => {
     firebase
       .setNoteBrief(user.uid, { ...noteDataBrief, creator: user.uid })
-      .then(id => {
+      .then((id) => {
         firebase.setNoteDetails(id, noteDetails).then(() => {
           navigate(`/notes/details/${id}`);
         });
@@ -138,42 +119,37 @@ const DetailsStep3 = ({
   };
 
   return (
-    <Container>
-      <LeftWrapper></LeftWrapper>
-      <RightWrapper>
-        <StyledForm>
-          <InputWrap>
-            <label>可能會被問的面試問題</label>
-            {values.questions.map((q, i) => {
-              return (
-                <FilesWrap key={i}>
-                  <label>問題</label>
-                  <StyledInput
-                    type="text"
-                    defaultValue={values.questions[i].question}
-                    onChange={handleInputChange(i)}
-                  />
-                </FilesWrap>
-              );
-            })}
-            <StyledAddButton onClick={handleAddField}>
-              ＋新增欄位
-            </StyledAddButton>
-          </InputWrap>
-          <InputWrap>
-            <label>Responsibilities（工作內容）</label>
-            <StyledText
-              onChange={handleChange('others')}
-              placeholder="一些要再做功課的注意事項等等"
-              size="md"
-              defaultValue={values.others}
-            />
-          </InputWrap>
-        </StyledForm>
-        <StyledButton onClick={prevStep}>上一頁</StyledButton>
-        <StyledButton onClick={createNote}>創建筆記</StyledButton>
-      </RightWrapper>
-    </Container>
+    <RightWrapper>
+      <StyledForm>
+        <InputWrap>
+          <label>可能會被問的面試問題</label>
+          {values.questions.map((q, i) => {
+            return (
+              <FilesWrap key={i}>
+                <label>問題</label>
+                <StyledInput
+                  type="text"
+                  defaultValue={values.questions[i].question}
+                  onChange={handleInputChange(i)}
+                />
+              </FilesWrap>
+            );
+          })}
+          <StyledAddButton onClick={handleAddField}>＋新增欄位</StyledAddButton>
+        </InputWrap>
+        <InputWrap>
+          <label>Responsibilities（工作內容）</label>
+          <StyledText
+            onChange={handleChange('others')}
+            placeholder="一些要再做功課的注意事項等等"
+            size="md"
+            defaultValue={values.others}
+          />
+        </InputWrap>
+      </StyledForm>
+      <StyledButton onClick={prevStep}>上一頁</StyledButton>
+      <StyledButton onClick={createNote}>創建筆記</StyledButton>
+    </RightWrapper>
   );
 };
 

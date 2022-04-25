@@ -2,25 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { Input, Textarea } from '@chakra-ui/react';
 
-const Container = styled.div`
-  min-height: 750px;
-  height: auto;
-  background: #ffffff;
-  border-radius: 30px;
-  margin: 40px auto 0;
-  width: 80%;
-`;
-
-const LeftWrapper = styled.div`
-  position: absolute;
-  width: 350px;
-  height: 750px;
-  left: 110px;
-  top: 110px;
-  background: #306172;
-  border-radius: 30px 0px 0px 30px;
-`;
-
 const RightWrapper = styled.div`
   width: 65%;
   margin-left: 350px;
@@ -208,90 +189,85 @@ const DetailsStep1 = ({
   };
 
   return (
-    <Container>
-      <LeftWrapper></LeftWrapper>
-      <RightWrapper>
-        <StyledForm>
-          <InputWrap>
-            <label>該公司主要產品 / 服務</label>
+    <RightWrapper>
+      <StyledForm>
+        <InputWrap>
+          <label>該公司主要產品 / 服務</label>
+          <StyledInput
+            type="text"
+            defaultValue={values.product}
+            onChange={handleChange('product')}
+          />
+        </InputWrap>
+        <SalaryContainer>
+          <label>薪資範圍</label>
+          <SalaryWrap>
             <StyledInput
               type="text"
-              defaultValue={values.product}
-              onChange={handleChange('product')}
+              defaultValue={values.salary.range}
+              placeholder="Ex:650-800"
+              onChange={handleSalaryChange}
             />
-          </InputWrap>
-          <SalaryContainer>
-            <label>薪資範圍</label>
-            <SalaryWrap>
-              <StyledInput
-                type="text"
-                defaultValue={values.salary.range}
-                placeholder="Ex:650-800"
-                onChange={handleSalaryChange}
-              />
-              <StyledDiv>K / 千</StyledDiv>
-              <TagsWrapper>
-                {salaryTypes.map((type, i) => {
-                  return (
-                    <React.Fragment key={i}>
-                      <RadioInput
-                        type="radio"
-                        id={`radio-${i}`}
-                        name="type"
-                        value={type}
-                        key={i}
-                        onChange={handleRadioChange}
-                        checked={values.salary.type === type}
-                      />
-                      <TagButton
-                        checked={values.salary.type === type}
-                        key={`label${i}`}
-                        htmlFor={`radio-${i}`}
-                      >
-                        {type}
-                      </TagButton>
-                    </React.Fragment>
-                  );
-                })}
-              </TagsWrapper>
-            </SalaryWrap>
-          </SalaryContainer>
-          <InputWrap>
-            <label>Responsibilities（工作內容）</label>
-            <StyledText
-              onChange={handleResponsibilitiesInputChange}
-              placeholder="請將每個項目分行隔開"
-              size="md"
-              defaultValue={values.responsibilities.join('\n')}
-            />
-          </InputWrap>
-          <InputWrap>
-            <label>Requirements（必備技能）</label>
-            {values.requirements.map((req, i) => {
-              return (
-                <RequirementWrapper key={i}>
-                  <CheckBox
-                    type="checkbox"
-                    checked={values.requirements[i].is_qualified}
-                    onChange={() => handleReqCheckboxChange(req, i)}
-                  />
-                  <StyledInput
-                    type="text"
-                    defaultValue={values.requirements[i].description}
-                    onChange={handleReqInputChange(i)}
-                  />
-                </RequirementWrapper>
-              );
-            })}
-            <StyledAddButton onClick={handleAddField}>
-              ＋新增欄位
-            </StyledAddButton>
-          </InputWrap>
-        </StyledForm>
-        <StyledButton onClick={prevStep}>上一頁</StyledButton>
-        <StyledButton onClick={nextStep}>下一頁</StyledButton>
-      </RightWrapper>
-    </Container>
+            <StyledDiv>K / 千</StyledDiv>
+            <TagsWrapper>
+              {salaryTypes.map((type, i) => {
+                return (
+                  <React.Fragment key={i}>
+                    <RadioInput
+                      type="radio"
+                      id={`radio-${i}`}
+                      name="type"
+                      value={type}
+                      key={i}
+                      onChange={handleRadioChange}
+                      checked={values.salary.type === type}
+                    />
+                    <TagButton
+                      checked={values.salary.type === type}
+                      key={`label${i}`}
+                      htmlFor={`radio-${i}`}
+                    >
+                      {type}
+                    </TagButton>
+                  </React.Fragment>
+                );
+              })}
+            </TagsWrapper>
+          </SalaryWrap>
+        </SalaryContainer>
+        <InputWrap>
+          <label>Responsibilities（工作內容）</label>
+          <StyledText
+            onChange={handleResponsibilitiesInputChange}
+            placeholder="請將每個項目分行隔開"
+            size="md"
+            defaultValue={values.responsibilities.join('\n')}
+          />
+        </InputWrap>
+        <InputWrap>
+          <label>Requirements（必備技能）</label>
+          {values.requirements.map((req, i) => {
+            return (
+              <RequirementWrapper key={i}>
+                <CheckBox
+                  type="checkbox"
+                  checked={values.requirements[i].is_qualified}
+                  onChange={() => handleReqCheckboxChange(req, i)}
+                />
+                <StyledInput
+                  type="text"
+                  defaultValue={values.requirements[i].description}
+                  onChange={handleReqInputChange(i)}
+                />
+              </RequirementWrapper>
+            );
+          })}
+          <StyledAddButton onClick={handleAddField}>＋新增欄位</StyledAddButton>
+        </InputWrap>
+      </StyledForm>
+      <StyledButton onClick={prevStep}>上一頁</StyledButton>
+      <StyledButton onClick={nextStep}>下一頁</StyledButton>
+    </RightWrapper>
   );
 };
 
