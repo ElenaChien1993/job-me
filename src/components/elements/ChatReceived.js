@@ -3,6 +3,7 @@ import { Image, CircularProgress } from '@chakra-ui/react';
 import styled from 'styled-components';
 
 import ProfileImage from '../ProfileImage';
+import useFormatedTime from '../../hooks/useFormatedTime';
 
 const Wrapper = styled.div`
   display: flex;
@@ -47,6 +48,7 @@ const MESSAGE_TYPE = props => ({
 });
 
 const ChatReceived = React.forwardRef((props, ref) => {
+  const timeString = useFormatedTime(props.message.create_at);
   return (
     <Wrapper ref={ref}>
       {!props.isCorner && (
@@ -58,7 +60,7 @@ const ChatReceived = React.forwardRef((props, ref) => {
         />
       )}
       {MESSAGE_TYPE(props)[props.message.type]}
-      <DateText>{props.message.create_at}</DateText>
+      <DateText>{timeString}</DateText>
     </Wrapper>
   );
 });

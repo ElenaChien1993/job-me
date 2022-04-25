@@ -22,6 +22,7 @@ const ChatContent = React.memo(({ room, rootRef, bottomRef, isCorner }) => {
   //   }
   // }, [bottomRef]);
 
+  console.log('room', room, 'messages', messages, 'ref', firstRenderRef.current)
   useEffect(() => {
     if (!messages[room.id]) return;
     firstMessageRef.current = messages[room.id][0];
@@ -29,6 +30,7 @@ const ChatContent = React.memo(({ room, rootRef, bottomRef, isCorner }) => {
 
   useEffect(() => {
     // bottomRef.current.scrollIntoView(false, { behavior: 'auto' });
+    console.log('room changed effect')
     if (messages[room.id]) return;
     firstRenderRef.current = true;
     lastMessagesRef.current = false;
@@ -39,7 +41,7 @@ const ChatContent = React.memo(({ room, rootRef, bottomRef, isCorner }) => {
     const callback = ([entry]) => {
       if (!entry || !entry.isIntersecting) return;
       if (lastMessagesRef.current) return;
-
+      console.log('callback', firstRenderRef.current)
       if (firstRenderRef.current) {
         firebase.listenMessagesChange(room, setMessages, currentUserId).then((res) => {
           unsubscribe = res;
@@ -53,6 +55,7 @@ const ChatContent = React.memo(({ room, rootRef, bottomRef, isCorner }) => {
             setMessages((prev) => {
               return { ...prev, [room.id]: [...messages, ...prev[room.id]] };
             });
+            console.log(messages);
             if (messages.length < 20) {
               lastMessagesRef.current = true;
             }
@@ -71,10 +74,12 @@ const ChatContent = React.memo(({ room, rootRef, bottomRef, isCorner }) => {
       observer.observe(observeTargetRef.current);
     }
 
-    return () => {
-      // unsubscribe();
-      observer.unobserve(observeTargetRef.current);
-    };
+    // return () => {
+    //   // unsubscribe();
+    //   if (observeTargetRef.current) {
+    //     observer.unobserve(observeTargetRef.current)
+    //   }
+    // };
   }, [observeTargetRef, firstRenderRef, bottomRef, room, rootRef, currentUserId]);
 
   return (

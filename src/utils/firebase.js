@@ -345,25 +345,11 @@ const firebase = {
   },
   async getMoreMessages(roomId, message) {
     if (!message) return;
+    console.log('firebase', message)
     const docsSnap = await getDocs(
       query(
         collection(db, `chatrooms/${roomId}/messages`),
         where('create_at', '<', message.create_at),
-        orderBy('create_at', 'desc'),
-        limit(20)
-      )
-    );
-    let data = [];
-    docsSnap.forEach((doc) => {
-      data.push(doc.data());
-    });
-    data.sort((a, b) => !b.create_at - a.create_at);
-    return data;
-  },
-  async getMessages(roomId) {
-    const docsSnap = await getDocs(
-      query(
-        collection(db, `chatrooms/${roomId}/messages`),
         orderBy('create_at', 'desc'),
         limit(20)
       )
@@ -391,18 +377,18 @@ const firebase = {
           }
         });
         data.sort((a, b) => !b.create_at - a.create_at);
-        const transformed = data.map((message) => {
-          const timeString = useFormatedTime(message.create_at);
-          return { ...message, create_at: timeString };
-        });
+        // const transformed = data.map((message) => {
+        //   const timeString = useFormatedTime(message.create_at);
+        //   return { ...message, create_at: timeString };
+        // });
         callback((prev) => {
           if (!prev[room.id]) {
             return {
               ...prev,
-              [room.id]: transformed,
+              [room.id]: data,
             };
           } else {
-            return { ...prev, [room.id]: [...prev[room.id], ...transformed] };
+            return { ...prev, [room.id]: [...prev[room.id], ...data] };
           }
         });
         if (!room.id || uid === room.latest_sender) return;

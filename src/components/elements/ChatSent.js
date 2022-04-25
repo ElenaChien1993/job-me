@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, CircularProgress } from '@chakra-ui/react';
 import styled from 'styled-components';
+import useFormatedTime from '../../hooks/useFormatedTime';
 
 const Wrapper = styled.div`
   display: flex;
@@ -49,9 +50,10 @@ const MESSAGE_TYPE = props => ({
 });
 
 const ChatSent = React.forwardRef((props, ref) => {
+  const timeString = useFormatedTime(props.message.create_at);
   return (
     <Wrapper ref={ref}>
-      <DateText>{props.message.create_at}</DateText>
+      <DateText>{timeString}</DateText>
       {MESSAGE_TYPE(props)[props.message.type]}
     </Wrapper>
   );

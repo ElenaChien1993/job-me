@@ -94,8 +94,6 @@ const ChatList = React.memo(({ rooms, active, setActive, isCorner }) => {
                 isRead={room.receiver_has_read || currentUserId === room.latest_sender}
               >
                 {LATEST_MESSAGE_TYPE(room)[room.latest.message_type]}
-                {/* {!room.latest.message_type && ''}
-                {room.latest.message_type === 0 ? room.latest.message : '傳送了一張照片'} */}
               </LatestMessage>
             </BriefContent>
             <DateText>{room.latest.timestamp}</DateText>

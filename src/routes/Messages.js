@@ -22,16 +22,17 @@ import ChatContent from '../components/ChatContent';
 import ProfileImage from '../components/ProfileImage';
 import AddImageModal from '../components/AddImageModal';
 import useClickOutside from '../hooks/useClickOutside';
+import ChatContent2 from '../components/ChatContent2';
 
 const Container = styled.div`
-  width: ${(props) => (props.theme.isCorner ? '40vw' : '')};
-  height: ${(props) => (props.theme.isCorner ? '400px' : '650px')};
+  width: ${props => (props.theme.isCorner ? '40vw' : '')};
+  height: ${props => (props.theme.isCorner ? '400px' : '650px')};
   background-color: white;
   border-radius: 20px;
   position: relative;
   z-index: 1;
-  margin: ${(props) => (props.theme.isCorner ? '' : '0 10%')};
-  top: ${(props) => (props.theme.isCorner ? '' : '70px')};
+  margin: ${props => (props.theme.isCorner ? '' : '0 10%')};
+  top: ${props => (props.theme.isCorner ? '' : '70px')};
 `;
 
 const LeftWrapper = styled.div`
@@ -67,7 +68,7 @@ const RightWrapper = styled.div`
 const SearchBar = styled.div`
   width: 90%;
   margin-bottom: 30px;
-  display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
+  display: ${props => (props.theme.isCorner ? 'none' : 'block')};
 `;
 
 const TopWrapper = styled.div`
@@ -86,7 +87,7 @@ const Name = styled.div`
 `;
 
 const Content = styled.div`
-  height: ${(props) => (props.theme.isCorner ? '272px' : '522px')};
+  height: ${props => (props.theme.isCorner ? '272px' : '522px')};
   overflow: scroll;
 `;
 
@@ -126,9 +127,9 @@ const EmojisPicker = styled.span`
 `;
 
 const EmptyText = styled.div`
-  color: #A0AEC0;
+  color: #a0aec0;
   font-size: 30px;
-`
+`;
 
 const Messages = () => {
   const [text, setText] = useState('');
@@ -156,14 +157,12 @@ const Messages = () => {
 
   useEffect(() => {
     let unsubscribe;
-    firebase.listenRoomsChange(currentUserId, setDatabaseRooms).then((res) => {
+    firebase.listenRoomsChange(currentUserId, setDatabaseRooms).then(res => {
       unsubscribe = res;
     });
 
     return unsubscribe;
   }, [currentUserId]);
-
-  console.log(renderRooms);
 
   useEffect(() => {
     setRenderRooms(databaseRooms);
@@ -183,7 +182,7 @@ const Messages = () => {
     };
     firebase.sendMessage(active.id, MessageData);
     setText('');
-    bottomRef.current.scrollIntoView({ behavior: 'auto' });
+    // bottomRef.current.scrollIntoView({ behavior: 'auto' });
   };
 
   const handleEnter = (e, value, type) => {
@@ -192,23 +191,22 @@ const Messages = () => {
     }
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     const term = e.target.value;
     if (!term) {
       setRenderRooms(databaseRooms);
       return;
     }
-    const filtered = databaseRooms.filter(
-      (room) =>
-        room.members.display_name.toLowerCase().includes(term) ||
-        room.latest_message.toLowerCase().includes(term)
-    );
+    const filtered = databaseRooms.filter(room => {
+      const regex = new RegExp(term, 'gi');
+      return room.members.display_name.match(regex);
+    });
     setRenderRooms(filtered);
   };
 
-  const addEmoji = (e) => {
+  const addEmoji = e => {
     let emoji = e.native;
-    setText((prev) => prev + emoji);
+    setText(prev => prev + emoji);
     setShowEmojis(false);
   };
 
@@ -260,9 +258,9 @@ const Messages = () => {
                 send={send}
               />
               <Content ref={rootRef}>
-                <ChatContent
+                <ChatContent2
                   room={active}
-                  bottomRef={bottomRef}
+                  // bottomRef={bottomRef}
                   rootRef={rootRef}
                   isCorner={isCorner}
                 />
@@ -272,8 +270,8 @@ const Messages = () => {
                   type="text"
                   placeholder="Type your message"
                   value={text}
-                  onChange={(event) => setText(event.target.value)}
-                  onKeyDown={(e) => handleEnter(e, text, 0)}
+                  onChange={event => setText(event.target.value)}
+                  onKeyDown={e => handleEnter(e, text, 0)}
                 />
                 {showEmojis && (
                   <EmojisPicker ref={emojisRef}>
@@ -306,7 +304,7 @@ const Messages = () => {
             </>
           ) : (
             <Flex flexDir="column" align="center" justify="center" mt="100px">
-              <Icon w="200px" h="200px" color="#A0AEC0" as={BiGame}/>
+              <Icon w="200px" h="200px" color="#A0AEC0" as={BiGame} />
               <EmptyText>請選取聊天室</EmptyText>
             </Flex>
           )}
