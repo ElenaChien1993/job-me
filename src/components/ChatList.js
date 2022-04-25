@@ -64,6 +64,12 @@ const NewMessage = styled.div`
   display: ${(props) => (props.isRead ? 'none' : 'block')};
 `;
 
+const LATEST_MESSAGE_TYPE = props => ({
+  0: props.latest.message,
+  1: '傳送了一張照片',
+  default: '',
+});
+
 const ChatList = React.memo(({ rooms, active, setActive, isCorner }) => {
   const { currentUserId } = useOutletContext();
 
@@ -87,7 +93,9 @@ const ChatList = React.memo(({ rooms, active, setActive, isCorner }) => {
               <LatestMessage
                 isRead={room.receiver_has_read || currentUserId === room.latest_sender}
               >
-                {room.latest.message_type === 0 ? room.latest.message : '傳送了一張照片'}
+                {LATEST_MESSAGE_TYPE(room)[room.latest.message_type]}
+                {/* {!room.latest.message_type && ''}
+                {room.latest.message_type === 0 ? room.latest.message : '傳送了一張照片'} */}
               </LatestMessage>
             </BriefContent>
             <DateText>{room.latest.timestamp}</DateText>

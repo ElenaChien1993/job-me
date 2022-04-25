@@ -156,6 +156,8 @@ const Messages = () => {
     return unsubscribe;
   }, [currentUserId]);
 
+  console.log(renderRooms)
+  
   useEffect(() => {
     setRenderRooms(databaseRooms);
   }, [databaseRooms]);

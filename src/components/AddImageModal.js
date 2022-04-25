@@ -36,7 +36,7 @@ const AddImageModal = ({ isOpen, onClose, room, send }) => {
     }
   };
 
-  const handleUpload = async e => {
+  const handleUpload = async () => {
     const path = `chatrooms/${room.id}/${uuid()}`;
     const url = await firebase.uploadFile(path, image.raw).then(() => {
       return firebase.getDownloadURL(path);

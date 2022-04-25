@@ -31,6 +31,7 @@ const PracticeParent = () => {
     setRecordType,
     brief,
     setBrief,
+    user,
   };
 
   return <Outlet context={props} />;

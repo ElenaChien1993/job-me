@@ -320,7 +320,6 @@ const firebase = {
         snapshot.forEach((snap) => {
           data.push(snap.data());
         });
-        console.log(data);
         const rooms = await Promise.all(
           data.map(async (room) => {
             const timeRelative = useRelativeTime(room);

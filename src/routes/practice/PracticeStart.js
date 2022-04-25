@@ -74,6 +74,10 @@ const PracticeStart = () => {
     }
   }, [])
 
+  const goToProfile = () => {
+    navigate(`/profile/${props.user.uid}`);
+  }
+
   return (
     <Container>
       <TitleWrapper>
@@ -107,7 +111,7 @@ const PracticeStart = () => {
           <Icon boxSize={200} as={BiWinkSmile} />
           <Title>此次練習已結束！你好棒！</Title>
           <Title>再多練習其他公司的面試吧～</Title>
-          <StyledButton variant="solid" size="xl" rightIcon={<CgProfile />}>
+          <StyledButton onClick={goToProfile} variant="solid" size="xl" rightIcon={<CgProfile />}>
             前往查看練習檔案
           </StyledButton>
         </>
