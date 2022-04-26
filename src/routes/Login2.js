@@ -171,7 +171,8 @@ const Login2 = () => {
 
   const signInWithProvider = async (provider) => {
     try {
-      const user = await firebase.signInWithProvider(provider);
+      await firebase.signInWithProvider(provider);
+      console.log('login')
       toast({
         title: '成功登入！',
         description: '已為您自動導向首頁',
@@ -180,7 +181,6 @@ const Login2 = () => {
         isClosable: true,
         position: 'top-right',
       });
-      await firebase.signUp(user.uid, user.displayName, user.photoURL);
     } catch (error) {
       console.log(error.code, error.message);
     }

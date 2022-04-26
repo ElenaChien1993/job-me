@@ -67,7 +67,7 @@ const firebase = {
       .then(() => {
         console.log('updated');
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
   },
@@ -92,25 +92,24 @@ const firebase = {
     }
   },
   listenUserProfileChange(uid, callback) {
-    return onSnapshot(doc(db, 'users', uid), (doc) => {
-      console.log('firebase')
-      callback((prev) => {
+    return onSnapshot(doc(db, 'users', uid), doc => {
+      callback(prev => {
         return { ...prev, ...doc.data() };
       });
     });
   },
   listenUserRecordsChange(uid, setAudioRecords, setVideoRecords) {
-    return onSnapshot(collection(db, 'users', uid, 'records'), async (docs) => {
+    return onSnapshot(collection(db, 'users', uid, 'records'), async docs => {
       let data = [];
-      docs.forEach((doc) => {
+      docs.forEach(doc => {
         data.push(doc.data());
       });
-      const transformed = data.map((record) => {
+      const transformed = data.map(record => {
         const timeString = useFormatedTime(record.date);
         return { ...record, date: timeString };
       });
-      const audios = transformed.filter((record) => record.type === 0);
-      const videos = transformed.filter((record) => record.type === 1);
+      const audios = transformed.filter(record => record.type === 0);
+      const videos = transformed.filter(record => record.type === 1);
       setAudioRecords(audios);
       setVideoRecords(videos);
     });
@@ -130,7 +129,7 @@ const firebase = {
   async getCompanies() {
     const docsSnap = await getDocs(collection(db, 'companies'));
     const data = [];
-    docsSnap.forEach((doc) => {
+    docsSnap.forEach(doc => {
       data.push(doc.data());
     });
     return data;
@@ -220,7 +219,10 @@ const firebase = {
   },
   async signUp(uid, value, url) {
     try {
-      await setDoc(doc(db, 'users', uid), { display_name: value, photo_url: url });
+      await setDoc(doc(db, 'users', uid), {
+        display_name: value,
+        photo_url: url,
+      });
     } catch (err) {
       console.log(err);
     }
@@ -237,7 +239,7 @@ const firebase = {
     );
     const querySnapshot = await getDocs(membersByCompany);
     let dataByCompany = [];
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(doc => {
       dataByCompany.push(doc.data());
     });
     const uniqueByCompany = helper.findUnique(dataByCompany);
@@ -250,18 +252,18 @@ const firebase = {
     );
     const Snapshots = await getDocs(membersByJob);
     let dataByJob = [];
-    Snapshots.forEach((doc) => {
+    Snapshots.forEach(doc => {
       dataByJob.push(doc.data());
     });
     const uniqueByJob = helper.findUnique(dataByJob);
     const data = helper.compare(uniqueByCompany, uniqueByJob);
     const users = await Promise.all(
-      data.map(async (note) => {
+      data.map(async note => {
         const userData = await this.getUserInfo(note.creator);
         return { ...note, creator_info: userData };
       })
     );
-    const filteredData = users.filter((item) => item.creator !== uid);
+    const filteredData = users.filter(item => item.creator !== uid);
     return filteredData;
   },
   async uploadFile(path, file) {
@@ -276,16 +278,16 @@ const firebase = {
       .then(() => {
         alert('已刪除檔案');
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
   },
   async getDownloadURL(path) {
     return getDownloadURL(ref(storage, path))
-      .then((url) => {
+      .then(url => {
         return url;
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
   },
@@ -305,7 +307,7 @@ const firebase = {
     );
     const querySnapshot = await getDocs(myRooms);
     let data = [];
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(doc => {
       if (doc.data().members.includes(ids[1])) {
         data.push(doc.data());
       }
@@ -319,16 +321,16 @@ const firebase = {
       orderBy('latest.timestamp', 'desc'),
       limit(7)
     );
-    return new Promise((res) => {
-      const unsubscribe = onSnapshot(q, async (snapshot) => {
+    return new Promise(res => {
+      const unsubscribe = onSnapshot(q, async snapshot => {
         let data = [];
-        snapshot.forEach((snap) => {
+        snapshot.forEach(snap => {
           data.push(snap.data());
         });
         const rooms = await Promise.all(
-          data.map(async (room) => {
+          data.map(async room => {
             const timeRelative = useRelativeTime(room);
-            const friendId = room.members.filter((id) => id !== uid);
+            const friendId = room.members.filter(id => id !== uid);
             const userData = await this.getUserInfo(friendId[0]);
             return {
               ...room,
@@ -360,7 +362,7 @@ const firebase = {
       )
     );
     let data = [];
-    docsSnap.forEach((doc) => {
+    docsSnap.forEach(doc => {
       data.push(doc.data());
     });
     data.sort((a, b) => !b.create_at - a.create_at);
@@ -374,9 +376,9 @@ const firebase = {
     );
     return onSnapshot(
       q,
-      async (snapshot) => {
+      async snapshot => {
         let data = [];
-        snapshot.docChanges().forEach((change) => {
+        snapshot.docChanges().forEach(change => {
           if (change.type === 'added') {
             data.push(change.doc.data());
           }
@@ -386,7 +388,7 @@ const firebase = {
         //   const timeString = useFormatedTime(message.create_at);
         //   return { ...message, create_at: timeString };
         // });
-        callback((prev) => {
+        callback(prev => {
           if (!prev[room.id]) {
             return {
               ...prev,
@@ -399,7 +401,7 @@ const firebase = {
         if (!room.id || uid === room.latest_sender) return;
         this.updateRoom(room.id, { receiver_has_read: true });
       },
-      (error) => {
+      error => {
         console.error(error);
       }
     );
@@ -439,20 +441,28 @@ const firebase = {
     await signInWithEmailAndPassword(auth, email, password);
   },
   async signInWithProvider(provider) {
+    let result;
     if (provider === 'Google') {
-      await signInWithRedirect(auth, providerGoogle);
+      result = await signInWithPopup(auth, providerGoogle);
+
     }
     if (provider === 'Facebook') {
-      await signInWithRedirect(auth, providerFacebook);
+      result = await signInWithPopup(auth, providerFacebook);
     }
-    const result = await getRedirectResult(auth);
     const user = result.user;
-    return user;
+    const docSnap = await getDoc(doc(db, 'users', user.uid));
+    if (docSnap.exists()) {
+      return;
+    } else {
+      this.signUp(user.uid, user.displayName, user.photoURL);
+    }
   },
-
   async updateUserInfoWithProvider(uid, name, photoUrl) {
     try {
-      await updateDoc(doc(db, 'users', uid), { display_name: name, photo_url: photoUrl });
+      await updateDoc(doc(db, 'users', uid), {
+        display_name: name,
+        photo_url: photoUrl,
+      });
     } catch (err) {
       console.log(err);
     }
