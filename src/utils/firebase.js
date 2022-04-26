@@ -422,6 +422,13 @@ const firebase = {
       console.log(err);
     }
   },
+  async register(email, password) {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  },
+  async signIn(email, password) {
+    await signInWithEmailAndPassword(auth, email, password);
+  },
   createUserWithEmailAndPassword,
   auth,
   signInWithEmailAndPassword,

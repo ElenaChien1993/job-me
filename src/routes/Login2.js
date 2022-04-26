@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Flex,
   IconButton,
@@ -10,6 +11,8 @@ import {
   InputGroup,
   InputLeftElement,
   InputRightElement,
+  FormErrorMessage,
+  useToast,
 } from '@chakra-ui/react';
 import { EmailIcon, LockIcon } from '@chakra-ui/icons';
 import { FcGoogle } from 'react-icons/fc';
@@ -22,6 +25,7 @@ import {
 import styled from 'styled-components';
 
 import image from '../images/login.png';
+import firebase from '../utils/firebase';
 
 const WebTitle = styled.div`./
   color: #306172;
@@ -78,7 +82,101 @@ const StyledSpan = styled.span`
 const Login2 = () => {
   const [show, setShow] = useState(false);
   const [isRegistered, setIsRegistered] = useState(true);
-  const handleClick = () => setShow(!show);
+  const [values, setValues] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
+  const [isInvalid, setIsInvalid] = useState({
+    name: true,
+    email: true,
+    password: true,
+  });
+  const navigate = useNavigate();
+  const location = useLocation();
+  let { from } = location.state || { from: { pathname: '/' } };
+  const toast = useToast();
+
+  const REGISTER_ERROR_MESSAGE = {
+    'auth/weak-password': '密碼需大於六位數',
+    'auth/email-already-in-use': '此信箱已是會員，請點下方切換為登入頁面',
+    'auth/invalid-email': '信箱格式錯誤，請填寫正確的信箱格式',
+    'auth/wrong-password': '密碼錯誤，請重新輸入',
+    'auth/user-not-found': '查無此信箱帳號非會員，請先註冊',
+    'auth/internal-error': '登入/註冊失敗，請稍後再試',
+  };
+
+  const handleRegister = async () => {
+    if (Object.values(values).some((value) => !value)) {
+      toast({
+        title: '哎呀',
+        description: '請填寫所有欄位',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right',
+      })
+      return;
+    }
+    try {
+      const user = await firebase.register(values.email, values.password);
+      firebase.updateUser(values.name);
+      firebase.signUp(user.uid, values.name === '' ? user.email : values.name);
+      toast({
+        title: '註冊成功！',
+        description: '已成功註冊！將自動為您導向首頁',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      navigate(from);
+    } catch (error) {
+      toast({
+        title: '哎呀',
+        description: REGISTER_ERROR_MESSAGE[error.code],
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+        position: 'top-right',
+      });
+    }
+  };
+
+  const handleSignIn = async () => {
+    try {
+      await firebase.signIn(values.email, values.password)
+      toast({
+        title: '登入成功！',
+        description: '歡迎回來！將自動為您導向首頁',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      navigate(from);
+    } catch (error) {
+      console.log(error)
+      toast({
+        title: '哎呀',
+        description: REGISTER_ERROR_MESSAGE[error.code],
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+        position: 'top-right',
+      });
+    }
+  };
+
+  const handleChange = (prop) => (event) => {
+    setValues((prev) => {
+      return { ...prev, [prop]: event.target.value };
+    });
+    if (!isInvalid[prop]) return;
+    setIsInvalid((prev) => {
+      return { ...prev, [prop]: false };
+    });
+  };
 
   return (
     <Flex bg="#ffeade" justify="center" align="center" my="5%" px="5%">
@@ -110,64 +208,81 @@ const Login2 = () => {
           <Divider />
         </DividerWrapper>
         {!isRegistered && (
-          <FormControl isRequired mt="10px">
+          <FormControl isRequired isInvalid={isInvalid.name} mt="10px">
             <FormLabel htmlFor="name" fontSize="20px">
               Name
             </FormLabel>
-            <InputGroup>
+            <InputGroup flexDir="column">
               <InputLeftElement
                 pointerEvents="none"
                 children={<BsPersonFill color="gray.500" w="20px" h="20px" />}
               />
               <Input
+                value={values.name}
+                onChange={handleChange('name')}
                 id="name"
                 placeholder="Enter your name"
                 variant="filled"
               />
+              {isInvalid.name && (
+                <FormErrorMessage>請填寫名字/暱稱</FormErrorMessage>
+              )}
             </InputGroup>
           </FormControl>
         )}
-        <FormControl isRequired mt="10px">
+        <FormControl isRequired isInvalid={isInvalid.email} mt="10px">
           <FormLabel htmlFor="email" fontSize="20px">
             Email
           </FormLabel>
-          <InputGroup>
+          <InputGroup flexDir="column">
             <InputLeftElement
               pointerEvents="none"
               children={<EmailIcon color="gray.500" w="20px" h="20px" />}
             />
             <Input
+              value={values.email}
+              onChange={handleChange('email')}
               id="email"
               placeholder="example.gmail.com"
               variant="filled"
             />
+            {isInvalid.email && (
+              <FormErrorMessage>請填寫正確的信箱格式</FormErrorMessage>
+            )}
           </InputGroup>
         </FormControl>
-        <FormControl isRequired mt="10px">
+        <FormControl isRequired isInvalid={isInvalid.password} mt="10px">
           <FormLabel htmlFor="password" fontSize="20px">
             Password
           </FormLabel>
-          <InputGroup>
+          <InputGroup flexDir="column">
             <InputLeftElement
               pointerEvents="none"
               children={<LockIcon color="gray.500" w="20px" h="20px" />}
             />
             <Input
+              value={values.password}
+              onChange={handleChange('password')}
               id="password"
               placeholder="Enter your password"
               variant="filled"
               type={show ? 'text' : 'password'}
             />
+            {isInvalid.password && (
+              <FormErrorMessage>密碼請大於六位數</FormErrorMessage>
+            )}
             <InputRightElement mr="5px">
               <IconButton
+                cursor="pointer"
                 size="xs"
-                onClick={handleClick}
+                onClick={() => setShow(!show)}
                 as={show ? BsFillEyeSlashFill : BsFillEyeFill}
               />
             </InputRightElement>
           </InputGroup>
         </FormControl>
         <Button
+          onClick={isRegistered ? handleSignIn : handleRegister}
           w="100%"
           mt="30px"
           py="5px"
@@ -176,11 +291,17 @@ const Login2 = () => {
         >
           {isRegistered ? '登入' : '註冊'}
         </Button>
-        {isRegistered ? <BottomText>
-          尚未有帳號？請先<StyledSpan onClick={() => setIsRegistered(false)}>註冊</StyledSpan>
-        </BottomText> : <BottomText>
-          已經有帳號？請前往<StyledSpan onClick={() => setIsRegistered(true)}>登入</StyledSpan>
-        </BottomText>}
+        {isRegistered ? (
+          <BottomText>
+            尚未有帳號？請先
+            <StyledSpan onClick={() => setIsRegistered(false)}>註冊</StyledSpan>
+          </BottomText>
+        ) : (
+          <BottomText>
+            已經有帳號？請前往
+            <StyledSpan onClick={() => setIsRegistered(true)}>登入</StyledSpan>
+          </BottomText>
+        )}
       </Flex>
     </Flex>
   );
