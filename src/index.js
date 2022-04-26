@@ -19,6 +19,7 @@ import Profile from './routes/profile/Profile';
 import Messages from './routes/Messages';
 import GlobalStyle from './style/GlobalStyle';
 import Loader from './components/Loader';
+import Login2 from './routes/Login2';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -92,17 +93,17 @@ const App = () => {
               </Route>
 
               {/* <Route path="*" element={<NotFound />}/> */}
-              <Route
-                path="login"
-                element={
-                  isLogIn ? (
-                    <Navigate to="/notes" />
-                  ) : (
-                    <Login setIsLogIn={setIsLogIn} />
-                  )
-                }
-              />
             </Route>
+            <Route
+              path="login"
+              element={
+                isLogIn ? (
+                  <Navigate to="/notes" />
+                ) : (
+                  <Login2 setIsLogIn={setIsLogIn} />
+                )
+              }
+            />
           </Routes>
         )}
       </BrowserRouter>

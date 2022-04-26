@@ -164,6 +164,7 @@ const Login = () => {
           Sign In
         </button>
       </StyledStack>
+      <a href="https://www.freepik.com/vectors/citizen">Citizen vector created by storyset - www.freepik.com</a>
     </Container>
   );
 };

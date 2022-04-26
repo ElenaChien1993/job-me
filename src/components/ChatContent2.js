@@ -19,22 +19,22 @@ const ChatContent2 = React.memo(({ room, rootRef, isCorner }) => {
   const { currentUserId } = useOutletContext();
 
   useEffect(() => {
-    let unsub;
+    let unsubscribe;
     const callback = async ([entry]) => {
       if (!entry || !entry.isIntersecting) return;
       if (lastMessagesRef.current) return;
 
       if (firstRenderRef.current) {
-        unsub = await firebase.listenMessagesChange(
+        unsubscribe = await firebase.listenMessagesChange(
           room,
           setMessages,
           currentUserId
         );
-        console.log('unsub', unsub);
+        console.log('unsubscribe', unsubscribe);
         firstRenderRef.current = false;
         justEnteredRef.current = false;
       } else {
-        console.log('callback')
+        console.log('callback');
         if (justEnteredRef.current) {
           justEnteredRef.current = false;
           return;
@@ -45,7 +45,7 @@ const ChatContent2 = React.memo(({ room, rootRef, isCorner }) => {
         );
         console.log('new', newMessages);
         if (newMessages.length !== 0) {
-          setMessages(prev => {
+          setMessages((prev) => {
             return { ...prev, [room.id]: [...newMessages, ...prev[room.id]] };
           });
           if (newMessages.length < 20) {
@@ -68,8 +68,8 @@ const ChatContent2 = React.memo(({ room, rootRef, isCorner }) => {
     }
 
     return () => {
-      if (unsub) {
-        unsub();
+      if (unsubscribe) {
+        unsubscribe();
       }
       observer.unobserve(target);
     };
@@ -82,24 +82,23 @@ const ChatContent2 = React.memo(({ room, rootRef, isCorner }) => {
     firstRenderRef.current = true;
     lastMessagesRef.current = false;
   }, [room]);
-
+  
   useEffect(() => {
-    console.log(justEnteredRef.current)
     if (!justEnteredRef.current) return;
     bottomRef.current.scrollIntoView({ behavior: 'auto' });
-  }, [messages, room]);
-
-  useEffect(() => {
-    if (!messages[room.id]) return;
+    if (!messages[room.id]) {
+      justEnteredRef.current = false;
+      return;
+    }
     firstMessageRef.current = messages[room.id][0];
-  }, [messages, room.id]);
+  }, [messages, room]);
 
   return (
     <div ref={containerRef}>
       <div ref={observeTargetRef}></div>
       <div>
         {messages[room.id] &&
-          messages[room.id].map(message =>
+          messages[room.id].map((message) =>
             message.uid !== currentUserId ? (
               <ChatReceived
                 isCorner={isCorner}

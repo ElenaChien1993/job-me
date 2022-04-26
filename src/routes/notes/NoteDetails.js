@@ -3,7 +3,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import {
   Editable,
   EditableInput,
-  EditableTextarea,
   EditablePreview,
   Select,
   IconButton,
