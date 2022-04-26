@@ -6,6 +6,11 @@ import {
   onAuthStateChanged,
   signOut,
   updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  FacebookAuthProvider,
 } from 'firebase/auth';
 import {
   getFirestore,
@@ -51,6 +56,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+const providerGoogle = new GoogleAuthProvider();
+const providerFacebook = new FacebookAuthProvider();
 
 const firebase = {
   updateUser(name) {
@@ -85,13 +92,11 @@ const firebase = {
     }
   },
   listenUserProfileChange(uid, callback) {
-    return new Promise((res) => {
-      const unsubscribe = onSnapshot(doc(db, 'users', uid), async (doc) => {
-        callback((prev) => {
-          return { ...prev, ...doc.data() };
-        });
+    return onSnapshot(doc(db, 'users', uid), (doc) => {
+      console.log('firebase')
+      callback((prev) => {
+        return { ...prev, ...doc.data() };
       });
-      res(unsubscribe);
     });
   },
   listenUserRecordsChange(uid, setAudioRecords, setVideoRecords) {
@@ -213,9 +218,9 @@ const firebase = {
   checklogin(callback) {
     onAuthStateChanged(auth, callback);
   },
-  async signUp(uid, value) {
+  async signUp(uid, value, url) {
     try {
-      await setDoc(doc(db, 'users', uid), { display_name: value });
+      await setDoc(doc(db, 'users', uid), { display_name: value, photo_url: url });
     } catch (err) {
       console.log(err);
     }
@@ -345,7 +350,7 @@ const firebase = {
   },
   async getMoreMessages(roomId, message) {
     if (!message) return;
-    console.log('firebase', message)
+    console.log('firebase', message);
     const docsSnap = await getDocs(
       query(
         collection(db, `chatrooms/${roomId}/messages`),
@@ -423,11 +428,34 @@ const firebase = {
     }
   },
   async register(email, password) {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
     return userCredential.user;
   },
   async signIn(email, password) {
     await signInWithEmailAndPassword(auth, email, password);
+  },
+  async signInWithProvider(provider) {
+    if (provider === 'Google') {
+      await signInWithRedirect(auth, providerGoogle);
+    }
+    if (provider === 'Facebook') {
+      await signInWithRedirect(auth, providerFacebook);
+    }
+    const result = await getRedirectResult(auth);
+    const user = result.user;
+    return user;
+  },
+
+  async updateUserInfoWithProvider(uid, name, photoUrl) {
+    try {
+      await updateDoc(doc(db, 'users', uid), { display_name: name, photo_url: photoUrl });
+    } catch (err) {
+      console.log(err);
+    }
   },
   createUserWithEmailAndPassword,
   auth,

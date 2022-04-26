@@ -104,6 +104,7 @@ const Login2 = () => {
     'auth/wrong-password': '密碼錯誤，請重新輸入',
     'auth/user-not-found': '查無此信箱帳號非會員，請先註冊',
     'auth/internal-error': '登入/註冊失敗，請稍後再試',
+    'auth/popup-closed-by-user': '未完成登入 / 註冊流程，請再試一次',
   };
 
   const handleRegister = async () => {
@@ -115,16 +116,16 @@ const Login2 = () => {
         duration: 5000,
         isClosable: true,
         position: 'top-right',
-      })
+      });
       return;
     }
     try {
       const user = await firebase.register(values.email, values.password);
       firebase.updateUser(values.name);
-      firebase.signUp(user.uid, values.name === '' ? user.email : values.name);
+      firebase.signUp(user.uid, values.name);
       toast({
         title: '註冊成功！',
-        description: '已成功註冊！將自動為您導向首頁',
+        description: '已為您自動導向首頁',
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -145,10 +146,10 @@ const Login2 = () => {
 
   const handleSignIn = async () => {
     try {
-      await firebase.signIn(values.email, values.password)
+      await firebase.signIn(values.email, values.password);
       toast({
-        title: '登入成功！',
-        description: '歡迎回來！將自動為您導向首頁',
+        title: '歡迎回來！',
+        description: '已自動為您導向首頁',
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -156,7 +157,7 @@ const Login2 = () => {
       });
       navigate(from);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast({
         title: '哎呀',
         description: REGISTER_ERROR_MESSAGE[error.code],
@@ -165,6 +166,23 @@ const Login2 = () => {
         isClosable: true,
         position: 'top-right',
       });
+    }
+  };
+
+  const signInWithProvider = async (provider) => {
+    try {
+      const user = await firebase.signInWithProvider(provider);
+      toast({
+        title: '成功登入！',
+        description: '已為您自動導向首頁',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      await firebase.signUp(user.uid, user.displayName, user.photoURL);
+    } catch (error) {
+      console.log(error.code, error.message);
     }
   };
 
@@ -196,10 +214,18 @@ const Login2 = () => {
         p="3%"
         ml="5%"
       >
-        <Wrapper variant="ghost" leftIcon={<FcGoogle />}>
+        <Wrapper
+          variant="ghost"
+          leftIcon={<FcGoogle />}
+          onClick={() => signInWithProvider('Google')}
+        >
           {isRegistered ? '用 Google 帳號登入' : '用 Google 帳號註冊'}
         </Wrapper>
-        <Wrapper variant="ghost" leftIcon={<CgFacebook />}>
+        <Wrapper
+          variant="ghost"
+          leftIcon={<CgFacebook />}
+          onClick={() => signInWithProvider('Facebook')}
+        >
           {isRegistered ? '用 Facebook 帳號登入' : '用 Facebook 帳號註冊'}
         </Wrapper>
         <DividerWrapper>

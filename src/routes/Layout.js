@@ -92,7 +92,7 @@ const LoginButton = styled.div`
   }
 `;
 
-const Nav = ({ isLogIn, userInfo, currentUserId, setUserInfo }) => {
+const Nav = ({ userInfo, currentUserId }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const menuRef = useRef();
@@ -103,11 +103,10 @@ const Nav = ({ isLogIn, userInfo, currentUserId, setUserInfo }) => {
     firebase
       .signOut()
       .then(() => {
-        setUserInfo(null);
         alert('已成功登出');
         navigate('/login', { state: { from: { pathname: '/notes' } } });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   };
@@ -119,7 +118,7 @@ const Nav = ({ isLogIn, userInfo, currentUserId, setUserInfo }) => {
   const goToProfile = () => {
     setIsMenuOpen(false);
     navigate(`/profile/${currentUserId}`);
-  };
+  }; 
 
   return (
     <StyledNav>
@@ -133,7 +132,7 @@ const Nav = ({ isLogIn, userInfo, currentUserId, setUserInfo }) => {
         <NavItem>
           <Link to="/messages">Messages</Link>
         </NavItem>
-        {isLogIn ? (
+        {currentUserId ? (
           <ImageWrapper onClick={() => setIsMenuOpen(true)}>
             {userInfo?.photo_url ? (
               <StyledImg src={userInfo && userInfo.photo_url} alt="head-shot" />
@@ -160,7 +159,7 @@ const Nav = ({ isLogIn, userInfo, currentUserId, setUserInfo }) => {
   );
 };
 
-const Layout = ({ isLogIn, isLoading, setIsLoading }) => {
+const Layout = () => {
   const currentUserId = firebase.auth.currentUser?.uid;
   const [userInfo, setUserInfo] = useState(null);
   const [chatOpen, setChatOpen] = useState(false);
@@ -168,19 +167,13 @@ const Layout = ({ isLogIn, isLoading, setIsLoading }) => {
 
   useEffect(() => {
     if (!currentUserId) return;
-    let unsubscribe;
-    const fetchInfo = async () => {
-      unsubscribe = await firebase.listenUserProfileChange(
-        currentUserId,
-        setUserInfo
-      );
-    };
+    const unsubscribe = firebase.listenUserProfileChange(
+      currentUserId,
+      setUserInfo
+    );
 
-    fetchInfo();
-    console.log(unsubscribe);
-
-    return unsubscribe;
-  }, [isLogIn, currentUserId]);
+    return () => unsubscribe();
+  }, [currentUserId]);
 
   const props = {
     currentUserId,
@@ -191,12 +184,9 @@ const Layout = ({ isLogIn, isLoading, setIsLoading }) => {
     setActive,
   };
 
-  // if (!currentUserId || !userInfo) return <Loader />
-
   return (
     <Container>
       <Nav
-        isLogIn={isLogIn}
         userInfo={userInfo}
         currentUserId={currentUserId}
         setUserInfo={setUserInfo}
