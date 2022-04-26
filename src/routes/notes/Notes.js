@@ -57,13 +57,9 @@ const Notes = () => {
   const { currentUserId } = useOutletContext();
 
   useEffect(() => {
-    firebase.getNotes(currentUserId).then(snaps => {
-      const notesArray = [];
-      snaps.forEach(doc => {
-        notesArray.push(doc.data());
-      });
-      setDatabaseNotes(notesArray);
-      setRenderNotes(notesArray);
+    firebase.getNotes(currentUserId).then(data => {
+      setDatabaseNotes(data);
+      setRenderNotes(data);
     });
   }, [currentUserId]);
 

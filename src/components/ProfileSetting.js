@@ -13,7 +13,7 @@ import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
 import useClickOutside from '../hooks/useClickOutside';
-import Loader from '../components/Loader'
+import Loader from '../components/Loader';
 import ChatCorner from './ChatCorner';
 import ProfileImage from './ProfileImage';
 
@@ -186,6 +186,9 @@ const ProfileSetting = () => {
     const filtered = entries.filter(entry => entry[1] !== '');
     const filteredObject = Object.fromEntries(filtered);
     firebase.updateUserInfo(currentUserId, filteredObject);
+    if (filteredObject.display_name) {
+      firebase.updateUser(filteredObject.display_name);
+    }
     setValues({ display_name: '', title: '', about_me: '' });
   };
 
@@ -230,7 +233,7 @@ const ProfileSetting = () => {
     });
   };
 
-  if (!userInfo) return <Loader />
+  if (!userInfo) return <Loader />;
 
   return (
     <Container>
@@ -281,7 +284,7 @@ const ProfileSetting = () => {
         <JobTitle>{userInfo?.title || '尚未提供'}</JobTitle>
         <About>{userInfo?.about_me || '尚未提供'}</About>
         <Counts>
-          <Number>12</Number>
+          <Number>{userInfo?.notes_qty}</Number>
           <p>Notes</p>
         </Counts>
       </LeftWrapper>

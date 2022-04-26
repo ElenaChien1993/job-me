@@ -86,7 +86,6 @@ const firebase = {
   async updateUserInfo(uid, data) {
     try {
       await updateDoc(doc(db, 'users', uid), data);
-      this.updateUser(data.display_name);
     } catch (err) {
       console.log(err);
     }
@@ -166,8 +165,12 @@ const firebase = {
     }
   },
   async getNotes(uid) {
-    const docsSnap = await getDocs(collection(db, `users/${uid}/notes`));
-    return docsSnap;
+    const docSnaps = await getDocs(collection(db, `users/${uid}/notes`));
+    const notesArray = [];
+    docSnaps.forEach(doc => {
+      notesArray.push(doc.data());
+    });
+    return notesArray;
   },
   async getNoteDetails(noteId) {
     const docSnap = await getDoc(doc(db, 'details', noteId));

@@ -113,7 +113,7 @@ const MemberProfile = React.memo(() => {
         <JobTitle>{info.title || '尚未提供'}</JobTitle>
         <About>{info.about_me || '尚未提供'}</About>
         <Counts>
-          <Number>12</Number>
+          <Number>{info.notes_qty}</Number>
           <p>Notes</p>
         </Counts>
         <Button

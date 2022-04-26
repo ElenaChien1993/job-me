@@ -47,9 +47,9 @@ const RadioInput = styled.input`
 const TagButton = styled.label`
   width: 90px;
   height: 35px;
-  background: ${(props) => (props.checked ? '#306172' : '#E3E3E3')};
+  background: ${props => (props.checked ? '#306172' : '#E3E3E3')};
   border-radius: 20px;
-  color: ${(props) => (props.checked ? 'white' : '#707070')};
+  color: ${props => (props.checked ? 'white' : '#707070')};
   font-size: 16px;
   line-height: 22px;
   margin-right: 15px;
@@ -120,31 +120,27 @@ const NoteCreateBrief = ({
   }, []);
 
   const handleCheckboxChange = () => {
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, is_share: !values.is_share };
     });
   };
 
-  const createNote = () => {
-    firebase
-      .setNoteBrief(user.uid, {
-        ...noteDataBrief,
-        creator: user.uid,
-        creator_name: user.displayName || '未提供名字',
-      })
-      .then((id) => {
-        firebase.setNoteDetails(id, noteDetails).then(() => {
-          navigate(`/notes/details/${id}`);
-        });
-      })
-      .then(() => {
-        firebase.setCompanies({ name: values.company_name });
-      });
+  const createNote = async () => {
+    const noteId = await firebase.setNoteBrief(user.uid, {
+      ...noteDataBrief,
+      creator: user.uid,
+      creator_name: user.displayName || '未提供名字',
+    });
+    const notes = await firebase.getNotes(user.uid);
+    firebase.updateUserInfo(user.uid, { notes_qty: notes.length });
+    await firebase.setNoteDetails(noteId, noteDetails);
+    await firebase.setCompanies({ name: values.company_name });
+    navigate(`/notes/details/${noteId}`);
   };
 
-  const handleTagsChange = (e) => {
+  const handleTagsChange = e => {
     const tagsArray = e.target.value.split(',', 5);
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, tags: tagsArray };
     });
   };
