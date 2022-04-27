@@ -137,15 +137,6 @@ const DetailsStep3 = ({
           })}
           <StyledAddButton onClick={handleAddField}>＋新增欄位</StyledAddButton>
         </InputWrap>
-        <InputWrap>
-          <label>Responsibilities（工作內容）</label>
-          <StyledText
-            onChange={handleChange('others')}
-            placeholder="一些要再做功課的注意事項等等"
-            size="md"
-            defaultValue={values.others}
-          />
-        </InputWrap>
       </StyledForm>
       <StyledButton onClick={prevStep}>上一頁</StyledButton>
       <StyledButton onClick={createNote}>創建筆記</StyledButton>

@@ -2,7 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 
 import firebase from './utils/firebase';
 import Layout from './routes/Layout';
@@ -20,12 +20,29 @@ import GlobalStyle from './style/GlobalStyle';
 import Loader from './components/Loader';
 import Login from './routes/Login';
 
+const theme = extendTheme({
+  colors: {
+    brand: {
+      50: 'white',
+      100: '#00403B',
+      200: '#51a386',
+      300: 'teal',
+      400: '#FFF6C9',
+      500: '#00403B',
+      600: '#704406',
+      700: '#FFE6CA',
+      800: '#e17f45',
+      900: '#00403B',
+    },
+  },
+});
+
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLogIn, setIsLogIn] = useState(false);
 
   useEffect(() => {
-    firebase.checklogin(user => {
+    firebase.checklogin((user) => {
       if (user) {
         console.log(user);
         setIsLogIn(true);
@@ -40,7 +57,7 @@ const App = () => {
   if (isLoading) return <Loader isLoading={isLoading} />;
 
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <BrowserRouter>
         <GlobalStyle />
         {!isLoading && (
@@ -55,7 +72,7 @@ const App = () => {
                 />
               }
             >
-              <Route element={<PrivateRoute isLogIn={isLogIn}/>}>
+              <Route element={<PrivateRoute isLogIn={isLogIn} />}>
                 <Route index element={<Navigate to="/notes" />} />
                 <Route path="notes">
                   <Route index element={<Notes />} />

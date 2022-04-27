@@ -8,6 +8,11 @@ import {
   IconButton,
   Button,
   useDisclosure,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
 } from '@chakra-ui/react';
 import {
   SmallCloseIcon,
@@ -54,6 +59,10 @@ const ButtonWrapper = styled.div`
   justify-content: space-between;
   margin-bottom: 20px;
 `;
+
+const FieldContainer = styled.div`
+  
+`
 
 const FieldWrapper = styled.div`
   margin-bottom: 20px;
@@ -157,7 +166,7 @@ const NoteDetails = () => {
     });
 
     return unsubscribe;
-  }, []);
+  }, [currentUserId, noteId]);
 
   useEffect(() => {
     if (!submitRef.current) return;
@@ -200,12 +209,6 @@ const NoteDetails = () => {
     console.log('onBlurSubmit', details[objectKey]);
     // handleMapArrayInputChange(e, i, 'questions', 'question');
     firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
-  };
-
-  const handlePressEnter = (e, objectKey) => {
-    if (e.keyCode === 13) {
-      firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
-    }
   };
 
   //-------- Handle Array of Strings
@@ -282,7 +285,8 @@ const NoteDetails = () => {
             size="sm"
             leftIcon={<ChevronLeftIcon />}
             variant="outline"
-            colorScheme="teal"
+            color="#00403B"
+            borderColor="#00403B"
           >
             回前頁
           </Button>
@@ -291,7 +295,7 @@ const NoteDetails = () => {
           size="sm"
           rightIcon={<AtSignIcon />}
           variant="solid"
-          colorScheme="facebook"
+          colorScheme="brand"
           onClick={showConnectModal}
         >
           查看其他相關會員
@@ -308,52 +312,66 @@ const NoteDetails = () => {
       )}
       {details && (
         <Container>
+          <Tabs variant='soft-rounded' colorScheme="brand">
+            <TabList>
+              <Tab>公司資訊</Tab>
+              <Tab>工作內容</Tab>
+              <Tab>面試準備</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                <FieldWrapper>
+                  <Title>公司主要產品 / 服務</Title>
+                  <Editable
+                    value={details.product === '' ? '尚未填寫資料' : details.product}
+                    onSubmit={() => onBlurSubmit('product')}
+                  >
+                    <EditablePreview />
+                    <EditableInput
+                      onChange={(e) =>
+                        setDetails((prev) => {
+                          return { ...prev, product: e.target.value };
+                        })
+                      }
+                    />
+                  </Editable>
+                </FieldWrapper>
+                <FieldWrapper>
+                  <Title>薪資範圍</Title>
+                  <StyledSalaryWrapper>
+                    <StyledEditable
+                      value={
+                        details.salary.range === ''
+                          ? '尚未填寫資料'
+                          : details.salary.range
+                      }
+                      onSubmit={() => onBlurSubmit('salary')}
+                    >
+                      <EditablePreview />
+                      <EditableInput
+                        onChange={(e) => handleInputSalaryChange(e, 'range')}
+                      />
+                    </StyledEditable>
+                    <Content> K </Content>
+                    <Select
+                      variant="outline"
+                      isFullWidth={false}
+                      maxWidth="100px"
+                      onChange={(e) => handleInputSalaryChange(e, 'type')}
+                      onBlur={() => onBlurSubmit('salary')}
+                    >
+                      <option value="年薪">年薪</option>
+                      <option value="月薪">月薪</option>
+                    </Select>
+                  </StyledSalaryWrapper>
+                </FieldWrapper>
+              </TabPanel>
+              <TabPanel>
+                <p>two!</p>
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
           <SectionTitle>詳細資料</SectionTitle>
-          <FieldWrapper>
-            <Title>公司主要產品 / 服務</Title>
-            <Editable
-              value={details.product === '' ? '尚未填寫資料' : details.product}
-              onSubmit={() => onBlurSubmit('product')}
-            >
-              <EditablePreview />
-              <EditableInput
-                onChange={(e) =>
-                  setDetails((prev) => {
-                    return { ...prev, product: e.target.value };
-                  })
-                }
-              />
-            </Editable>
-          </FieldWrapper>
-          <FieldWrapper>
-            <Title>薪資範圍</Title>
-            <StyledSalaryWrapper>
-              <StyledEditable
-                value={
-                  details.salary.range === ''
-                    ? '尚未填寫資料'
-                    : details.salary.range
-                }
-                onSubmit={() => onBlurSubmit('salary')}
-              >
-                <EditablePreview />
-                <EditableInput
-                  onChange={(e) => handleInputSalaryChange(e, 'range')}
-                />
-              </StyledEditable>
-              <Content> K </Content>
-              <Select
-                variant="outline"
-                isFullWidth={false}
-                maxWidth="100px"
-                onChange={(e) => handleInputSalaryChange(e, 'type')}
-                onBlur={() => onBlurSubmit('salary')}
-              >
-                <option value="年薪">年薪</option>
-                <option value="月薪">月薪</option>
-              </Select>
-            </StyledSalaryWrapper>
-          </FieldWrapper>
           <FieldWrapper>
             <Title>工作內容</Title>
             <Content>
@@ -521,7 +539,6 @@ const NoteDetails = () => {
           <FieldWrapper>
             <Title>其他備註</Title>
             <EditorArea noteId={noteId} details={details} objectKey="other" />
-            <Content>{details.others}</Content>
           </FieldWrapper>
           <Line />
           <SectionTitle>面試準備筆記</SectionTitle>

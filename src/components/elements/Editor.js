@@ -52,7 +52,9 @@ const EditorArea = ({ noteId, details, objectKey }) => {
   const [editorState, setEditorState] = useState(() =>
     details[objectKey] === '' || !details[objectKey]
       ? EditorState.createEmpty()
-      : EditorState.createWithContent(convertFromRaw(JSON.parse(details[objectKey])))
+      : EditorState.createWithContent(
+          convertFromRaw(JSON.parse(details[objectKey]))
+        )
   );
 
   const handleKeyCommand = (command, editorState) => {
@@ -104,7 +106,9 @@ const EditorArea = ({ noteId, details, objectKey }) => {
       <StyledButton id="italic" onClick={onItalicClick}>
         I
       </StyledButton>
-      <StyledButton id="linethrough" onClick={onStrikeThroughClick}>abc</StyledButton>
+      <StyledButton id="linethrough" onClick={onStrikeThroughClick}>
+        abc
+      </StyledButton>
       <StyledEditor>
         <Editor
           editorState={editorState}

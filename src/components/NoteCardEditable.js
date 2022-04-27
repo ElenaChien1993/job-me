@@ -29,7 +29,7 @@ const HeadWrapper = styled.div`
   width: 140px;
   height: 140px;
   border-radius: 70px;
-  background: #f5cdc5;
+  background: #FFE6CA;
   margin-right: 30px;
   display: flex;
   justify-content: center;
@@ -41,7 +41,6 @@ const HeadWrapper = styled.div`
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: 112px;
   justify-content: space-between;
 `;
 
@@ -86,6 +85,7 @@ const Status = styled.p`
   font-weight: 700;
   font-size: 16px;
   color: #999999;
+  margin: 0 10px;
 `;
 
 const StyledSelect = styled(Select)`
@@ -107,7 +107,10 @@ const TagsWrapper = styled.div`
 `;
 
 const Tag = styled.div`
-  padding: 13px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
   height: 40px;
   background: #d5f4f7;
   border-radius: 6px;

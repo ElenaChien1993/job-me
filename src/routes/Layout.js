@@ -21,7 +21,7 @@ const ContentContainer = styled.div`
 const StyledNav = styled.nav`
   width: 100vw;
   height: 70px;
-  background-color: #306172;
+  background-color: #00403B;
   position: fixed;
   z-index: 5;
 `;
