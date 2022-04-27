@@ -22,28 +22,26 @@ const StyledListItem = styled.div`
   }
 `;
 
-const RenderList = ({ companies, value, setValues, toggle, setToggle }) => {
-  if (value && companies) {
-    const filteredList = companies.filter(company => {
+const RenderList = ({ data, value, setValue, toggle, setToggle }) => {
+  if (value && data) {
+    const filteredList = data.filter(item => {
       const regex = new RegExp(value, "gi");
-      return company.name.match(regex);
+      return item.name.match(regex);
     });
     if (filteredList.length) {
       return (
         toggle && (
           <StyledList>
-            {filteredList.map(company => {
+            {filteredList.map(item => {
               return (
                 <StyledListItem
-                  key={company.id}
+                  key={item.id}
                   onClick={() => {
                     setToggle(false);
-                    setValues(prev => {
-                      return { ...prev, company_name: company.name };
-                    });
+                    setValue(item.name);
                   }}
                 >
-                  {company.name}
+                  {item.name}
                 </StyledListItem>
               );
             })}
@@ -62,24 +60,22 @@ const RenderList = ({ companies, value, setValues, toggle, setToggle }) => {
   return null;
 };
 
-const SearchableInput = ({ value, setValues, companies }) => {
+const SearchableInput = ({ value, setValue, data }) => {
   const [toggle, setToggle] = useState(true);
 
   return (
     <>
       <StyledInput
         onChange={e => {
-          setValues(prev => {
-            return { ...prev, company_name: e.target.value };
-          });
+          setValue(e.target.value);
           setToggle(true);
         }}
         value={value}
       />
       <RenderList
-        companies={companies}
+        data={data}
         value={value}
-        setValues={setValues}
+        setValue={setValue}
         toggle={toggle}
         setToggle={setToggle}
       />

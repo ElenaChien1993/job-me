@@ -14,12 +14,11 @@ import PracticeParent from './routes/practice/PracticeParent';
 import Practice from './routes/practice/Practice';
 import PracticeSetting from './routes/practice/PracticeSetting';
 import PracticeStart from './routes/practice/PracticeStart';
-import Login from './routes/Login';
 import Profile from './routes/profile/Profile';
 import Messages from './routes/Messages';
 import GlobalStyle from './style/GlobalStyle';
 import Loader from './components/Loader';
-import Login2 from './routes/Login2';
+import Login from './routes/Login';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -60,16 +59,6 @@ const App = () => {
                 <Route index element={<Navigate to="/notes" />} />
                 <Route path="notes">
                   <Route index element={<Notes />} />
-                  {/* <Route
-                    index
-                    element={
-                      isLogIn ? (
-                        <Notes />
-                      ) : (
-                        <Navigate to="/login" state={{ from: '/notes' }} />
-                      )
-                    }
-                  /> */}
                   <Route path="details">
                     <Route path=":noteId" element={<NoteDetails />} />
                   </Route>
@@ -100,7 +89,7 @@ const App = () => {
                 isLogIn ? (
                   <Navigate to="/notes" />
                 ) : (
-                  <Login2 setIsLogIn={setIsLogIn} />
+                  <Login setIsLogIn={setIsLogIn} />
                 )
               }
             />

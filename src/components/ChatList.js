@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
 import { v4 as uuid } from 'uuid';
@@ -9,6 +9,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+  overflow: scroll;
 `;
 
 const ChatWrapper = styled.div`
@@ -64,18 +65,58 @@ const NewMessage = styled.div`
   display: ${(props) => (props.isRead ? 'none' : 'block')};
 `;
 
-const LATEST_MESSAGE_TYPE = props => ({
+const LATEST_MESSAGE_TYPE = (props) => ({
   0: props.latest.message,
   1: '傳送了一張照片',
   default: '',
 });
 
-const ChatList = React.memo(({ rooms, active, setActive, isCorner }) => {
+const ChatList = React.memo(({ rooms, active, setActive, isCorner, setRenderRooms, databaseRooms }) => {
   const { currentUserId } = useOutletContext();
+  const rootRef = useRef();
+  const observeTargetRef = useRef();
+  const firstRenderRef = useRef(true);
+  const roomsQtyRef = useRef(0);
+
+  useEffect(() => {
+    roomsQtyRef.current = rooms.length;
+  }, [rooms])
+
+  useEffect(() => {
+    const callback = ([entry]) => {
+      if (!entry || !entry.isIntersecting) return;
+      if (firstRenderRef.current) {
+        firstRenderRef.current = false;
+        return;
+      }
+      
+      const startIndex = roomsQtyRef.current;
+      if (startIndex === databaseRooms.length) return;
+      
+      console.log('observer fire',startIndex ,databaseRooms.slice(startIndex, startIndex + 5));
+      setRenderRooms(prev => [...prev, ...databaseRooms.slice(startIndex, startIndex + 5)])
+    };
+
+    const options = {
+      root: rootRef.current,
+      rootMargin: '30px',
+      threshold: 1,
+    };
+
+    const target = observeTargetRef.current;
+    const observer = new IntersectionObserver(callback, options);
+    if (target) {
+      observer.observe(target);
+    }
+
+    return () => {
+      observer.unobserve(target);
+    };
+  }, [databaseRooms, rooms]);
 
   return (
     <ThemeProvider theme={{ isCorner }}>
-      <Container>
+      <Container ref={rootRef}>
         {rooms.map((room) => (
           <ChatWrapper
             isSelected={active?.id === room.id}
@@ -91,17 +132,22 @@ const ChatList = React.memo(({ rooms, active, setActive, isCorner }) => {
             <BriefContent>
               <Name>{room.members.display_name}</Name>
               <LatestMessage
-                isRead={room.receiver_has_read || currentUserId === room.latest_sender}
+                isRead={
+                  room.receiver_has_read || currentUserId === room.latest_sender
+                }
               >
                 {LATEST_MESSAGE_TYPE(room)[room.latest.message_type]}
               </LatestMessage>
             </BriefContent>
             <DateText>{room.latest.timestamp}</DateText>
             <NewMessage
-              isRead={room.receiver_has_read || currentUserId === room.latest_sender}
+              isRead={
+                room.receiver_has_read || currentUserId === room.latest_sender
+              }
             />
           </ChatWrapper>
         ))}
+        <div ref={observeTargetRef}></div>
       </Container>
     </ThemeProvider>
   );

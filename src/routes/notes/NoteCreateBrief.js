@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Input } from '@chakra-ui/react';
 import styled from 'styled-components';
 
@@ -47,9 +47,9 @@ const RadioInput = styled.input`
 const TagButton = styled.label`
   width: 90px;
   height: 35px;
-  background: ${props => (props.checked ? '#306172' : '#E3E3E3')};
+  background: ${(props) => (props.checked ? '#306172' : '#E3E3E3')};
   border-radius: 20px;
-  color: ${props => (props.checked ? 'white' : '#707070')};
+  color: ${(props) => (props.checked ? 'white' : '#707070')};
   font-size: 16px;
   line-height: 22px;
   margin-right: 15px;
@@ -100,7 +100,8 @@ const NoteCreateBrief = ({
   noteDataBrief,
   noteDetails,
 }) => {
-  const [databaseCompanies, setDatabaseCompanies] = useState(null);
+  const { currentUserId, companies, setCompanies, jobTitles, setJobTitles } =
+    useOutletContext();
   const user = firebase.auth.currentUser;
   const navigate = useNavigate();
   const statusArray = [
@@ -113,34 +114,45 @@ const NoteCreateBrief = ({
   ];
 
   useEffect(() => {
-    firebase.getCompanies().then(data => {
-      console.log(data);
-      setDatabaseCompanies(data);
+    if (companies) return;
+    firebase.getWholeCollection('companies').then((data) => {
+      setCompanies(data);
+    });
+    if (jobTitles) return;
+    firebase.getWholeCollection('job_titles').then((data) => {
+      setJobTitles(data);
     });
   }, []);
 
   const handleCheckboxChange = () => {
-    setValues(prev => {
+    setValues((prev) => {
       return { ...prev, is_share: !values.is_share };
     });
   };
 
   const createNote = async () => {
-    const noteId = await firebase.setNoteBrief(user.uid, {
+    const noteId = await firebase.setNoteBrief(currentUserId, {
       ...noteDataBrief,
-      creator: user.uid,
+      creator: currentUserId,
       creator_name: user.displayName || '未提供名字',
     });
-    const notes = await firebase.getNotes(user.uid);
-    firebase.updateUserInfo(user.uid, { notes_qty: notes.length });
+    const notes = await firebase.getNotes(currentUserId);
+    firebase.updateUserInfo(currentUserId, { notes_qty: notes.length });
     await firebase.setNoteDetails(noteId, noteDetails);
-    await firebase.setCompanies({ name: values.company_name });
+
+    if (companies.indexOf(values.company_name) < 0) {
+      await firebase.createDoc('companies', { name: values.company_name });
+    }
+    if (jobTitles.indexOf(values.job_title) < 0) {
+      await firebase.createDoc('job_titles', { name: values.job_title });
+    }
+
     navigate(`/notes/details/${noteId}`);
   };
 
-  const handleTagsChange = e => {
+  const handleTagsChange = (e) => {
     const tagsArray = e.target.value.split(',', 5);
-    setValues(prev => {
+    setValues((prev) => {
       return { ...prev, tags: tagsArray };
     });
   };
@@ -154,16 +166,24 @@ const NoteCreateBrief = ({
           <label>公司名稱</label>
           <SearchableInput
             value={values.company_name}
-            setValues={setValues}
-            companies={databaseCompanies}
+            setValue={value => {
+              setValues(prev => {
+                return { ...prev, company_name: value };
+              });
+            }}
+            data={companies}
           />
         </InputWrap>
         <InputWrap>
           <label>應徵職務</label>
-          <StyledInput
-            size="sm"
-            defaultValue={values.job_title}
-            onChange={handleChange('job_title')}
+          <SearchableInput
+            value={values.job_title}
+            setValue={value => {
+              setValues(prev => {
+                return { ...prev, job_title: value };
+              });
+            }}
+            data={jobTitles}
           />
         </InputWrap>
         <InputWrap>

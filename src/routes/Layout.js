@@ -164,6 +164,8 @@ const Layout = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [active, setActive] = useState(null);
+  const [companies, setCompanies] = useState(null);
+  const [jobTitles, setJobTitles] = useState(null);
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -182,6 +184,10 @@ const Layout = () => {
     setChatOpen,
     active,
     setActive,
+    companies,
+    setCompanies,
+    jobTitles,
+    setJobTitles,
   };
 
   return (

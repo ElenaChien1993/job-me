@@ -148,9 +148,9 @@ const NoteDetails = () => {
     firebase.getNote(currentUserId, noteId).then((snap) => {
       setBrief(snap.data());
     });
-    // firebase.getNoteDetails(noteId).then(snap => {
-    //   setDetails(snap.data());
-    // });
+    firebase.getNoteDetails(noteId).then(snap => {
+      setDetails(snap.data());
+    });
     const unsubscribe = firebase.listenDetailsChange(noteId, (doc) => {
       setDetails(doc.data());
       console.log('database changed', doc.data());

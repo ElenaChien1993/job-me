@@ -7,6 +7,7 @@ import {
   EditablePreview,
   Select,
   IconButton,
+  Flex
 } from '@chakra-ui/react';
 import { EditIcon, CheckCircleIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
@@ -24,12 +25,17 @@ const Container = styled.div`
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
 `;
 
-const ImageWrapper = styled.div`
+const HeadWrapper = styled.div`
   width: 140px;
   height: 140px;
   border-radius: 70px;
   background: #f5cdc5;
   margin-right: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 70px;
+  font-weight: 700;
 `;
 
 const ContentWrapper = styled.div`
@@ -117,13 +123,7 @@ const StyledInput = styled(Input)`
   }
 `;
 
-const NoteElement = React.memo(function NoteElement({
-  uid,
-  noteId,
-  note,
-  setNote,
-  editable,
-}) {
+const NoteElement = React.memo(({ uid, noteId, note, setNote, editable }) => {
   const [isEditing, setIsEditing] = useState(false);
   console.log('NoteEl render');
 
@@ -159,9 +159,12 @@ const NoteElement = React.memo(function NoteElement({
     <>
       {editable ? (
         <Container>
-          <ImageWrapper />
+          <HeadWrapper>{note.company_name.split('', 1)}</HeadWrapper>
           <ContentWrapper>
-            <Editable value={note.company_name} onSubmit={() => onBlurSubmit('company_name')}>
+            <Editable
+              value={note.company_name}
+              onSubmit={() => onBlurSubmit('company_name')}
+            >
               <StyledCompanyPreview />
               <EditableInput
                 onChange={(e) =>
@@ -171,7 +174,10 @@ const NoteElement = React.memo(function NoteElement({
                 }
               />
             </Editable>
-            <Editable value={note.job_title} onSubmit={() => onBlurSubmit('job_title')}>
+            <Editable
+              value={note.job_title}
+              onSubmit={() => onBlurSubmit('job_title')}
+            >
               <StyledJobPreview />
               <EditableInput
                 onChange={(e) =>
@@ -244,7 +250,7 @@ const NoteElement = React.memo(function NoteElement({
         </Container>
       ) : (
         <Container>
-          <ImageWrapper />
+          <HeadWrapper>{note.company_name.split('', 1)}</HeadWrapper>
           <ContentWrapper>
             <CompanyName>{note.company_name}</CompanyName>
             <JobTitle>{note.job_title}</JobTitle>

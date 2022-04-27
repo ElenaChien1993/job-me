@@ -31,7 +31,7 @@ const Practice = () => {
     setRenderNotes(databaseNotes);
   }, [databaseNotes]);
 
-  console.log(databaseNotes)
+  console.log('practice', databaseNotes)
 
   const handleSearch = (e) => {
     const term = e.target.value;

@@ -21,7 +21,7 @@ const ProfileImage = ({ user, size, hasBorder, marginRight, preview}) => {
   return (
     <ImageWrapper size={size} hasBorder={hasBorder} marginRight={marginRight}>
       {user.photo_url || preview ? (
-        <StyledImg src={preview ? preview : user.photo_url} alt="head-shot" size={size}/>
+        <StyledImg src={preview ? preview : user.photo_url} alt="head-shot" size={size} referrerpolicy="no-referrer"/>
       ) : (
         <Avatar
           size={size}

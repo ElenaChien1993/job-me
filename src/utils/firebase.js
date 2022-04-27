@@ -8,8 +8,6 @@ import {
   updateProfile,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
   FacebookAuthProvider,
 } from 'firebase/auth';
 import {
@@ -67,7 +65,7 @@ const firebase = {
       .then(() => {
         console.log('updated');
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   },
@@ -91,24 +89,24 @@ const firebase = {
     }
   },
   listenUserProfileChange(uid, callback) {
-    return onSnapshot(doc(db, 'users', uid), doc => {
-      callback(prev => {
+    return onSnapshot(doc(db, 'users', uid), (doc) => {
+      callback((prev) => {
         return { ...prev, ...doc.data() };
       });
     });
   },
   listenUserRecordsChange(uid, setAudioRecords, setVideoRecords) {
-    return onSnapshot(collection(db, 'users', uid, 'records'), async docs => {
+    return onSnapshot(collection(db, 'users', uid, 'records'), async (docs) => {
       let data = [];
-      docs.forEach(doc => {
+      docs.forEach((doc) => {
         data.push(doc.data());
       });
-      const transformed = data.map(record => {
+      const transformed = data.map((record) => {
         const timeString = useFormatedTime(record.date);
         return { ...record, date: timeString };
       });
-      const audios = transformed.filter(record => record.type === 0);
-      const videos = transformed.filter(record => record.type === 1);
+      const audios = transformed.filter((record) => record.type === 0);
+      const videos = transformed.filter((record) => record.type === 1);
       setAudioRecords(audios);
       setVideoRecords(videos);
     });
@@ -125,16 +123,16 @@ const firebase = {
       console.log(err);
     }
   },
-  async getCompanies() {
-    const docsSnap = await getDocs(collection(db, 'companies'));
+  async getWholeCollection(category) {
+    const docsSnap = await getDocs(collection(db, category));
     const data = [];
-    docsSnap.forEach(doc => {
+    docsSnap.forEach((doc) => {
       data.push(doc.data());
     });
     return data;
   },
-  async setCompanies(data) {
-    const newDocRef = doc(collection(db, 'companies'));
+  async createDoc(category, data) {
+    const newDocRef = doc(collection(db, category));
     try {
       await setDoc(newDocRef, { ...data, id: newDocRef.id });
     } catch (err) {
@@ -167,7 +165,7 @@ const firebase = {
   async getNotes(uid) {
     const docSnaps = await getDocs(collection(db, `users/${uid}/notes`));
     const notesArray = [];
-    docSnaps.forEach(doc => {
+    docSnaps.forEach((doc) => {
       notesArray.push(doc.data());
     });
     return notesArray;
@@ -242,7 +240,7 @@ const firebase = {
     );
     const querySnapshot = await getDocs(membersByCompany);
     let dataByCompany = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       dataByCompany.push(doc.data());
     });
     const uniqueByCompany = helper.findUnique(dataByCompany);
@@ -255,18 +253,18 @@ const firebase = {
     );
     const Snapshots = await getDocs(membersByJob);
     let dataByJob = [];
-    Snapshots.forEach(doc => {
+    Snapshots.forEach((doc) => {
       dataByJob.push(doc.data());
     });
     const uniqueByJob = helper.findUnique(dataByJob);
     const data = helper.compare(uniqueByCompany, uniqueByJob);
     const users = await Promise.all(
-      data.map(async note => {
+      data.map(async (note) => {
         const userData = await this.getUserInfo(note.creator);
         return { ...note, creator_info: userData };
       })
     );
-    const filteredData = users.filter(item => item.creator !== uid);
+    const filteredData = users.filter((item) => item.creator !== uid);
     return filteredData;
   },
   async uploadFile(path, file) {
@@ -281,16 +279,16 @@ const firebase = {
       .then(() => {
         alert('已刪除檔案');
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   },
   async getDownloadURL(path) {
     return getDownloadURL(ref(storage, path))
-      .then(url => {
+      .then((url) => {
         return url;
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   },
@@ -310,7 +308,7 @@ const firebase = {
     );
     const querySnapshot = await getDocs(myRooms);
     let data = [];
-    querySnapshot.forEach(doc => {
+    querySnapshot.forEach((doc) => {
       if (doc.data().members.includes(ids[1])) {
         data.push(doc.data());
       }
@@ -322,29 +320,25 @@ const firebase = {
       collection(db, 'chatrooms'),
       where('members', 'array-contains', uid),
       orderBy('latest.timestamp', 'desc'),
-      limit(7)
     );
-    return new Promise(res => {
-      const unsubscribe = onSnapshot(q, async snapshot => {
-        let data = [];
-        snapshot.forEach(snap => {
-          data.push(snap.data());
-        });
-        const rooms = await Promise.all(
-          data.map(async room => {
-            const timeRelative = useRelativeTime(room);
-            const friendId = room.members.filter(id => id !== uid);
-            const userData = await this.getUserInfo(friendId[0]);
-            return {
-              ...room,
-              members: userData,
-              latest: { ...room.latest, timestamp: timeRelative },
-            };
-          })
-        );
-        callback(rooms);
-        res(unsubscribe);
+    return onSnapshot(q, async (snapshot) => {
+      let data = [];
+      snapshot.forEach((snap) => {
+        data.push(snap.data());
       });
+      const rooms = await Promise.all(
+        data.map(async (room) => {
+          const timeRelative = useRelativeTime(room);
+          const friendId = room.members.filter((id) => id !== uid);
+          const userData = await this.getUserInfo(friendId[0]);
+          return {
+            ...room,
+            members: userData,
+            latest: { ...room.latest, timestamp: timeRelative },
+          };
+        })
+      );
+      callback(rooms);
     });
   },
   async getUserInfo(uid) {
@@ -356,7 +350,7 @@ const firebase = {
   async getMoreMessages(roomId, message) {
     if (!message) return;
     console.log('firebase', message);
-    const docsSnap = await getDocs(
+    const docSnaps = await getDocs(
       query(
         collection(db, `chatrooms/${roomId}/messages`),
         where('create_at', '<', message.create_at),
@@ -365,7 +359,7 @@ const firebase = {
       )
     );
     let data = [];
-    docsSnap.forEach(doc => {
+    docSnaps.forEach((doc) => {
       data.push(doc.data());
     });
     data.sort((a, b) => !b.create_at - a.create_at);
@@ -379,9 +373,9 @@ const firebase = {
     );
     return onSnapshot(
       q,
-      async snapshot => {
+      async (snapshot) => {
         let data = [];
-        snapshot.docChanges().forEach(change => {
+        snapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
             data.push(change.doc.data());
           }
@@ -391,7 +385,7 @@ const firebase = {
         //   const timeString = useFormatedTime(message.create_at);
         //   return { ...message, create_at: timeString };
         // });
-        callback(prev => {
+        callback((prev) => {
           if (!prev[room.id]) {
             return {
               ...prev,
@@ -404,7 +398,7 @@ const firebase = {
         if (!room.id || uid === room.latest_sender) return;
         this.updateRoom(room.id, { receiver_has_read: true });
       },
-      error => {
+      (error) => {
         console.error(error);
       }
     );
@@ -447,7 +441,6 @@ const firebase = {
     let result;
     if (provider === 'Google') {
       result = await signInWithPopup(auth, providerGoogle);
-
     }
     if (provider === 'Facebook') {
       result = await signInWithPopup(auth, providerFacebook);

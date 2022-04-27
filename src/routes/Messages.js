@@ -141,11 +141,12 @@ const Messages = () => {
   const rootRef = useRef();
   const bottomRef = useRef();
   const emojisRef = useRef();
-  // const unsubscribeRef = useRef();
   const { currentUserId, active, setActive } = useOutletContext();
   const { pathname } = useLocation();
 
   const { onOpen, isOpen, onClose } = useDisclosure({ id: 'addImage' });
+
+  console.log(databaseRooms, renderRooms)
 
   useEffect(() => {
     if (pathname === '/messages') {
@@ -156,16 +157,13 @@ const Messages = () => {
   }, [pathname]);
 
   useEffect(() => {
-    let unsubscribe;
-    firebase.listenRoomsChange(currentUserId, setDatabaseRooms).then(res => {
-      unsubscribe = res;
-    });
+    const unsubscribe = firebase.listenRoomsChange(currentUserId, setDatabaseRooms);
 
-    return unsubscribe;
+    return () => unsubscribe();
   }, [currentUserId]);
 
   useEffect(() => {
-    setRenderRooms(databaseRooms);
+    setRenderRooms(databaseRooms.slice(0, 5));
   }, [databaseRooms]);
 
   useEffect(() => {
@@ -182,7 +180,7 @@ const Messages = () => {
     };
     firebase.sendMessage(active.id, MessageData);
     setText('');
-    // bottomRef.current.scrollIntoView({ behavior: 'auto' });
+    bottomRef.current.scrollIntoView({ behavior: 'auto' });
   };
 
   const handleEnter = (e, value, type) => {
@@ -194,7 +192,7 @@ const Messages = () => {
   const handleSearch = e => {
     const term = e.target.value;
     if (!term) {
-      setRenderRooms(databaseRooms);
+      setRenderRooms(databaseRooms.slice(0, 5));
       return;
     }
     const filtered = databaseRooms.filter(room => {
@@ -234,9 +232,11 @@ const Messages = () => {
           </TitleWrapper>
           <ChatList
             rooms={renderRooms}
+            setRenderRooms={setRenderRooms}
             active={active}
             setActive={setActive}
             isCorner={isCorner}
+            databaseRooms={databaseRooms}
           />
         </LeftWrapper>
         <RightWrapper>
@@ -260,7 +260,7 @@ const Messages = () => {
               <Content ref={rootRef}>
                 <ChatContent2
                   room={active}
-                  // bottomRef={bottomRef}
+                  bottomRef={bottomRef}
                   rootRef={rootRef}
                   isCorner={isCorner}
                 />
