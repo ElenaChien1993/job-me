@@ -46,10 +46,13 @@ const Container = styled.div`
 `;
 
 const DeleteButton = styled(IconButton)`
-  ${
-    '' /* && {
-    display: none;
-  } */
+  && {
+    margin-left: auto;
+    height: 20px;
+  }
+  & svg {
+    width: 15px;
+    height: 15px;
   }
 `;
 
@@ -60,12 +63,11 @@ const ButtonWrapper = styled.div`
   margin-bottom: 20px;
 `;
 
-const FieldContainer = styled.div`
-  
-`
-
 const FieldWrapper = styled.div`
+  width: 90%;
+  margin: 0 auto;
   margin-bottom: 20px;
+  position: relative;
 `;
 
 const SectionTitle = styled.p`
@@ -80,19 +82,70 @@ const Title = styled.p`
   font-weight: 500;
   margin-bottom: 10px;
   color: #306172;
+  z-index: 1;
+  position: relative;
+`;
+
+const TitleBack = styled.div`
+  height: 10px;
+  width: 73px;
+  position: absolute;
+  top: 16px;
+  left: 0;
+  background-color: #fff6c9;
+  z-index: 0;
+`;
+
+const SalaryText = styled.div`
+  font-size: 16px;
+  margin: 0 10px;
 `;
 
 const Content = styled.div`
   font-size: 16px;
-  margin-right: 10px;
+`;
+
+const ListWrapper = styled.div`
+  width: 100%;
+`;
+
+const Dot = styled.div`
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #306172;
+`;
+
+const ListItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const QuestionCard = styled.div`
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 15px;
+  background-color: #fff6c9;
+  position: relative;
+`;
+
+const CustomDeleteButton = styled(IconButton)`
+  && {
+    height: 20px;
+    position: absolute;
+    right: 20px;
+  }
+  & svg {
+    width: 15px;
+    height: 15px;
+  }
 `;
 
 const CheckBoxWrapper = styled.div`
   display: flex;
-  margin-bottom: 10px;
-  &:hover ${DeleteButton} {
-    display: block;
-  }
+  align-items: center;
 `;
 
 const CheckBox = styled.input`
@@ -110,15 +163,22 @@ const Line = styled.div`
 `;
 
 const StyledLink = styled.a`
+  margin-left: 10px;
   color: black;
   text-decoration: underline;
 `;
 
-const StyledListItem = styled.li`
+const StyledListItem = styled.div`
   margin-bottom: 10px;
-  &:hover ${DeleteButton} {
-    display: block;
-  }
+  display: flex;
+  align-items: center;
+`;
+
+const TitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
 `;
 
 const StyledSalaryWrapper = styled.div`
@@ -128,15 +188,20 @@ const StyledSalaryWrapper = styled.div`
 
 const StyledEditable = styled(Editable)`
   && {
-    width: 10%;
+    min-width: 12%;
     margin-right: 10px;
   }
 `;
 
-const QuestionWrapper = styled.div`
-  margin-bottom: 15px;
-  &:hover ${DeleteButton} {
-    display: block;
+const QuestionCardsWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+`;
+
+const QuestionTitle = styled.div`
+  & .chakra-editable__preview {
+    font-weight: 700;
   }
 `;
 
@@ -154,13 +219,13 @@ const NoteDetails = () => {
   const noteId = params.noteId;
 
   useEffect(() => {
-    firebase.getNote(currentUserId, noteId).then((snap) => {
+    firebase.getNote(currentUserId, noteId).then(snap => {
       setBrief(snap.data());
     });
     firebase.getNoteDetails(noteId).then(snap => {
       setDetails(snap.data());
     });
-    const unsubscribe = firebase.listenDetailsChange(noteId, (doc) => {
+    const unsubscribe = firebase.listenDetailsChange(noteId, doc => {
       setDetails(doc.data());
       console.log('database changed', doc.data());
     });
@@ -205,7 +270,7 @@ const NoteDetails = () => {
     return updatedChecked;
   };
 
-  const onBlurSubmit = (objectKey) => {
+  const onBlurSubmit = objectKey => {
     console.log('onBlurSubmit', details[objectKey]);
     // handleMapArrayInputChange(e, i, 'questions', 'question');
     firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
@@ -215,7 +280,7 @@ const NoteDetails = () => {
   const handleArrayInputChange = (value, index, objectKey) => {
     const update = getArrayChangedValue(value, index, objectKey);
     console.log('handleArrayInputChange function', update);
-    setDetails((prev) => {
+    setDetails(prev => {
       return { ...prev, [objectKey]: update };
     });
   };
@@ -228,7 +293,7 @@ const NoteDetails = () => {
       objectKey,
       targetKey
     );
-    setDetails((prev) => {
+    setDetails(prev => {
       return { ...prev, [objectKey]: update };
     });
   };
@@ -246,7 +311,7 @@ const NoteDetails = () => {
   };
 
   const handleInputSalaryChange = (e, type) => {
-    setDetails((prev) => {
+    setDetails(prev => {
       return { ...prev, salary: { ...details.salary, [type]: e.target.value } };
     });
   };
@@ -265,7 +330,7 @@ const NoteDetails = () => {
     onOpen();
     firebase
       .getRecommendedUsers(brief.company_name, brief.job_title, currentUserId)
-      .then((members) => {
+      .then(members => {
         setRecommend(members);
         setIsLoading(false);
       });
@@ -312,24 +377,28 @@ const NoteDetails = () => {
       )}
       {details && (
         <Container>
-          <Tabs variant='soft-rounded' colorScheme="brand">
+          <Tabs size="lg" variant="soft-rounded" colorScheme="brand">
             <TabList>
-              <Tab>公司資訊</Tab>
-              <Tab>工作內容</Tab>
-              <Tab>面試準備</Tab>
+              <Tab m="10px">公司資訊</Tab>
+              <Tab m="10px">工作內容</Tab>
+              <Tab m="10px">面試準備</Tab>
+              <Tab m="10px">筆記心得</Tab>
             </TabList>
+            <Line />
             <TabPanels>
               <TabPanel>
                 <FieldWrapper>
                   <Title>公司主要產品 / 服務</Title>
                   <Editable
-                    value={details.product === '' ? '尚未填寫資料' : details.product}
+                    defaultValue={
+                      details.product === '' ? '尚未填寫資料' : details.product
+                    }
                     onSubmit={() => onBlurSubmit('product')}
                   >
                     <EditablePreview />
                     <EditableInput
-                      onChange={(e) =>
-                        setDetails((prev) => {
+                      onChange={e =>
+                        setDetails(prev => {
                           return { ...prev, product: e.target.value };
                         })
                       }
@@ -349,15 +418,15 @@ const NoteDetails = () => {
                     >
                       <EditablePreview />
                       <EditableInput
-                        onChange={(e) => handleInputSalaryChange(e, 'range')}
+                        onChange={e => handleInputSalaryChange(e, 'range')}
                       />
                     </StyledEditable>
-                    <Content> K </Content>
+                    <SalaryText> K </SalaryText>
                     <Select
                       variant="outline"
                       isFullWidth={false}
                       maxWidth="100px"
-                      onChange={(e) => handleInputSalaryChange(e, 'type')}
+                      onChange={e => handleInputSalaryChange(e, 'type')}
                       onBlur={() => onBlurSubmit('salary')}
                     >
                       <option value="年薪">年薪</option>
@@ -367,251 +436,272 @@ const NoteDetails = () => {
                 </FieldWrapper>
               </TabPanel>
               <TabPanel>
-                <p>two!</p>
+                <FieldWrapper>
+                  <Title>工作內容</Title>
+                  <TitleBack />
+                  <ListWrapper>
+                    {details.responsibilities.map((item, i) => {
+                      return (
+                        <ListItem key={uuid()}>
+                          <Dot />
+                          <EditableInputField
+                            value={item}
+                            onBlurSubmit={onBlurSubmit}
+                            onSubmitCallback={handleArrayInputChange}
+                            callbackArgs={{ objectKey: 'responsibilities' }}
+                            i={i}
+                            submitRef={submitRef}
+                          />
+                          <DeleteButton
+                            aria-label="delete item"
+                            icon={<SmallCloseIcon />}
+                            onClick={() => handleDelete(i, 'responsibilities')}
+                          />
+                        </ListItem>
+                      );
+                    })}
+                  </ListWrapper>
+                  <AddField
+                    setter={setDetails}
+                    objectKey="responsibilities"
+                    newValue={'新欄位，請點擊編輯'}
+                  />
+                </FieldWrapper>
+                <FieldWrapper>
+                  <Title>必備技能</Title>
+                  <TitleBack />
+                  <ListWrapper>
+                    {details.requirements.map((item, i) => {
+                      return (
+                        <CheckBoxWrapper key={uuid()}>
+                          <CheckBox
+                            type="checkbox"
+                            checked={details.requirements[i].is_qualified}
+                            onChange={() =>
+                              handleCheckboxChange(i, 'requirements')
+                            }
+                          />
+                          <EditableInputField
+                            value={item.description}
+                            onBlurSubmit={onBlurSubmit}
+                            onSubmitCallback={handleMapArrayInputChange}
+                            callbackArgs={{
+                              objectKey: 'requirements',
+                              subKey: 'description',
+                            }}
+                            i={i}
+                            submitRef={submitRef}
+                          />
+                          <DeleteButton
+                            aria-label="delete item"
+                            icon={<SmallCloseIcon />}
+                            onClick={() => handleDelete(i, 'requirements')}
+                          />
+                        </CheckBoxWrapper>
+                      );
+                    })}
+                  </ListWrapper>
+                  <AddField
+                    setter={setDetails}
+                    objectKey="requirements"
+                    newValue={{
+                      description: '新欄位，請點擊編輯',
+                      is_qualified: false,
+                    }}
+                  />
+                </FieldWrapper>
+                <FieldWrapper>
+                  <Title>加分項目</Title>
+                  <TitleBack />
+                  <ListWrapper>
+                    {details.bonus.map((item, i) => {
+                      return (
+                        <CheckBoxWrapper key={uuid()}>
+                          <CheckBox
+                            type="checkbox"
+                            checked={details.bonus[i].is_qualified}
+                            onChange={() => handleCheckboxChange(i, 'bonus')}
+                          />
+                          <EditableInputField
+                            value={item.description}
+                            onBlurSubmit={onBlurSubmit}
+                            onSubmitCallback={handleMapArrayInputChange}
+                            callbackArgs={{
+                              objectKey: 'bonus',
+                              subKey: 'description',
+                            }}
+                            i={i}
+                            submitRef={submitRef}
+                          />
+                          <DeleteButton
+                            aria-label="delete item"
+                            icon={<SmallCloseIcon />}
+                            onClick={() => handleDelete(i, 'bonus')}
+                          />
+                        </CheckBoxWrapper>
+                      );
+                    })}
+                  </ListWrapper>
+                  <AddField
+                    setter={setDetails}
+                    objectKey="bonus"
+                    newValue={{
+                      description: '新欄位，請點擊編輯',
+                      is_qualified: false,
+                    }}
+                  />
+                </FieldWrapper>
+              </TabPanel>
+              <TabPanel>
+                <FieldWrapper>
+                  <TitleWrapper>
+                    <Title>相關準備資料連結</Title>
+                    {!isFilesEditing ? (
+                      <IconButton
+                        colorScheme="brand"
+                        size="sm"
+                        onClick={() => setIsFilesEditing(true)}
+                        icon={<EditIcon />}
+                      />
+                    ) : (
+                      <Button
+                        colorScheme="brand"
+                        size="sm"
+                        onClick={handleFilesSubmit}
+                      >
+                        儲存
+                      </Button>
+                    )}
+                  </TitleWrapper>
+                  {!isFilesEditing ? (
+                    <Content>
+                      <StyledListItem>
+                        <Dot />
+                        <StyledLink href={details.job_link} target="_blank">
+                          職缺連結
+                        </StyledLink>
+                      </StyledListItem>
+                      <StyledListItem>
+                        <Dot />
+                        <StyledLink href={details.resume_link} target="_blank">
+                          我的履歷連結
+                        </StyledLink>
+                      </StyledListItem>
+                      {details.attached_files.map((file, i) => {
+                        return (
+                          <React.Fragment key={uuid()}>
+                            <StyledListItem>
+                              <Dot />
+                              <StyledLink href={file.file_link} target="_blank">
+                                {file.file_name}
+                              </StyledLink>
+                              <DeleteButton
+                                aria-label="delete item"
+                                icon={<SmallCloseIcon />}
+                                onClick={() =>
+                                  handleDelete(i, 'attached_files')
+                                }
+                              />
+                            </StyledListItem>
+                          </React.Fragment>
+                        );
+                      })}
+                    </Content>
+                  ) : (
+                    <>
+                      <EditFiles details={details} setDetails={setDetails} />
+                      <AddField
+                        setter={setDetails}
+                        objectKey="attached_files"
+                        newValue={{
+                          file_name: '請輸入檔案名稱',
+                          file_link: '請輸入檔案連結',
+                        }}
+                      />
+                    </>
+                  )}
+                </FieldWrapper>
+                <FieldWrapper>
+                  <Title>面試題目猜題</Title>
+                  <QuestionCardsWrapper>
+                    {details.questions.map((q, i) => {
+                      return (
+                        <QuestionCard key={uuid()}>
+                          <QuestionTitle>
+                            <EditableInputField
+                              style={{ fontWeight: '700' }}
+                              value={q.question}
+                              onBlurSubmit={onBlurSubmit}
+                              onSubmitCallback={handleMapArrayInputChange}
+                              callbackArgs={{
+                                objectKey: 'questions',
+                                subKey: 'question',
+                              }}
+                              i={i}
+                              submitRef={submitRef}
+                            />
+                          </QuestionTitle>
+                          <CustomDeleteButton
+                            aria-label="delete item"
+                            icon={<SmallCloseIcon />}
+                            onClick={() => handleDelete(i, 'questions')}
+                          />
+                          <EditableInputField
+                            value={q.answer}
+                            onBlurSubmit={onBlurSubmit}
+                            onSubmitCallback={handleMapArrayInputChange}
+                            callbackArgs={{
+                              objectKey: 'questions',
+                              subKey: 'answer',
+                            }}
+                            i={i}
+                            submitRef={submitRef}
+                          />
+                        </QuestionCard>
+                      );
+                    })}
+                    <AddField
+                      setter={setDetails}
+                      objectKey="questions"
+                      newValue={{
+                        question: '新欄位，請點擊編輯',
+                        answer: '請輸入練習回答',
+                      }}
+                    />
+                  </QuestionCardsWrapper>
+                </FieldWrapper>
+              </TabPanel>
+              <TabPanel>
+                <FieldWrapper>
+                  <Title>面試前筆記區</Title>
+                  <Content>
+                    <div>Ex: 想問公司的問題？</div>
+                    <EditorArea
+                      noteId={noteId}
+                      details={details}
+                      objectKey="before_note"
+                    />
+                  </Content>
+                </FieldWrapper>
+                <FieldWrapper>
+                  <Title>面試中筆記區</Title>
+                  <EditorArea
+                    noteId={noteId}
+                    details={details}
+                    objectKey="ing_note"
+                  />
+                </FieldWrapper>
+                <FieldWrapper>
+                  <Title>面試後心得區</Title>
+                  <EditorArea
+                    noteId={noteId}
+                    details={details}
+                    objectKey="after_note"
+                  />
+                </FieldWrapper>
               </TabPanel>
             </TabPanels>
           </Tabs>
-          <SectionTitle>詳細資料</SectionTitle>
-          <FieldWrapper>
-            <Title>工作內容</Title>
-            <Content>
-              {details.responsibilities.map((item, i) => {
-                return (
-                  <div key={uuid()}>
-                    <EditableInputField
-                      value={item}
-                      onBlurSubmit={onBlurSubmit}
-                      onSubmitCallback={handleArrayInputChange}
-                      callbackArgs={{objectKey: 'responsibilities'}}
-                      i={i}
-                      submitRef={submitRef}
-                    />
-                    <DeleteButton
-                      w={4}
-                      h={4}
-                      ml={5}
-                      aria-label="delete item"
-                      icon={<SmallCloseIcon />}
-                      onClick={() => handleDelete(i, 'responsibilities')}
-                    />
-                  </div>
-                );
-              })}
-            </Content>
-            <AddField
-              setter={setDetails}
-              objectKey="responsibilities"
-              newValue={'新欄位，請點擊編輯'}
-            />
-          </FieldWrapper>
-          <FieldWrapper>
-            <Title>必備技能</Title>
-            {details.requirements.map((item, i) => {
-              return (
-                <CheckBoxWrapper key={uuid()}>
-                  <CheckBox
-                    type="checkbox"
-                    checked={details.requirements[i].is_qualified}
-                    onChange={() => handleCheckboxChange(i, 'requirements')}
-                  />
-                  <EditableInputField
-                    value={item.description}
-                    onBlurSubmit={onBlurSubmit}
-                    onSubmitCallback={handleMapArrayInputChange}
-                    callbackArgs={{objectKey: 'requirements', subKey: 'description'}}
-                    i={i}
-                    submitRef={submitRef}
-                  />
-                  <DeleteButton
-                    w={4}
-                    h={4}
-                    ml={5}
-                    aria-label="delete item"
-                    icon={<SmallCloseIcon />}
-                    onClick={() => handleDelete(i, 'requirements')}
-                  />
-                </CheckBoxWrapper>
-              );
-            })}
-            <AddField
-              setter={setDetails}
-              objectKey="requirements"
-              newValue={{
-                description: '新欄位，請點擊編輯',
-                is_qualified: false,
-              }}
-            />
-          </FieldWrapper>
-          <FieldWrapper>
-            <Title>加分項目</Title>
-            {details.bonus.map((item, i) => {
-              return (
-                <CheckBoxWrapper key={uuid()}>
-                  <CheckBox
-                    type="checkbox"
-                    checked={details.bonus[i].is_qualified}
-                    onChange={() => handleCheckboxChange(i, 'bonus')}
-                  />
-                  <EditableInputField
-                    value={item.description}
-                    onBlurSubmit={onBlurSubmit}
-                    onSubmitCallback={handleMapArrayInputChange}
-                    callbackArgs={{objectKey: 'bonus', subKey: 'description'}}
-                    i={i}
-                    submitRef={submitRef}
-                  />
-                  <DeleteButton
-                    w={4}
-                    h={4}
-                    ml={5}
-                    aria-label="delete item"
-                    icon={<SmallCloseIcon />}
-                    onClick={() => handleDelete(i, 'bonus')}
-                  />
-                </CheckBoxWrapper>
-              );
-            })}
-            <AddField
-              setter={setDetails}
-              objectKey="bonus"
-              newValue={{
-                description: '新欄位，請點擊編輯',
-                is_qualified: false,
-              }}
-            />
-          </FieldWrapper>
-          <FieldWrapper>
-            <Title>相關準備資料連結</Title>
-            {!isFilesEditing ? (
-              <Content>
-                <IconButton
-                  size="sm"
-                  onClick={() => setIsFilesEditing(true)}
-                  icon={<EditIcon />}
-                />
-                <StyledListItem>
-                  <StyledLink href={details.job_link} target="_blank">
-                    職缺連結
-                  </StyledLink>
-                </StyledListItem>
-                <StyledListItem>
-                  <StyledLink href={details.resume_link} target="_blank">
-                    我的履歷連結
-                  </StyledLink>
-                </StyledListItem>
-                {details.attached_files.map((file, i) => {
-                  return (
-                    <StyledListItem key={uuid()}>
-                      <StyledLink href={file.file_link} target="_blank">
-                        {file.file_name}
-                      </StyledLink>
-                      <DeleteButton
-                        w={4}
-                        h={4}
-                        ml={5}
-                        aria-label="delete item"
-                        icon={<SmallCloseIcon />}
-                        onClick={() => handleDelete(i, 'attached_files')}
-                      />
-                    </StyledListItem>
-                  );
-                })}
-              </Content>
-            ) : (
-              <>
-                <IconButton
-                  size="sm"
-                  onClick={handleFilesSubmit}
-                  icon={<CheckCircleIcon />}
-                />
-                <EditFiles details={details} setDetails={setDetails} />
-                <AddField
-                  setter={setDetails}
-                  objectKey="attached_files"
-                  newValue={{
-                    file_name: '請輸入檔案名稱',
-                    file_link: '請輸入檔案連結',
-                  }}
-                />
-              </>
-            )}
-          </FieldWrapper>
-          <FieldWrapper>
-            <Title>其他備註</Title>
-            <EditorArea noteId={noteId} details={details} objectKey="other" />
-          </FieldWrapper>
-          <Line />
-          <SectionTitle>面試準備筆記</SectionTitle>
-          <FieldWrapper>
-            <Title>面試題目猜題</Title>
-            <Content>
-              {details.questions.map((q, i) => {
-                return (
-                  <QuestionWrapper key={uuid()}>
-                    <EditableInputField
-                      value={q.question}
-                      onBlurSubmit={onBlurSubmit}
-                      onSubmitCallback={handleMapArrayInputChange}
-                      callbackArgs={{objectKey: 'questions', subKey: 'question'}}
-                      i={i}
-                      submitRef={submitRef}
-                    />
-                    <DeleteButton
-                      w={4}
-                      h={4}
-                      ml={5}
-                      aria-label="delete item"
-                      icon={<SmallCloseIcon />}
-                      onClick={() => handleDelete(i, 'questions')}
-                    />
-                    <EditableInputField
-                      value={q.answer}
-                      onBlurSubmit={onBlurSubmit}
-                      onSubmitCallback={handleMapArrayInputChange}
-                      callbackArgs={{objectKey: 'questions', subKey: 'answer'}}
-                      i={i}
-                      submitRef={submitRef}
-                    />
-                  </QuestionWrapper>
-                );
-              })}
-              <AddField
-                setter={setDetails}
-                objectKey="questions"
-                newValue={{
-                  question: '新欄位，請點擊編輯',
-                  answer: '請輸入練習回答',
-                }}
-              />
-            </Content>
-          </FieldWrapper>
-          <FieldWrapper>
-            <Title>面試前筆記區</Title>
-            <Content>
-              <div>Ex: 想問公司的問題？</div>
-              <EditorArea
-                noteId={noteId}
-                details={details}
-                objectKey="before_note"
-              />
-            </Content>
-          </FieldWrapper>
-          <FieldWrapper>
-            <Title>面試中筆記區</Title>
-            <EditorArea
-              noteId={noteId}
-              details={details}
-              objectKey="ing_note"
-            />
-          </FieldWrapper>
-          <FieldWrapper>
-            <Title>面試後心得區</Title>
-            <EditorArea
-              noteId={noteId}
-              details={details}
-              objectKey="after_note"
-            />
-          </FieldWrapper>
         </Container>
       )}
     </Background>

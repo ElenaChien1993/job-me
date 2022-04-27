@@ -35,6 +35,7 @@ const EditableInputField = ({
 }) => {
   return (
     <Editable
+      w="90%"
       defaultValue={value === '' ? '尚未填寫資料' : value}
       isPreviewFocusable
       selectAllOnFocus={false}
@@ -61,28 +62,5 @@ const EditableInputField = ({
     </Editable>
   );
 };
-
-{
-  /* <Editable
-  value={item === '' ? '尚未填寫資料' : item}
-  key={uuid()}
-  onSubmit={() => onBlurSubmit('responsibilities')}
->
-  <StyledListItem>
-    <EditablePreview />
-    <EditableInput
-      onChange={e => handleArrayInputChange(e, i, 'responsibilities')}
-    />
-    <DeleteButton
-      w={4}
-      h={4}
-      ml={5}
-      aria-label="delete item"
-      icon={<SmallCloseIcon />}
-      onClick={() => handleDelete(i, 'responsibilities')}
-    />
-  </StyledListItem>
-</Editable>; */
-}
 
 export default EditableInputField;

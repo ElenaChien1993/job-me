@@ -1,18 +1,16 @@
+import { Button } from '@chakra-ui/react';
+import { AddIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
-import firebase from '../../utils/firebase'
-
-const StyledAddButton = styled.button`
-  height: 30px;
+const StyledAddButton = styled(Button)`
+  height: 25px;
   color: #306172;
-  font-size: 16px;
-  margin-bottom: 16px;
-  cursor: pointer;
+  font-size: 14px;
+  margin: 10px 0;
 `;
 
 const AddField = ({setter, objectKey, newValue}) => {
   const handleAddField = (e) => {
-    // e.preventDefault();
     setter((prev) => {
       return {
         ...prev,
@@ -25,8 +23,8 @@ const AddField = ({setter, objectKey, newValue}) => {
   };
 
   return (
-    <StyledAddButton onClick={handleAddField}>
-      ＋新增欄位
+    <StyledAddButton size="sm" leftIcon={<AddIcon />} onClick={handleAddField}>
+      新增欄位
     </StyledAddButton>
   )
 }

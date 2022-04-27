@@ -4,6 +4,7 @@ import { Input } from '@chakra-ui/react';
 const StyledInput = styled(Input)`
   && {
     border-radius: 10px;
+    height: 25px;
   }
 `;
 
@@ -12,11 +13,12 @@ const FilesWrap = styled.div`
   align-items: center;
   width: 100%;
   margin-bottom: 10px;
+  justify-content: space-between;
   & input {
     margin-right: 10px;
   }
   & label {
-    width: 50px;
+    width: 30%;
   }
 `;
 
@@ -24,13 +26,22 @@ const FileName = styled.div`
   display: flex;
   align-items: center;
   width: 40%;
+  margin-right: 10px;
+  justify-content: space-between;
+  & label {
+    width: 50px;
+  }
 `;
 
 const FileLink = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 60%;
-`;
+  & label {
+    width: 50px;
+  }
+`
 
 const EditFiles = ({ details, setDetails }) => {
   const getObjectInArrayChangedValue = (value, index, objectKey, targetKey) => {
@@ -52,7 +63,7 @@ const EditFiles = ({ details, setDetails }) => {
       objectKey,
       targetKey
     );
-    setDetails((prev) => {
+    setDetails(prev => {
       return { ...prev, [objectKey]: update };
     });
   };
@@ -60,32 +71,28 @@ const EditFiles = ({ details, setDetails }) => {
   return (
     <>
       <FilesWrap key="job_link">
-        <FileLink>
-          <label>職缺連結</label>
-          <StyledInput
-            type="text"
-            defaultValue={details.job_link}
-            onChange={(e) =>
-              setDetails((prev) => {
-                return { ...prev, job_link: e.target.value };
-              })
-            }
-          />
-        </FileLink>
+        <label>職缺連結</label>
+        <StyledInput
+          type="text"
+          defaultValue={details.job_link}
+          onChange={e =>
+            setDetails(prev => {
+              return { ...prev, job_link: e.target.value };
+            })
+          }
+        />
       </FilesWrap>
       <FilesWrap key="resume_link">
-        <FileLink>
-          <label>我的履歷連結</label>
-          <StyledInput
-            type="text"
-            defaultValue={details.resume_link}
-            onChange={(e) =>
-              setDetails((prev) => {
-                return { ...prev, resume_link: e.target.value };
-              })
-            }
-          />
-        </FileLink>
+        <label>我的履歷連結</label>
+        <StyledInput
+          type="text"
+          defaultValue={details.resume_link}
+          onChange={e =>
+            setDetails(prev => {
+              return { ...prev, resume_link: e.target.value };
+            })
+          }
+        />
       </FilesWrap>
       {details.attached_files.map((file, i) => {
         return (
@@ -94,8 +101,9 @@ const EditFiles = ({ details, setDetails }) => {
               <label>檔名</label>
               <StyledInput
                 type="text"
-                defaultValue={file.file_name}
-                onChange={(e) =>
+                placeholder="請輸入檔案名稱"
+                value={file.file_name}
+                onChange={e =>
                   handleMapArrayInputChange(e, i, 'attached_files', 'file_name')
                 }
               />
@@ -104,8 +112,9 @@ const EditFiles = ({ details, setDetails }) => {
               <label>連結</label>
               <StyledInput
                 type="text"
-                defaultValue={file.file_link}
-                onChange={(e) =>
+                placeholder="請輸入檔案連結"
+                value={file.file_link}
+                onChange={e =>
                   handleMapArrayInputChange(e, i, 'attached_files', 'file_link')
                 }
               />
