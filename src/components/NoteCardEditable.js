@@ -7,7 +7,6 @@ import {
   EditablePreview,
   Select,
   IconButton,
-  Flex
 } from '@chakra-ui/react';
 import { EditIcon, CheckCircleIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
@@ -133,7 +132,7 @@ const StyledInput = styled(Input)`
   }
 `;
 
-const NoteElement = React.memo(({ uid, noteId, note, setNote, editable }) => {
+const NoteElement = React.memo(({ uid, noteId, note, setNote, editable, isPublic }) => {
   const [isEditing, setIsEditing] = useState(false);
   console.log('NoteEl render');
 
@@ -264,7 +263,7 @@ const NoteElement = React.memo(({ uid, noteId, note, setNote, editable }) => {
           <ContentWrapper>
             <CompanyName>{note.company_name}</CompanyName>
             <JobTitle>{note.job_title}</JobTitle>
-            <Status>{`${note.status}｜${note.address}`}</Status>
+            {!isPublic && <Status>{`${note.status}｜${note.address}`}</Status>}
           </ContentWrapper>
           <TagsWrapper>
             {note.tags &&

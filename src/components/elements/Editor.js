@@ -48,12 +48,17 @@ const StyledButton = styled.button`
   }
 `;
 
-const EditorArea = ({ noteId, details, objectKey }) => {
+const ReadMode = styled.div`
+  line-height: 1.5em;
+  letter-spacing: 1.2px;
+`;
+
+const EditorArea = ({ noteId, details, objectKey, isPublic }) => {
   const [editorState, setEditorState] = useState(() =>
-    details[objectKey] === '' || !details[objectKey]
+    details.more_notes[objectKey] === '' || !details.more_notes[objectKey]
       ? EditorState.createEmpty()
       : EditorState.createWithContent(
-          convertFromRaw(JSON.parse(details[objectKey]))
+          convertFromRaw(JSON.parse(details.more_notes[objectKey]))
         )
   );
 
@@ -84,39 +89,50 @@ const EditorArea = ({ noteId, details, objectKey }) => {
     setEditorState(RichUtils.toggleInlineStyle(editorState, 'STRIKETHROUGH'));
   };
 
-  const handleChange = (editorState) => {
+  const handleChange = editorState => {
     setEditorState(editorState);
   };
 
   const onBlur = () => {
     const contentState = editorState.getCurrentContent();
+    console.log(convertToRaw(contentState));
     firebase.updateNoteDetails(noteId, {
-      other: JSON.stringify(convertToRaw(contentState)),
+      more_notes: {
+        [objectKey]: JSON.stringify(convertToRaw(contentState)),
+      },
     });
   };
 
   return (
     <>
-      <StyledButton id="underline" onClick={onUnderlineClick}>
-        U
-      </StyledButton>
-      <StyledButton id="bold" onClick={onBoldClick}>
-        B
-      </StyledButton>
-      <StyledButton id="italic" onClick={onItalicClick}>
-        I
-      </StyledButton>
-      <StyledButton id="linethrough" onClick={onStrikeThroughClick}>
-        abc
-      </StyledButton>
-      <StyledEditor>
-        <Editor
-          editorState={editorState}
-          onChange={handleChange}
-          handleKeyCommand={handleKeyCommand}
-          onBlur={onBlur}
-        />
-      </StyledEditor>
+      {isPublic ? (
+        <ReadMode>
+          <Editor readOnly editorState={editorState} />
+        </ReadMode>
+      ) : (
+        <>
+          <StyledButton id="underline" onClick={onUnderlineClick}>
+            U
+          </StyledButton>
+          <StyledButton id="bold" onClick={onBoldClick}>
+            B
+          </StyledButton>
+          <StyledButton id="italic" onClick={onItalicClick}>
+            I
+          </StyledButton>
+          <StyledButton id="linethrough" onClick={onStrikeThroughClick}>
+            abc
+          </StyledButton>
+          <StyledEditor>
+            <Editor
+              editorState={editorState}
+              onChange={handleChange}
+              handleKeyCommand={handleKeyCommand}
+              onBlur={onBlur}
+            />
+          </StyledEditor>
+        </>
+      )}
     </>
   );
 };

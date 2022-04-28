@@ -19,6 +19,8 @@ import Messages from './routes/Messages';
 import GlobalStyle from './style/GlobalStyle';
 import Loader from './components/Loader';
 import Login from './routes/Login';
+import NotFound from './routes/NotFound';
+import NotePublic from './routes/notes/NotePublic';
 
 const theme = extendTheme({
   colors: {
@@ -35,6 +37,13 @@ const theme = extendTheme({
       900: '#00403B',
     },
   },
+  styles: {
+    global: {
+      body: {
+        fontFamily: 'Noto Sans TC', 
+      },
+    }
+  }
 });
 
 const App = () => {
@@ -98,7 +107,13 @@ const App = () => {
                 <Route path=":uid" element={<Profile />} />
               </Route>
 
-              {/* <Route path="*" element={<NotFound />}/> */}
+              <Route path="public">
+                <Route path=":uid">
+                  <Route path=":noteId" element={<NotePublic />} />
+                </Route>
+              </Route>
+
+              <Route path="*" element={<NotFound />}/>
             </Route>
             <Route
               path="login"

@@ -72,6 +72,7 @@ const GlobalStyle = createGlobalStyle`
   }
   html {
     background-color: #ffeade;
+    font-family: 'Noto Sans TC', sans-serif;
   }
 `;
 

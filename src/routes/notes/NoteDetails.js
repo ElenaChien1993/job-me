@@ -18,7 +18,6 @@ import {
 import {
   SmallCloseIcon,
   EditIcon,
-  CheckCircleIcon,
   ChevronLeftIcon,
   AtSignIcon,
 } from '@chakra-ui/icons';
@@ -76,7 +75,7 @@ const TitleSection = styled.div`
 `;
 
 const Title = styled.p`
-  font-size: 18px;
+  font-size: 1.3rem;
   font-weight: 500;
   margin-bottom: 10px;
   color: #306172;
@@ -85,9 +84,9 @@ const Title = styled.p`
 `;
 
 const TitleBack = styled.div`
-  height: 10px;
+  height: 13px;
   position: absolute;
-  top: 16px;
+  top: 18px;
   left: 0;
   background-color: #fff6c9;
   z-index: 0;
