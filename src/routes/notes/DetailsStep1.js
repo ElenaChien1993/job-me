@@ -1,26 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Input, Textarea } from '@chakra-ui/react';
-
-const RightWrapper = styled.div`
-  width: 65%;
-  margin-left: 350px;
-  padding: 40px 44px 30px;
-`;
-
-const StyledForm = styled.form`
-  margin-top: 16px;
-`;
+import { Button, Input, Textarea } from '@chakra-ui/react';
+import AddField from '../../components/elements/AddField';
 
 const InputWrap = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   margin-bottom: 16px;
-  & label {
-    line-height: 24px;
-    font-weight: 500;
-  }
+`;
+
+const InputLabel = styled.label`
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 18px;
 `;
 
 const StyledInput = styled(Input)`
@@ -63,9 +56,9 @@ const RadioInput = styled.input`
 const TagButton = styled.label`
   width: 90px;
   height: 35px;
-  background: ${(props) => (props.checked ? '#306172' : '#E3E3E3')};
+  background: ${props => (props.checked ? '#306172' : '#E3E3E3')};
   border-radius: 20px;
-  color: ${(props) => (props.checked ? 'white' : '#707070')};
+  color: ${props => (props.checked ? 'white' : '#707070')};
   font-size: 16px;
   line-height: 22px;
   margin-right: 15px;
@@ -95,25 +88,10 @@ const CheckBox = styled.input`
   cursor: pointer;
 `;
 
-const StyledAddButton = styled.button`
-  height: 30px;
-  color: #306172;
-  font-size: 16px;
-  margin-bottom: 16px;
-  cursor: pointer;
-`;
-
-const StyledButton = styled.button`
-  width: 115px;
-  height: 35px;
-  background: #306172;
-  border-radius: 24px;
-  padding: 9px 24px;
-  color: white;
-  font-size: 16px;
-  line-height: 22px;
-  margin-bottom: 16px;
-  cursor: pointer;
+const ButtonGroup = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const DetailsStep1 = ({
@@ -125,22 +103,22 @@ const DetailsStep1 = ({
 }) => {
   const salaryTypes = ['月薪', '年薪'];
 
-  const handleSalaryChange = (e) => {
-    setValues((prev) => {
+  const handleSalaryChange = e => {
+    setValues(prev => {
       return { ...prev, salary: { ...prev.salary, range: e.target.value } };
     });
   };
 
-  const handleRadioChange = (e) => {
-    setValues((prev) => {
+  const handleRadioChange = e => {
+    setValues(prev => {
       return { ...prev, salary: { ...prev.salary, type: e.target.value } };
     });
   };
 
-  const handleResponsibilitiesInputChange = (e) => {
+  const handleResponsibilitiesInputChange = e => {
     const answerArray = e.target.value.split('\n');
-    const filtered = answerArray.filter((ans) => ans !== '');
-    setValues((prev) => {
+    const filtered = answerArray.filter(ans => ans !== '');
+    setValues(prev => {
       return { ...prev, responsibilities: filtered };
     });
   };
@@ -155,14 +133,14 @@ const DetailsStep1 = ({
         : item
     );
 
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, requirements: updatedChecked };
     });
   };
 
-  const handleAddField = (e) => {
+  const handleAddField = e => {
     e.preventDefault();
-    setValues((prev) => {
+    setValues(prev => {
       return {
         ...prev,
         requirements: [
@@ -173,7 +151,7 @@ const DetailsStep1 = ({
     });
   };
 
-  const handleReqInputChange = (i) => (e) => {
+  const handleReqInputChange = i => e => {
     const updatedDes = values.requirements.map((item, index) =>
       index === i
         ? {
@@ -183,16 +161,16 @@ const DetailsStep1 = ({
         : item
     );
 
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, requirements: updatedDes };
     });
   };
 
   return (
-    <RightWrapper>
-      <StyledForm>
+    <>
+      <>
         <InputWrap>
-          <label>該公司主要產品 / 服務</label>
+          <InputLabel>該公司主要產品 / 服務</InputLabel>
           <StyledInput
             type="text"
             defaultValue={values.product}
@@ -200,7 +178,7 @@ const DetailsStep1 = ({
           />
         </InputWrap>
         <SalaryContainer>
-          <label>薪資範圍</label>
+          <InputLabel>薪資範圍</InputLabel>
           <SalaryWrap>
             <StyledInput
               type="text"
@@ -236,7 +214,7 @@ const DetailsStep1 = ({
           </SalaryWrap>
         </SalaryContainer>
         <InputWrap>
-          <label>Responsibilities（工作內容）</label>
+          <InputLabel>Responsibilities（工作內容）</InputLabel>
           <StyledText
             onChange={handleResponsibilitiesInputChange}
             placeholder="請將每個項目分行隔開"
@@ -245,7 +223,7 @@ const DetailsStep1 = ({
           />
         </InputWrap>
         <InputWrap>
-          <label>Requirements（必備技能）</label>
+          <InputLabel>Requirements（必備技能）</InputLabel>
           {values.requirements.map((req, i) => {
             return (
               <RequirementWrapper key={i}>
@@ -262,12 +240,35 @@ const DetailsStep1 = ({
               </RequirementWrapper>
             );
           })}
-          <StyledAddButton onClick={handleAddField}>＋新增欄位</StyledAddButton>
+          <AddField
+            setter={setValues}
+            objectKey="requirements"
+            newValue={{
+              description: '',
+              is_qualified: false,
+            }}
+          />
         </InputWrap>
-      </StyledForm>
-      <StyledButton onClick={prevStep}>上一頁</StyledButton>
-      <StyledButton onClick={nextStep}>下一頁</StyledButton>
-    </RightWrapper>
+      </>
+      <ButtonGroup>
+        <Button
+          size="lg"
+          colorScheme="brand"
+          borderRadius="full"
+          onClick={prevStep}
+        >
+          上一頁
+        </Button>
+        <Button
+          size="lg"
+          colorScheme="brand"
+          borderRadius="full"
+          onClick={nextStep}
+        >
+          下一頁
+        </Button>
+      </ButtonGroup>
+    </>
   );
 };
 

@@ -1,29 +1,22 @@
 import { useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
-import { Input, Textarea } from '@chakra-ui/react';
+import { Button, Input, useToast } from '@chakra-ui/react';
 
 import firebase from '../../utils/firebase';
-
-const RightWrapper = styled.div`
-  width: 65%;
-  margin-left: 350px;
-  padding: 40px 44px 30px;
-`;
-
-const StyledForm = styled.form`
-  margin-top: 16px;
-`;
+import AddField from '../../components/elements/AddField';
 
 const InputWrap = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   margin-bottom: 16px;
-  & label {
-    line-height: 24px;
-    font-weight: 500;
-  }
+`;
+
+const InputLabel = styled.label`
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 18px;
 `;
 
 const StyledInput = styled(Input)`
@@ -45,31 +38,10 @@ const FilesWrap = styled.div`
   }
 `;
 
-const StyledAddButton = styled.button`
-  height: 30px;
-  color: #306172;
-  font-size: 16px;
-  margin-bottom: 16px;
-  cursor: pointer;
-`;
-
-const StyledText = styled(Textarea)`
-  && {
-    height: 140px;
-  }
-`;
-
-const StyledButton = styled.button`
-  width: 115px;
-  height: 35px;
-  background: #306172;
-  border-radius: 24px;
-  padding: 9px 24px;
-  color: white;
-  font-size: 16px;
-  line-height: 22px;
-  margin-bottom: 16px;
-  cursor: pointer;
+const ButtonGroup = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const DetailsStep3 = ({
@@ -82,8 +54,9 @@ const DetailsStep3 = ({
 }) => {
   const user = firebase.auth.currentUser;
   const navigate = useNavigate();
+  const toast = useToast();
 
-  const handleInputChange = (i) => (e) => {
+  const handleInputChange = i => e => {
     const updated = values.questions.map((q, index) =>
       index === i
         ? {
@@ -93,25 +66,26 @@ const DetailsStep3 = ({
         : q
     );
 
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, questions: updated };
     });
   };
 
-  const handleAddField = (e) => {
-    e.preventDefault();
-    setValues((prev) => {
-      return {
-        ...prev,
-        questions: [...prev.questions, { question: '', answer: '' }],
-      };
-    });
-  };
-
   const createNote = () => {
+    if (values.company_name === '' || values.job_title === '') {
+      toast({
+        title: '哎呀',
+        description: '公司名稱和應徵職稱為必填欄位',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      return;
+    }
     firebase
       .setNoteBrief(user.uid, { ...noteDataBrief, creator: user.uid })
-      .then((id) => {
+      .then(id => {
         firebase.setNoteDetails(id, noteDetails).then(() => {
           navigate(`/notes/details/${id}`);
         });
@@ -119,10 +93,10 @@ const DetailsStep3 = ({
   };
 
   return (
-    <RightWrapper>
-      <StyledForm>
+    <>
+      <>
         <InputWrap>
-          <label>可能會被問的面試問題</label>
+          <InputLabel>可能會被問的面試問題</InputLabel>
           {values.questions.map((q, i) => {
             return (
               <FilesWrap key={i}>
@@ -135,12 +109,35 @@ const DetailsStep3 = ({
               </FilesWrap>
             );
           })}
-          <StyledAddButton onClick={handleAddField}>＋新增欄位</StyledAddButton>
+          <AddField
+            setter={setValues}
+            objectKey="questions"
+            newValue={{
+              question: '',
+              answer: '',
+            }}
+          />
         </InputWrap>
-      </StyledForm>
-      <StyledButton onClick={prevStep}>上一頁</StyledButton>
-      <StyledButton onClick={createNote}>創建筆記</StyledButton>
-    </RightWrapper>
+      </>
+      <ButtonGroup>
+        <Button
+          size="lg"
+          colorScheme="brand"
+          borderRadius="full"
+          onClick={prevStep}
+        >
+          上一頁
+        </Button>
+        <Button
+          size="lg"
+          colorScheme="brand"
+          borderRadius="full"
+          onClick={createNote}
+        >
+          創建筆記
+        </Button>
+      </ButtonGroup>
+    </>
   );
 };
 

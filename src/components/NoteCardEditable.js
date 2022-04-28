@@ -215,7 +215,7 @@ const NoteElement = React.memo(({ uid, noteId, note, setNote, editable }) => {
                 <option value="等待中">等待中</option>
               </StyledSelect>
               <Line>｜</Line>
-              <Editable value={note.address}>
+              <Editable value={note.address === '' ? '尚未填寫資料' : note.address}>
                 <StyledAddressPreview />
                 <EditableInput
                   onChange={(e) =>

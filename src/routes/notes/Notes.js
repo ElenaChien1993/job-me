@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
+import { InputGroup, InputRightElement, Input, Button } from '@chakra-ui/react';
+import { Search2Icon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
@@ -19,7 +21,7 @@ const SearchBar = styled.div`
   margin-bottom: 16px;
 `;
 
-const Input = styled.input`
+const StyledInput = styled(Input)`
   width: 100%;
   height: 100%;
   border-radius: 10px;
@@ -27,27 +29,9 @@ const Input = styled.input`
   font-size: 18px;
 `;
 
-const CreateButton = styled.button`
-  width: 115px;
-  height: 35px;
-  background: #306172;
-  border-radius: 24px;
-  padding: 9px 24px;
-  color: white;
-  font-size: 16px;
-  line-height: 22px;
-  margin-bottom: 16px;
-  cursor: pointer;
-`;
-
 const NotesWrapper = styled.div`
   display: flex;
   flex-direction: column;
-`;
-
-const ButtonWrapper = styled.div`
-  width: 115px;
-  align-self: flex-end;
 `;
 
 const Notes = () => {
@@ -68,22 +52,39 @@ const Notes = () => {
       setRenderNotes(databaseNotes);
       return;
     }
-    const filtered = databaseNotes.filter(
-      note => note.company_name.includes(term) || note.job_title.includes(term)
-    );
+    const filtered = databaseNotes.filter(note => {
+      const regex = new RegExp(term, 'gi');
+      return (
+        note.company_name.match(regex) ||
+        note.job_title.match(regex) ||
+        note.tags.join().match(regex)
+      );
+    });
     setRenderNotes(filtered);
   };
 
   return (
     <Container>
       <SearchBar>
-        <Input type="text" onChange={handleSearch} />
+        <InputGroup>
+          <StyledInput
+            type="text"
+            placeholder="輸入公司 / 職稱 / 標籤搜尋"
+            onChange={handleSearch}
+          />
+          <InputRightElement
+            pointerEvents="none"
+            children={<Search2Icon color="brand.300" />}
+          />
+        </InputGroup>
       </SearchBar>
-      <ButtonWrapper>
-        <Link to="/notes/create">
-          <CreateButton>建立筆記</CreateButton>
-        </Link>
-      </ButtonWrapper>
+
+      <Link to="/notes/create" style={{ alignSelf: 'flex-end' }}>
+        <Button my="10px" colorScheme="brand">
+          建立筆記
+        </Button>
+      </Link>
+
       <NotesWrapper>
         {databaseNotes.length !== 0 &&
           renderNotes.map(note => {

@@ -271,7 +271,6 @@ const NoteDetails = () => {
 
   const onBlurSubmit = objectKey => {
     console.log('onBlurSubmit', details[objectKey]);
-    // handleMapArrayInputChange(e, i, 'questions', 'question');
     firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
   };
 

@@ -12,18 +12,19 @@ import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   width: 80%;
-  height: 750px;
   background: #ffffff;
   border-radius: 30px;
-  margin: 40px auto 0;
+  margin: 40px 10%;
+  position: relative;
+  min-height: 650px;
 `;
 
 const LeftWrapper = styled.div`
   position: absolute;
-  width: 350px;
-  height: 750px;
-  left: 110px;
-  top: 110px;
+  width: 35%;
+  height: 100%;
+  left: 0;
+  top: 0;
   background: #306172;
   border-radius: 30px 0px 0px 30px;
   display: flex;
@@ -32,6 +33,16 @@ const LeftWrapper = styled.div`
   padding: 20px 10px;
   justify-content: space-around;
 `;
+
+const RightWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  width: 65%;
+  margin-left: 35%;
+  padding: 40px 44px 60px;
+`
 
 const StyledIcon = styled(Icon)`
   width: 35px;
@@ -53,6 +64,13 @@ const StraightLine = styled.div`
   margin-left: 16px;
   background-color: ${(props) => (props.isComplete ? 'white' : '#214552')};
 `;
+
+const CTEATE_STEP = props => ({
+  1: <NoteCreateBrief {...props}/>,
+  2: <DetailsStep1 {...props}/>,
+  3: <DetailsStep2 {...props}/>,
+  4: <DetailsStep3 {...props}/>,
+})
 
 const NoteCreate = () => {
   const [step, setStep] = useState(1);
@@ -123,6 +141,16 @@ const NoteCreate = () => {
     navigate('/notes');
   };
 
+  const props = {
+    nextStep,
+    prevStep,
+    handleChange,
+    values,
+    setValues,
+    noteDataBrief,
+    noteDetails,
+  }
+
   return (
     <Container>
       <LeftWrapper>
@@ -162,54 +190,10 @@ const NoteCreate = () => {
           取消
         </Button>
       </LeftWrapper>
-      {(() => {
-        switch (step) {
-          case 1:
-            return (
-              <NoteCreateBrief
-                nextStep={nextStep}
-                handleChange={handleChange}
-                noteDataBrief={noteDataBrief}
-                noteDetails={noteDetails}
-                values={values}
-                setValues={setValues}
-              />
-            );
-          case 2:
-            return (
-              <DetailsStep1
-                nextStep={nextStep}
-                prevStep={prevStep}
-                handleChange={handleChange}
-                values={values}
-                setValues={setValues}
-              />
-            );
-          case 3:
-            return (
-              <DetailsStep2
-                nextStep={nextStep}
-                prevStep={prevStep}
-                handleChange={handleChange}
-                values={values}
-                setValues={setValues}
-              />
-            );
-          case 4:
-            return (
-              <DetailsStep3
-                prevStep={prevStep}
-                handleChange={handleChange}
-                values={values}
-                noteDataBrief={noteDataBrief}
-                noteDetails={noteDetails}
-                setValues={setValues}
-              />
-            );
-          default:
-            console.log('This is a multi-step form built with React.');
-        }
-      })()}
+      <RightWrapper>
+        {CTEATE_STEP(props)[step]}
+      </RightWrapper>
+      
     </Container>
   );
 };

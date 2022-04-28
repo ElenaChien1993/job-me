@@ -1,30 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { Input } from '@chakra-ui/react';
+import {
+  Input,
+  IconButton,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverArrow,
+  PopoverCloseButton,
+  PopoverHeader,
+  PopoverBody,
+  Button,
+  useToast,
+} from '@chakra-ui/react';
+import { QuestionIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
 import SearchableInput from '../../components/SearchableInput';
-
-const RightWrapper = styled.div`
-  width: 65%;
-  margin-left: 350px;
-  padding: 40px 44px 30px;
-`;
-
-const StyledForm = styled.form`
-  margin-top: 16px;
-`;
 
 const InputWrap = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   margin-bottom: 16px;
-  & label {
-    line-height: 24px;
-    font-weight: 500;
-  }
+`;
+
+const InputLabel = styled.label`
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 18px;
 `;
 
 const StyledInput = styled(Input)`
@@ -35,7 +40,7 @@ const StyledInput = styled(Input)`
 
 const TagsWrapper = styled.div`
   display: flex;
-  margin-bottom: 16px;
+  margin: 8px 0 16px;
 `;
 
 const RadioInput = styled.input`
@@ -47,9 +52,9 @@ const RadioInput = styled.input`
 const TagButton = styled.label`
   width: 90px;
   height: 35px;
-  background: ${(props) => (props.checked ? '#306172' : '#E3E3E3')};
+  background: ${props => (props.checked ? '#306172' : '#E3E3E3')};
   border-radius: 20px;
-  color: ${(props) => (props.checked ? 'white' : '#707070')};
+  color: ${props => (props.checked ? 'white' : '#707070')};
   font-size: 16px;
   line-height: 22px;
   margin-right: 15px;
@@ -60,8 +65,13 @@ const TagButton = styled.label`
 `;
 
 const CheckBoxWrapper = styled.div`
+  align-items: center;
   display: flex;
-  margin-bottom: 16px;
+  margin: 30px 0;
+  & p {
+    font-size: 18px;
+    font-weight: 500;
+  }
 `;
 
 const CheckBox = styled.input`
@@ -73,33 +83,51 @@ const CheckBox = styled.input`
   cursor: pointer;
 `;
 
-const CreateButton = styled.button`
-  width: 115px;
-  height: 35px;
-  background: #306172;
-  border-radius: 24px;
-  padding: 9px 24px;
-  color: white;
-  font-size: 16px;
-  line-height: 22px;
-  margin-bottom: 16px;
-  cursor: pointer;
-`;
-
 const SideNote = styled.span`
   color: #999999;
-  margin-right: 5px;
+  margin-left: 5px;
   font-size: 15px;
 `;
 
-const NoteCreateBrief = ({
-  nextStep,
-  handleChange,
-  values,
-  setValues,
-  noteDataBrief,
-  noteDetails,
-}) => {
+const ButtonGroup = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const InfoPopup = () => {
+  return (
+    <Popover>
+      <PopoverTrigger>
+        <IconButton
+          aria-label="more info"
+          colorScheme="brand"
+          variant="ghost"
+          icon={<QuestionIcon />}
+        />
+      </PopoverTrigger>
+      <PopoverContent>
+        <PopoverArrow />
+        <PopoverCloseButton />
+        <PopoverHeader>什麼意思？</PopoverHeader>
+        <PopoverBody>
+          如果勾選此選項，其他會員可在推薦 /
+          搜尋找到您，便可交流面試經驗；若未勾選，則此筆記將不會為您推薦其他會員
+        </PopoverBody>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+const NoteCreateBrief = props => {
+  const {
+    nextStep,
+    handleChange,
+    values,
+    setValues,
+    noteDataBrief,
+    noteDetails,
+  } = props;
   const { currentUserId, companies, setCompanies, jobTitles, setJobTitles } =
     useOutletContext();
   const user = firebase.auth.currentUser;
@@ -112,25 +140,37 @@ const NoteCreateBrief = ({
     '無聲卡',
     '等待中',
   ];
+  const toast = useToast();
 
   useEffect(() => {
     if (companies) return;
-    firebase.getWholeCollection('companies').then((data) => {
+    firebase.getWholeCollection('companies').then(data => {
       setCompanies(data);
     });
     if (jobTitles) return;
-    firebase.getWholeCollection('job_titles').then((data) => {
+    firebase.getWholeCollection('job_titles').then(data => {
       setJobTitles(data);
     });
   }, []);
 
   const handleCheckboxChange = () => {
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, is_share: !values.is_share };
     });
   };
 
   const createNote = async () => {
+    if (values.company_name === '' || values.job_title === '') {
+      toast({
+        title: '哎呀',
+        description: '公司名稱和應徵職稱為必填欄位',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      return;
+    }
     const noteId = await firebase.setNoteBrief(currentUserId, {
       ...noteDataBrief,
       creator: currentUserId,
@@ -140,30 +180,33 @@ const NoteCreateBrief = ({
     firebase.updateUserInfo(currentUserId, { notes_qty: notes.length });
     await firebase.setNoteDetails(noteId, noteDetails);
 
-    if (companies.indexOf(values.company_name) < 0) {
+    if (
+      companies.map(company => company.name).indexOf(values.company_name) === -1
+    ) {
       await firebase.createDoc('companies', { name: values.company_name });
     }
-    if (jobTitles.indexOf(values.job_title) < 0) {
+    if (jobTitles.map(job => job.name).indexOf(values.job_title) === -1) {
       await firebase.createDoc('job_titles', { name: values.job_title });
     }
 
     navigate(`/notes/details/${noteId}`);
   };
 
-  const handleTagsChange = (e) => {
+  const handleTagsChange = e => {
     const tagsArray = e.target.value.split(',', 5);
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, tags: tagsArray };
     });
   };
 
-  console.log(values);
+  console.log(companies, jobTitles);
+  console.log(props);
 
   return (
-    <RightWrapper>
-      <StyledForm>
+    <>
+      <>
         <InputWrap>
-          <label>公司名稱</label>
+          <InputLabel>公司名稱</InputLabel>
           <SearchableInput
             value={values.company_name}
             setValue={value => {
@@ -175,7 +218,7 @@ const NoteCreateBrief = ({
           />
         </InputWrap>
         <InputWrap>
-          <label>應徵職務</label>
+          <InputLabel>應徵職務</InputLabel>
           <SearchableInput
             value={values.job_title}
             setValue={value => {
@@ -187,7 +230,7 @@ const NoteCreateBrief = ({
           />
         </InputWrap>
         <InputWrap>
-          <label>公司地點</label>
+          <InputLabel>公司地點</InputLabel>
           <StyledInput
             size="sm"
             defaultValue={values.address}
@@ -195,7 +238,7 @@ const NoteCreateBrief = ({
           />
         </InputWrap>
         <div>
-          <p>目前對於此公司的求職狀態</p>
+          <InputLabel>目前對於此公司的求職狀態</InputLabel>
           <TagsWrapper>
             {statusArray.map((status, i) => {
               return (
@@ -222,13 +265,13 @@ const NoteCreateBrief = ({
           </TagsWrapper>
         </div>
         <InputWrap>
-          <label>
+          <InputLabel>
             標籤
             <SideNote>
               {' '}
               Ex: 新創 / React / 最想要.....等自訂標籤以利搜尋（上限為 5 個）
             </SideNote>
-          </label>
+          </InputLabel>
           <StyledInput
             size="sm"
             defaultValue={values.tags.join(',')}
@@ -243,11 +286,28 @@ const NoteCreateBrief = ({
             onChange={handleCheckboxChange}
           />
           <p>我願意和其他會員交流此公司的準備經驗</p>
+          <InfoPopup />
         </CheckBoxWrapper>
-      </StyledForm>
-      <CreateButton onClick={createNote}>直接創建</CreateButton>
-      <CreateButton onClick={nextStep}>下一頁</CreateButton>
-    </RightWrapper>
+      </>
+      <ButtonGroup>
+        <Button
+          size="lg"
+          colorScheme="brand"
+          borderRadius="full"
+          onClick={createNote}
+        >
+          直接創建
+        </Button>
+        <Button
+          size="lg"
+          colorScheme="brand"
+          borderRadius="full"
+          onClick={nextStep}
+        >
+          下一頁
+        </Button>
+      </ButtonGroup>
+    </>
   );
 };
 

@@ -1,25 +1,18 @@
 import styled from 'styled-components';
-import { Input } from '@chakra-ui/react';
-
-const RightWrapper = styled.div`
-  width: 65%;
-  margin-left: 350px;
-  padding: 40px 44px 30px;
-`;
-
-const StyledForm = styled.form`
-  margin-top: 16px;
-`;
+import { Button, Input } from '@chakra-ui/react';
+import AddField from '../../components/elements/AddField';
 
 const InputWrap = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   margin-bottom: 16px;
-  & label {
-    line-height: 24px;
-    font-weight: 500;
-  }
+`;
+
+const InputLabel = styled.label`
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 18px;
 `;
 
 const StyledInput = styled(Input)`
@@ -42,30 +35,9 @@ const CheckBox = styled.input`
   cursor: pointer;
 `;
 
-const StyledAddButton = styled.button`
-  height: 30px;
-  color: #306172;
-  font-size: 16px;
-  margin-bottom: 16px;
-  cursor: pointer;
-`;
-
-const StyledButton = styled.button`
-  width: 115px;
-  height: 35px;
-  background: #306172;
-  border-radius: 24px;
-  padding: 9px 24px;
-  color: white;
-  font-size: 16px;
-  line-height: 22px;
-  margin-bottom: 16px;
-  cursor: pointer;
-`;
-
 const SideNote = styled.span`
   color: #999999;
-  margin-right: 5px;
+  margin-left: 5px;
   font-size: 15px;
 `;
 
@@ -94,6 +66,12 @@ const FileLink = styled.div`
   width: 60%;
 `;
 
+const ButtonGroup = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
 const DetailsStep2 = ({
   nextStep,
   prevStep,
@@ -111,22 +89,12 @@ const DetailsStep2 = ({
         : item
     );
 
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, bonus: updatedChecked };
     });
   };
 
-  const handleAddField = (e) => {
-    e.preventDefault();
-    setValues((prev) => {
-      return {
-        ...prev,
-        bonus: [...prev.bonus, { is_qualified: false, description: '' }],
-      };
-    });
-  };
-
-  const handleInputChange = (i) => (e) => {
+  const handleInputChange = i => e => {
     const updatedDes = values.bonus.map((item, index) =>
       index === i
         ? {
@@ -136,12 +104,12 @@ const DetailsStep2 = ({
         : item
     );
 
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, bonus: updatedDes };
     });
   };
 
-  const handleFileNameInputChange = (i) => (e) => {
+  const handleFileNameInputChange = i => e => {
     const updated = values.attached_files.map((item, index) =>
       index === i
         ? {
@@ -151,12 +119,12 @@ const DetailsStep2 = ({
         : item
     );
 
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, attached_files: updated };
     });
   };
 
-  const handleFileLinkInputChange = (i) => (e) => {
+  const handleFileLinkInputChange = i => e => {
     const updated = values.attached_files.map((item, index) =>
       index === i
         ? {
@@ -166,29 +134,16 @@ const DetailsStep2 = ({
         : item
     );
 
-    setValues((prev) => {
+    setValues(prev => {
       return { ...prev, attached_files: updated };
     });
   };
 
-  const handleFileAddField = (e) => {
-    e.preventDefault();
-    setValues((prev) => {
-      return {
-        ...prev,
-        attached_files: [
-          ...prev.attached_files,
-          { file_name: '', file_link: '' },
-        ],
-      };
-    });
-  };
-
   return (
-    <RightWrapper>
-      <StyledForm>
+    <>
+      <>
         <InputWrap>
-          <label>Bonus（加分項目）</label>
+          <InputLabel>Bonus（加分項目）</InputLabel>
           {values.bonus.map((req, i) => {
             return (
               <RequirementWrapper key={i}>
@@ -205,10 +160,17 @@ const DetailsStep2 = ({
               </RequirementWrapper>
             );
           })}
-          <StyledAddButton onClick={handleAddField}>＋新增欄位</StyledAddButton>
+          <AddField
+            setter={setValues}
+            objectKey="bonus"
+            newValue={{
+              description: '',
+              is_qualified: false,
+            }}
+          />
         </InputWrap>
         <InputWrap>
-          <label>職缺連結</label>
+          <InputLabel>職缺連結</InputLabel>
           <StyledInput
             type="text"
             defaultValue={values.job_link}
@@ -216,7 +178,7 @@ const DetailsStep2 = ({
           />
         </InputWrap>
         <InputWrap>
-          <label>我的履歷連結</label>
+          <InputLabel>我的履歷連結</InputLabel>
           <StyledInput
             type="text"
             defaultValue={values.resume_link}
@@ -224,13 +186,13 @@ const DetailsStep2 = ({
           />
         </InputWrap>
         <InputWrap>
-          <label>
+          <InputLabel>
             我的其他檔案連結
             <SideNote>
               {' '}
               Ex: 個人網站 / 作品集 / CV / github 頁面.....等
             </SideNote>
-          </label>
+          </InputLabel>
           {values.attached_files.map((file, i) => {
             return (
               <FilesWrap key={i}>
@@ -253,14 +215,35 @@ const DetailsStep2 = ({
               </FilesWrap>
             );
           })}
-          <StyledAddButton onClick={handleFileAddField}>
-            ＋新增欄位
-          </StyledAddButton>
+          <AddField
+            setter={setValues}
+            objectKey="attached_files"
+            newValue={{
+              file_name: '',
+              file_link: '',
+            }}
+          />
         </InputWrap>
-      </StyledForm>
-      <StyledButton onClick={prevStep}>上一頁</StyledButton>
-      <StyledButton onClick={nextStep}>下一頁</StyledButton>
-    </RightWrapper>
+      </>
+      <ButtonGroup>
+        <Button
+          size="lg"
+          colorScheme="brand"
+          borderRadius="full"
+          onClick={prevStep}
+        >
+          上一頁
+        </Button>
+        <Button
+          size="lg"
+          colorScheme="brand"
+          borderRadius="full"
+          onClick={nextStep}
+        >
+          下一頁
+        </Button>
+      </ButtonGroup>
+    </>
   );
 };
 

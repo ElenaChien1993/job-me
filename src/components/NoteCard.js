@@ -6,15 +6,29 @@ import styled from 'styled-components';
 import firebase from '../utils/firebase';
 import NoteElement from './NoteCardEditable';
 
+
+const HighLight = styled.div`
+  width: 20px;
+  height: 182px;
+  background-color: #306172;
+  position: absolute;
+  left: 0px;
+  border-radius: 24px 0 0 24px;
+  display: none;
+`;
+
 const Container = styled.div`
   position: relative;
+  &:hover ${HighLight} {
+    display: block;
+  }
 `;
 
 const DeleteButton = styled(IconButton)`
   && {
     position: absolute;
-    top: 75px;
-    right: 50px;
+    top: 12px;
+    right: 20px;
     cursor: pointer;
   }
 `;
@@ -23,13 +37,19 @@ const StyledNote = styled(NoteElement)`
   cursor: pointer;
 `;
 
-const Note = ({ note, currentUserId, databaseNotes, setRenderNotes, setDatabaseNotes }) => {
+const Note = ({
+  note,
+  currentUserId,
+  databaseNotes,
+  setRenderNotes,
+  setDatabaseNotes,
+}) => {
   const { pathname } = useLocation();
 
   const handleDeleteNote = () => {
     firebase.deleteNote(currentUserId, note.note_id).then(() => {
       const update = databaseNotes.filter(
-        (item) => item.note_id !== note.note_id
+        item => item.note_id !== note.note_id
       );
       setDatabaseNotes(update);
       setRenderNotes(update);
@@ -45,10 +65,12 @@ const Note = ({ note, currentUserId, databaseNotes, setRenderNotes, setDatabaseN
             : `/practice/setting/${note.note_id}`
         }
       >
+        <HighLight />
         <StyledNote note={note} editable={false} />
       </Link>
       {pathname === '/notes' && (
         <DeleteButton
+          variant="ghost"
           onClick={handleDeleteNote}
           aria-label="Delete note"
           icon={<DeleteIcon />}
