@@ -13,6 +13,7 @@ import {
   Tab,
   TabPanels,
   TabPanel,
+  Divider,
 } from '@chakra-ui/react';
 import {
   SmallCloseIcon,
@@ -70,11 +71,8 @@ const FieldWrapper = styled.div`
   position: relative;
 `;
 
-const SectionTitle = styled.p`
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: #cd5545;
+const TitleSection = styled.div`
+  position: relative;
 `;
 
 const Title = styled.p`
@@ -88,12 +86,12 @@ const Title = styled.p`
 
 const TitleBack = styled.div`
   height: 10px;
-  width: 73px;
   position: absolute;
   top: 16px;
   left: 0;
   background-color: #fff6c9;
   z-index: 0;
+  width: 100%;
 `;
 
 const SalaryText = styled.div`
@@ -202,6 +200,7 @@ const QuestionCardsWrapper = styled.div`
 const QuestionTitle = styled.div`
   & .chakra-editable__preview {
     font-weight: 700;
+    font-size: 18px;
   }
 `;
 
@@ -437,8 +436,10 @@ const NoteDetails = () => {
               </TabPanel>
               <TabPanel>
                 <FieldWrapper>
-                  <Title>工作內容</Title>
-                  <TitleBack />
+                  <TitleSection>
+                    <Title>工作內容</Title>
+                    <TitleBack />
+                  </TitleSection>
                   <ListWrapper>
                     {details.responsibilities.map((item, i) => {
                       return (
@@ -468,8 +469,10 @@ const NoteDetails = () => {
                   />
                 </FieldWrapper>
                 <FieldWrapper>
-                  <Title>必備技能</Title>
-                  <TitleBack />
+                  <TitleSection>
+                    <Title>必備技能</Title>
+                    <TitleBack />
+                  </TitleSection>
                   <ListWrapper>
                     {details.requirements.map((item, i) => {
                       return (
@@ -511,8 +514,10 @@ const NoteDetails = () => {
                   />
                 </FieldWrapper>
                 <FieldWrapper>
-                  <Title>加分項目</Title>
-                  <TitleBack />
+                  <TitleSection>
+                    <Title>加分項目</Title>
+                    <TitleBack />
+                  </TitleSection>
                   <ListWrapper>
                     {details.bonus.map((item, i) => {
                       return (
@@ -641,6 +646,7 @@ const NoteDetails = () => {
                               submitRef={submitRef}
                             />
                           </QuestionTitle>
+                          <Divider />
                           <CustomDeleteButton
                             aria-label="delete item"
                             icon={<SmallCloseIcon />}
@@ -673,7 +679,10 @@ const NoteDetails = () => {
               </TabPanel>
               <TabPanel>
                 <FieldWrapper>
-                  <Title>面試前筆記區</Title>
+                  <TitleSection>
+                    <Title>面試前筆記區</Title>
+                    <TitleBack />
+                  </TitleSection>
                   <Content>
                     <div>Ex: 想問公司的問題？</div>
                     <EditorArea
@@ -684,7 +693,10 @@ const NoteDetails = () => {
                   </Content>
                 </FieldWrapper>
                 <FieldWrapper>
-                  <Title>面試中筆記區</Title>
+                  <TitleSection>
+                    <Title>面試中筆記區</Title>
+                    <TitleBack />
+                  </TitleSection>
                   <EditorArea
                     noteId={noteId}
                     details={details}
@@ -692,7 +704,10 @@ const NoteDetails = () => {
                   />
                 </FieldWrapper>
                 <FieldWrapper>
-                  <Title>面試後心得區</Title>
+                  <TitleSection>
+                    <Title>面試後心得區</Title>
+                    <TitleBack />
+                  </TitleSection>
                   <EditorArea
                     noteId={noteId}
                     details={details}

@@ -6,7 +6,6 @@ import { v4 as uuid } from 'uuid';
 import firebase from '../../utils/firebase';
 import Note from '../../components/NoteCard';
 import ChatCorner from '../../components/ChatCorner';
-import { initMap } from '../../components/GoogleSearch';
 
 const Container = styled.div`
   display: flex;

@@ -81,11 +81,18 @@ const StyledAddressPreview = styled(EditablePreview)`
   }
 `;
 
-const Status = styled.p`
+const Line = styled.div`
   font-weight: 700;
   font-size: 16px;
   color: #999999;
   margin: 0 10px;
+`
+
+const Status = styled.p`
+  font-weight: 700;
+  font-size: 16px;
+  color: #999999;
+  margin-top: 5px;
 `;
 
 const StyledSelect = styled(Select)`
@@ -207,7 +214,7 @@ const NoteElement = React.memo(({ uid, noteId, note, setNote, editable }) => {
                 <option value="無聲卡">無聲卡</option>
                 <option value="等待中">等待中</option>
               </StyledSelect>
-              <Status>｜</Status>
+              <Line>｜</Line>
               <Editable value={note.address}>
                 <StyledAddressPreview />
                 <EditableInput
