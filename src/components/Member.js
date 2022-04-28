@@ -6,10 +6,9 @@ import ProfileImage from './ProfileImage';
 const Container = styled.div`
   display: flex;
   align-items: center;
-  height: 182px;
   border-radius: 24px;
   background: white;
-  padding: 0 40px;
+  padding: 20px 40px;
   margin-bottom: 25px;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
 `;
@@ -38,7 +37,7 @@ const JobTitle = styled.p`
 
 const Status = styled.p`
   font-weight: 700;
-  font-size: 16px;
+  font-size: 18px;
   color: #999999;
 `;
 
@@ -52,7 +51,7 @@ const Member = ({ note }) => {
     <Container>
       <ProfileImage
         user={note.creator_info}
-        size={140}
+        size={100}
         hasBorder={false}
         marginRight={30}
       />
@@ -61,7 +60,7 @@ const Member = ({ note }) => {
         <JobTitle>{note.creator_info.display_name}</JobTitle>
         <Status>{note.job_title}</Status>
       </ContentWrapper>
-      <Button colorScheme="blue" onClick={() => goToProfile(note.creator)}>
+      <Button variant="outline" ml="auto" colorScheme="brand" onClick={() => goToProfile(note.creator)}>
         查看個人檔案
       </Button>
     </Container>

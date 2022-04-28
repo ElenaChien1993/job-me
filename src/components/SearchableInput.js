@@ -10,15 +10,18 @@ const StyledInput = styled(Input)`
 
 const StyledList = styled.div`
   width: 100%;
-  padding-left: 17px;
-`
+  background-color: white;
+  border-radius: 5px;
+  margin-top: 5px;
+  padding: 5px 0;
+`;
 
 const StyledListItem = styled.div`
   cursor: pointer;
   width: 100%;
-  margin: 3px 0;
+  padding-left: 17px;
   &:hover {
-    background-color: #999999
+    background-color: #FFF6C9;
   }
 `;
 

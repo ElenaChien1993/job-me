@@ -236,7 +236,7 @@ const firebase = {
       collectionGroup(db, 'notes'),
       where('company_name', '==', company),
       where('is_share', '==', true),
-      limit(5)
+      limit(7)
     );
     const querySnapshot = await getDocs(membersByCompany);
     let dataByCompany = [];
@@ -249,7 +249,7 @@ const firebase = {
       collectionGroup(db, 'notes'),
       where('job_title', '==', job),
       where('is_share', '==', true),
-      limit(5)
+      limit(7)
     );
     const Snapshots = await getDocs(membersByJob);
     let dataByJob = [];
