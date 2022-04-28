@@ -14,6 +14,7 @@ import {
   TabPanels,
   TabPanel,
   Divider,
+  Tooltip,
 } from '@chakra-ui/react';
 import {
   SmallCloseIcon,
@@ -21,6 +22,7 @@ import {
   ChevronLeftIcon,
   AtSignIcon,
 } from '@chakra-ui/icons';
+import { MdPreview } from 'react-icons/md';
 import { v4 as uuid } from 'uuid';
 import styled from 'styled-components';
 
@@ -43,6 +45,15 @@ const Container = styled.div`
   background: white;
   padding: 20px 40px 0;
   margin-bottom: 60px;
+  position: relative;
+`;
+
+const PublicButtons = styled.div`
+  position: absolute;
+  right: 40px;
+  top: 32px;
+  display: flex;
+  align-items: center;
 `;
 
 const DeleteButton = styled(IconButton)`
@@ -269,14 +280,12 @@ const NoteDetails = () => {
   };
 
   const onBlurSubmit = objectKey => {
-    console.log('onBlurSubmit', details[objectKey]);
     firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
   };
 
   //-------- Handle Array of Strings
   const handleArrayInputChange = (value, index, objectKey) => {
     const update = getArrayChangedValue(value, index, objectKey);
-    console.log('handleArrayInputChange function', update);
     setDetails(prev => {
       return { ...prev, [objectKey]: update };
     });
@@ -333,6 +342,19 @@ const NoteDetails = () => {
       });
   };
 
+  const openPreview = () => {
+    window.open(`/public/${currentUserId}/${noteId}`, '_blank');
+  };
+
+  const togglePublic = () => {
+    firebase.updateNoteBrief(currentUserId, noteId, {
+      is_share: !brief.is_share,
+    });
+    setBrief(prev => {
+      return { ...prev, is_share: !brief.is_share };
+    });
+  };
+
   return (
     <Background>
       <RecommendModal
@@ -374,6 +396,31 @@ const NoteDetails = () => {
       )}
       {details && (
         <Container>
+          <PublicButtons>
+            {brief.is_share && (
+              <Tooltip
+                hasArrow
+                label="預覽公開頁面"
+                bg="gray.300"
+                color="black"
+              >
+                <IconButton
+                  color="#704406"
+                  aria-label="Open Preview"
+                  icon={<MdPreview />}
+                  mr="10px"
+                  onClick={openPreview}
+                />
+              </Tooltip>
+            )}
+            <Button
+              colorScheme="brand"
+              variant="outline"
+              onClick={togglePublic}
+            >
+              {brief.is_share ? '公開中' : '隱藏中'}
+            </Button>
+          </PublicButtons>
           <Tabs size="lg" variant="soft-rounded" colorScheme="brand">
             <TabList>
               <Tab m="10px">公司資訊</Tab>

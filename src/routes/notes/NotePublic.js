@@ -164,7 +164,8 @@ const NotePublic = () => {
   }, [uid, noteId]);
 
   const goToProfile = id => {
-    navigate(`/profile/${id}`);
+    window.open(`/profile/${id}`, "_blank");
+    // navigate(`/profile/${id}`);
   };
 
   if (!info || !brief || !details) return <Loader />;

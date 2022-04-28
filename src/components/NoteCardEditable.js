@@ -28,7 +28,7 @@ const HeadWrapper = styled.div`
   width: 140px;
   height: 140px;
   border-radius: 70px;
-  background: #FFE6CA;
+  background: #ffe6ca;
   margin-right: 30px;
   display: flex;
   justify-content: center;
@@ -85,7 +85,7 @@ const Line = styled.div`
   font-size: 16px;
   color: #999999;
   margin: 0 10px;
-`
+`;
 
 const Status = styled.p`
   font-weight: 700;
@@ -132,149 +132,150 @@ const StyledInput = styled(Input)`
   }
 `;
 
-const NoteElement = React.memo(({ uid, noteId, note, setNote, editable, isPublic }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  console.log('NoteEl render');
+const NoteElement = React.memo(
+  ({ uid, noteId, note, setNote, editable, isPublic }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    console.log('NoteEl render');
 
-  const onBlurSubmit = (objectKey) => {
-    firebase.updateNoteBrief(uid, noteId, { [objectKey]: note[objectKey] });
-  };
-
-  const handlePressEnter = (e, objectKey) => {
-    if (e.keyCode === 13) {
+    const onBlurSubmit = objectKey => {
       firebase.updateNoteBrief(uid, noteId, { [objectKey]: note[objectKey] });
-    }
-  };
+    };
 
-  const handleStatusChange = (e) => {
-    setNote((prev) => {
-      return { ...prev, status: e.target.value };
-    });
-  };
+    const handleStatusChange = e => {
+      setNote(prev => {
+        return { ...prev, status: e.target.value };
+      });
+    };
 
-  const handleTagsChange = (e) => {
-    const tagsArray = e.target.value.split(',', 5);
-    setNote((prev) => {
-      return { ...prev, tags: tagsArray };
-    });
-  };
+    const handleTagsChange = e => {
+      const tagsArray = e.target.value.split(',', 5);
+      setNote(prev => {
+        return { ...prev, tags: tagsArray };
+      });
+    };
 
-  const handleTagsSubmit = () => {
-    firebase.updateNoteBrief(uid, noteId, { tags: note.tags });
-    setIsEditing(false);
-  };
+    const handleTagsSubmit = () => {
+      firebase.updateNoteBrief(uid, noteId, { tags: note.tags });
+      setIsEditing(false);
+    };
 
-  return (
-    <>
-      {editable ? (
-        <Container>
-          <HeadWrapper>{note.company_name.split('', 1)}</HeadWrapper>
-          <ContentWrapper>
-            <Editable
-              value={note.company_name}
-              onSubmit={() => onBlurSubmit('company_name')}
-            >
-              <StyledCompanyPreview />
-              <EditableInput
-                onChange={(e) =>
-                  setNote((prev) => {
-                    return { ...prev, company_name: e.target.value };
-                  })
-                }
-              />
-            </Editable>
-            <Editable
-              value={note.job_title}
-              onSubmit={() => onBlurSubmit('job_title')}
-            >
-              <StyledJobPreview />
-              <EditableInput
-                onChange={(e) =>
-                  setNote((prev) => {
-                    return { ...prev, job_title: e.target.value };
-                  })
-                }
-              />
-            </Editable>
-            <StatusWrapper>
-              <StyledSelect
-                color="#999999"
-                variant="filled"
-                isFullWidth={false}
-                maxWidth="120px"
-                onChange={handleStatusChange}
-                value={note.status}
-                onBlur={() => onBlurSubmit('status')}
+    return (
+      <>
+        {editable ? (
+          <Container>
+            <HeadWrapper>{note.company_name.split('', 1)}</HeadWrapper>
+            <ContentWrapper>
+              <Editable
+                value={note.company_name}
+                onSubmit={() => onBlurSubmit('company_name')}
               >
-                <option value="未申請">未申請</option>
-                <option value="已申請">已申請</option>
-                <option value="未錄取">未錄取</option>
-                <option value="已錄取">已錄取</option>
-                <option value="無聲卡">無聲卡</option>
-                <option value="等待中">等待中</option>
-              </StyledSelect>
-              <Line>｜</Line>
-              <Editable value={note.address === '' ? '尚未填寫資料' : note.address}>
-                <StyledAddressPreview />
+                <StyledCompanyPreview />
                 <EditableInput
-                  onChange={(e) =>
-                    setNote((prev) => {
-                      return { ...prev, address: e.target.value };
+                  onChange={e =>
+                    setNote(prev => {
+                      return { ...prev, company_name: e.target.value };
                     })
                   }
-                  onBlur={() => onBlurSubmit('address')}
-                  onKeyDown={(e) => handlePressEnter(e, 'address')}
                 />
               </Editable>
-            </StatusWrapper>
-          </ContentWrapper>
-          <TagsWrapper>
-            {!isEditing ? (
-              <>
-                {note.tags?.map((tag, i) => {
+              <Editable
+                value={note.job_title}
+                onSubmit={() => onBlurSubmit('job_title')}
+              >
+                <StyledJobPreview />
+                <EditableInput
+                  onChange={e =>
+                    setNote(prev => {
+                      return { ...prev, job_title: e.target.value };
+                    })
+                  }
+                />
+              </Editable>
+              <StatusWrapper>
+                <StyledSelect
+                  color="#999999"
+                  variant="filled"
+                  isFullWidth={false}
+                  maxWidth="120px"
+                  onChange={handleStatusChange}
+                  value={note.status}
+                  onBlur={() => onBlurSubmit('status')}
+                >
+                  <option value="未申請">未申請</option>
+                  <option value="已申請">已申請</option>
+                  <option value="未錄取">未錄取</option>
+                  <option value="已錄取">已錄取</option>
+                  <option value="無聲卡">無聲卡</option>
+                  <option value="等待中">等待中</option>
+                </StyledSelect>
+                <Line>｜</Line>
+                <Editable
+                  defaultValue={
+                    note.address === '' ? '尚未填寫資料' : note.address
+                  }
+                  onSubmit={() => onBlurSubmit('address')}
+                >
+                  <StyledAddressPreview />
+                  <EditableInput
+                    onChange={e =>
+                      setNote(prev => {
+                        return { ...prev, address: e.target.value };
+                      })
+                    }
+                  />
+                </Editable>
+              </StatusWrapper>
+            </ContentWrapper>
+            <TagsWrapper>
+              {!isEditing ? (
+                <>
+                  {note.tags?.map((tag, i) => {
+                    return <Tag key={i}>{tag}</Tag>;
+                  })}
+                  <IconButton
+                    size="sm"
+                    onClick={() => setIsEditing(true)}
+                    icon={<EditIcon />}
+                  />
+                </>
+              ) : (
+                <>
+                  <StyledInput
+                    size="sm"
+                    defaultValue={note.tags.join(',')}
+                    placeholder="請以「,」隔開每個標籤"
+                    onChange={handleTagsChange}
+                  />
+                  <IconButton
+                    size="sm"
+                    onClick={handleTagsSubmit}
+                    icon={<CheckCircleIcon />}
+                  />
+                </>
+              )}
+            </TagsWrapper>
+          </Container>
+        ) : (
+          <Container>
+            <HeadWrapper>{note.company_name.split('', 1)}</HeadWrapper>
+            <ContentWrapper>
+              <CompanyName>{note.company_name}</CompanyName>
+              <JobTitle>{note.job_title}</JobTitle>
+              {!isPublic && (
+                <Status>{`${note.status}｜${note.address}`}</Status>
+              )}
+            </ContentWrapper>
+            <TagsWrapper>
+              {note.tags &&
+                note.tags.map((tag, i) => {
                   return <Tag key={i}>{tag}</Tag>;
                 })}
-                <IconButton
-                  size="sm"
-                  onClick={() => setIsEditing(true)}
-                  icon={<EditIcon />}
-                />
-              </>
-            ) : (
-              <>
-                <StyledInput
-                  size="sm"
-                  defaultValue={note.tags.join(',')}
-                  placeholder="請以「,」隔開每個標籤"
-                  onChange={handleTagsChange}
-                />
-                <IconButton
-                  size="sm"
-                  onClick={handleTagsSubmit}
-                  icon={<CheckCircleIcon />}
-                />
-              </>
-            )}
-          </TagsWrapper>
-        </Container>
-      ) : (
-        <Container>
-          <HeadWrapper>{note.company_name.split('', 1)}</HeadWrapper>
-          <ContentWrapper>
-            <CompanyName>{note.company_name}</CompanyName>
-            <JobTitle>{note.job_title}</JobTitle>
-            {!isPublic && <Status>{`${note.status}｜${note.address}`}</Status>}
-          </ContentWrapper>
-          <TagsWrapper>
-            {note.tags &&
-              note.tags.map((tag, i) => {
-                return <Tag key={i}>{tag}</Tag>;
-              })}
-          </TagsWrapper>
-        </Container>
-      )}
-    </>
-  );
-});
+            </TagsWrapper>
+          </Container>
+        )}
+      </>
+    );
+  }
+);
 
 export default NoteElement;
