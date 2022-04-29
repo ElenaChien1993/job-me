@@ -1,21 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Outlet, Link, useNavigate, NavLink } from 'react-router-dom';
+import { Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
 import styled from 'styled-components';
 import Avatar from 'boring-avatars';
 
-import useClickOutside from '../hooks/useClickOutside';
 import firebase from '../utils/firebase';
+import logo from '../images/logo.png';
 
 const Container = styled.div`
   height: auto;
+  background-color: #ffeade;
 `;
 
 const ContentContainer = styled.div`
   margin: 0 auto;
   width: 100%;
   height: 100%;
-  background-color: #ffeade;
   padding-top: 70px;
+  max-width: 1400px;
 `;
 
 const StyledNav = styled.nav`
@@ -32,9 +34,13 @@ const Ul = styled.ul`
   align-items: center;
 `;
 
+const Logo = styled.img`
+  width: 180px;
+`;
+
 const NavItem = styled.li`
   font-size: 20px;
-  color: white;
+  color: ${props => (props.isActive ? '#e17f45' : 'white')};
   margin: 10px 20px;
 `;
 
@@ -45,7 +51,6 @@ const ImageWrapper = styled.div`
   background: #f5cdc5;
   margin-right: 13px;
   overflow: hidden;
-  margin-left: auto;
   margin-right: 20px;
   cursor: pointer;
 `;
@@ -54,31 +59,6 @@ const StyledImg = styled.img`
   width: 60px;
   height: 60px;
   object-fit: cover;
-`;
-
-const MenuWrapper = styled.div`
-  position: absolute;
-  right: 0;
-  top: 55px;
-  width: 120px;
-  height: 100px;
-  background-color: white;
-  box-shadow: 4px 4px 4px 1px rgba(0, 0, 0, 0.25);
-  border-radius: 20px;
-  padding: 10px 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
-`;
-
-const Option = styled.div`
-  padding: 10px 15px;
-  cursor: pointer;
-  &:hover {
-    background: #e3e3e3;
-  }
 `;
 
 const LoginButton = styled.div`
@@ -92,12 +72,14 @@ const LoginButton = styled.div`
   }
 `;
 
-const Nav = ({ userInfo, currentUserId }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
-  const menuRef = useRef();
+const StyledNavLink = styled(NavLink)`
+  font-size: 20px;
+  color: ${props => (props.isActive ? '#e17f45' : 'white')};
+  margin: 10px 20px;
+`;
 
-  useClickOutside(menuRef, () => isMenuOpen && setIsMenuOpen(false));
+const Nav = ({ userInfo, currentUserId }) => {
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     firebase
@@ -106,7 +88,7 @@ const Nav = ({ userInfo, currentUserId }) => {
         alert('已成功登出');
         navigate('/login', { state: { from: { pathname: '/notes' } } });
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
   };
@@ -116,15 +98,21 @@ const Nav = ({ userInfo, currentUserId }) => {
   };
 
   const goToProfile = () => {
-    setIsMenuOpen(false);
     navigate(`/profile/${currentUserId}`);
-  }; 
+  };
 
   return (
     <StyledNav>
       <Ul>
         <NavItem>
-          <Link to="/notes">Notes</Link>
+          <Link to="/notes">
+            <Logo alt="logo" src={logo} />
+          </Link>
+        </NavItem>
+        <NavItem>
+          <StyledNavLink to="/notes">
+            Notes
+          </StyledNavLink>
         </NavItem>
         <NavItem>
           <Link to="/practice">Practice</Link>
@@ -133,26 +121,37 @@ const Nav = ({ userInfo, currentUserId }) => {
           <Link to="/messages">Messages</Link>
         </NavItem>
         {currentUserId ? (
-          <ImageWrapper onClick={() => setIsMenuOpen(true)}>
-            {userInfo?.photo_url ? (
-              <StyledImg src={userInfo && userInfo.photo_url} alt="head-shot" />
-            ) : (
-              <Avatar
-                size={60}
-                name={userInfo?.display_name}
-                variant="beam"
-                colors={['#C1DDC7', '#F5E8C6', '#BBCD77', '#DC8051', '#F4D279']}
-              />
-            )}
-          </ImageWrapper>
+          <Menu>
+            <MenuButton ml="auto">
+              <ImageWrapper>
+                {userInfo?.photo_url ? (
+                  <StyledImg
+                    src={userInfo && userInfo.photo_url}
+                    alt="head-shot"
+                  />
+                ) : (
+                  <Avatar
+                    size={60}
+                    name={userInfo?.display_name}
+                    variant="beam"
+                    colors={[
+                      '#C1DDC7',
+                      '#F5E8C6',
+                      '#BBCD77',
+                      '#DC8051',
+                      '#F4D279',
+                    ]}
+                  />
+                )}
+              </ImageWrapper>
+            </MenuButton>
+            <MenuList w="100px">
+              <MenuItem onClick={goToProfile}>Profile</MenuItem>
+              <MenuItem onClick={handleLogout}>登出</MenuItem>
+            </MenuList>
+          </Menu>
         ) : (
           <LoginButton onClick={handleLogIn}>登入</LoginButton>
-        )}
-        {isMenuOpen && (
-          <MenuWrapper ref={menuRef}>
-            <Option onClick={goToProfile}>Profile</Option>
-            <Option onClick={handleLogout}>登出</Option>
-          </MenuWrapper>
         )}
       </Ul>
     </StyledNav>

@@ -1,23 +1,57 @@
 import { useState } from 'react';
-import { Button, Select } from '@chakra-ui/react';
+import { Button, Icon, Select, useToast } from '@chakra-ui/react';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
+import { MdTimer } from 'react-icons/md';
 import styled from 'styled-components';
 
 import SwitchElement from './elements/Switch';
 
 const PlayerWrapper = styled.div`
+  font-size: 1.5rem;
   margin-bottom: 20px;
 `;
 
 const TimerSettingWrapper = styled.div`
   display: flex;
-  width: 40%;
   margin-bottom: 20px;
-  justify-content: center;s
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  padding: 20px;
+  background-color: white;
+`;
+
+const Text = styled.div`
+  font-size: 1.2rem;
+`;
+
+const SelectWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `;
 
 const BeforeRecord = ({ recordType, timer, setTimer, setProgress }) => {
   const [isTimer, setIsTimer] = useState(true);
+  const toast = useToast();
+
+  const handleStart = () => {
+    if (timer === '') {
+      toast({
+        title: '哎呀',
+        description: '請選擇計時時間或是選擇不定時',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      return;
+    }
+    if (!isTimer) {
+      setTimer(180);
+    }
+    setProgress('recording');
+  };
 
   return (
     <>
@@ -27,13 +61,16 @@ const BeforeRecord = ({ recordType, timer, setTimer, setProgress }) => {
           : '此次練習將以錄影方式進行'}
       </PlayerWrapper>
       <TimerSettingWrapper>
-        <SwitchElement isTimer={isTimer} setIsTimer={setIsTimer} />
+        <Icon as={MdTimer} boxSize="5rem" mr="20px" />
         {isTimer ? (
-          <>
-            <p>此題定時</p>
+          <SelectWrapper>
+            <Text>此題定時</Text>
             <Select
-              onChange={(e) => setTimer(e.target.value)}
+              mt="10px"
+              onChange={e => setTimer(e.target.value)}
               placeholder="請選擇計時時間"
+              isRequired
+              colorScheme="brand"
             >
               <option value={30}>30 秒</option>
               <option value={60}>1 分鐘</option>
@@ -42,14 +79,19 @@ const BeforeRecord = ({ recordType, timer, setTimer, setProgress }) => {
               <option value={150}>2 分半</option>
               <option value={180}>3 分鐘</option>
             </Select>
-          </>
+          </SelectWrapper>
         ) : (
-          <p>此題不定時（可自由結束，但回答時間最多為 3 分鐘）</p>
+          <Text>
+            此題不定時
+            <br />
+            （可自由結束，但回答時間最多為 3 分鐘）
+          </Text>
         )}
+        <SwitchElement isTimer={isTimer} setIsTimer={setIsTimer} />
       </TimerSettingWrapper>
       <Button
-        size="sm"
-        onClick={() => setProgress('recording')}
+        colorScheme="brand"
+        onClick={handleStart}
         rightIcon={<ArrowForwardIcon />}
       >
         開始練習

@@ -1,26 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import {
-  Link,
   useOutletContext,
   useNavigate,
-  useParams,
 } from 'react-router-dom';
-import { Icon, Button } from '@chakra-ui/react';
-import { BiWinkSmile } from 'react-icons/bi';
+import { Button } from '@chakra-ui/react';
 import { CgProfile } from 'react-icons/cg';
+import Lottie from 'react-lottie-player';
 import styled from 'styled-components';
 
 import BackButton from '../../components/elements/BackButton';
 import NoteBar from '../../components/elements/NoteBar';
 import BeforeRecord from '../../components/BeforeRecord';
 import Recording from '../../components/Recording';
+import finishJson from '../../images/finish.json'
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 30px 10% 0;
+  margin: 20px 5% 5%;
 `;
 
 const TitleWrapper = styled.div`
@@ -31,11 +30,11 @@ const TitleWrapper = styled.div`
 `;
 
 const StyledNoteBar = styled(NoteBar)`
-  width: 40%;
+  padding: 0 30px;
 `;
 
 const Question = styled.div`
-  font-size: 30px;
+  font-size: 3.5rem;
   font-weight: 700;
   color: #306172;
   margin-bottom: 30px;
@@ -72,11 +71,11 @@ const PracticeStart = () => {
     if (props.practiceQuestions === [] || props.brief === []) {
       navigate('/practice');
     }
-  }, [])
+  }, []);
 
   const goToProfile = () => {
     navigate(`/profile/${props.user.uid}`);
-  }
+  };
 
   return (
     <Container>
@@ -108,10 +107,20 @@ const PracticeStart = () => {
       )}
       {progress === 'finished' && (
         <>
-          <Icon boxSize={200} as={BiWinkSmile} />
+          <Lottie
+            loop
+            animationData={finishJson}
+            play
+            style={{ width: 400, height: 370 }}
+          />
           <Title>此次練習已結束！你好棒！</Title>
           <Title>再多練習其他公司的面試吧～</Title>
-          <StyledButton onClick={goToProfile} variant="solid" size="xl" rightIcon={<CgProfile />}>
+          <StyledButton
+            onClick={goToProfile}
+            variant="solid"
+            size="xl"
+            rightIcon={<CgProfile />}
+          >
             前往查看練習檔案
           </StyledButton>
         </>

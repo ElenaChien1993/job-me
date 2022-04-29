@@ -8,7 +8,7 @@ import {
   TagLabel,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import EditorArea from '../../components/elements/Editor';
@@ -146,7 +146,6 @@ const NotePublic = () => {
   const [brief, setBrief] = useState();
   const [details, setDetails] = useState();
   const [info, setInfo] = useState();
-  const navigate = useNavigate();
   let params = useParams();
   const noteId = params.noteId;
   const uid = params.uid;
@@ -165,7 +164,6 @@ const NotePublic = () => {
 
   const goToProfile = id => {
     window.open(`/profile/${id}`, "_blank");
-    // navigate(`/profile/${id}`);
   };
 
   if (!info || !brief || !details) return <Loader />;

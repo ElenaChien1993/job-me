@@ -7,12 +7,15 @@ import {
   Input,
   Textarea,
   IconButton,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
 } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
-import useClickOutside from '../hooks/useClickOutside';
 import Loader from '../components/Loader';
 import ChatCorner from './ChatCorner';
 import ProfileImage from './ProfileImage';
@@ -34,20 +37,6 @@ const LeftWrapper = styled.div`
 
 const ImageContainer = styled.div`
   position: relative;
-`;
-
-const ImageWrapper = styled.div`
-  width: 200px;
-  height: 200px;
-  border-radius: 100px;
-  border: 5px solid #ee9c91;
-  overflow: hidden;
-`;
-
-const StyledImg = styled.img`
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
 `;
 
 const IconGroup = styled.div`
@@ -135,51 +124,15 @@ const StyledInput = styled(Input)`
   }
 `;
 
-const IconWrapper = styled.div`
-  position: absolute;
-  bottom: 17px;
-  right: 6px;
-  z-index: 0;
-`;
-
-const MenuWrapper = styled.div`
-  position: absolute;
-  right: -70px;
-  bottom: -37px;
-  width: 120px;
-  height: 100px;
-  background-color: white;
-  box-shadow: 4px 4px 4px 1px rgba(0, 0, 0, 0.25);
-  border-radius: 20px;
-  padding: 10px 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
-`;
-
-const Option = styled.div`
-  padding: 10px 15px;
-  cursor: pointer;
-  &:hover {
-    background: #e3e3e3;
-  }
-`;
-
 const ProfileSetting = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [values, setValues] = useState({
     display_name: '',
     title: '',
     about_me: '',
   });
   const [image, setImage] = useState({ preview: '', raw: '' });
-  const menuRef = useRef();
   const hiddenInputRef = useRef();
   const { userInfo, currentUserId } = useOutletContext();
-
-  useClickOutside(menuRef, () => isMenuOpen && setIsMenuOpen(false));
 
   const handleSubmit = () => {
     const entries = Object.entries(values);
@@ -227,6 +180,13 @@ const ProfileSetting = () => {
   };
 
   const handleDelete = () => {
+    if (
+      userInfo.photo_url.includes('googleusercontent') ||
+      userInfo.photo_url.includes('facebook')
+    ) {
+      firebase.updateUserInfo(currentUserId, { photo_url: null });
+      return;
+    }
     const path = `profile/${currentUserId}`;
     firebase.deleteFile(path).then(() => {
       firebase.updateUserInfo(currentUserId, { photo_url: null });
@@ -246,18 +206,6 @@ const ProfileSetting = () => {
             marginRight={0}
             preview={image.preview}
           />
-          {isMenuOpen && (
-            <MenuWrapper ref={menuRef}>
-              <Option onClick={handleChooseFile}>上傳照片</Option>
-              <input
-                type="file"
-                ref={hiddenInputRef}
-                onChange={handleFileChange}
-                style={{ display: 'none' }}
-              />
-              <Option onClick={handleDelete}>刪除照片</Option>
-            </MenuWrapper>
-          )}
           {image.preview !== '' && (
             <IconGroup>
               <IconButton
@@ -272,13 +220,26 @@ const ProfileSetting = () => {
               />
             </IconGroup>
           )}
-          <IconWrapper>
-            <IconButton
+          <Menu>
+            <MenuButton
+              position="absolute"
+              right="0"
+              bottom="23px"
+              as={IconButton}
               aria-label="Edit profile image"
               icon={<EditIcon />}
-              onClick={() => setIsMenuOpen(true)}
             />
-          </IconWrapper>
+            <MenuList>
+              <MenuItem onClick={handleChooseFile}>上傳照片</MenuItem>
+              <input
+                type="file"
+                ref={hiddenInputRef}
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+              <MenuItem onClick={handleDelete}>刪除照片</MenuItem>
+            </MenuList>
+          </Menu>
         </ImageContainer>
         <NameWrapper>{userInfo && userInfo.display_name}</NameWrapper>
         <JobTitle>{userInfo?.title || '尚未提供'}</JobTitle>

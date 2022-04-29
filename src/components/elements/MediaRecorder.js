@@ -1,5 +1,9 @@
 import { useRef, useEffect } from 'react';
+import { Badge } from '@chakra-ui/react';
+import Lottie from 'react-lottie-player';
 import styled from 'styled-components';
+
+import recordingJson from '../../images/recording.json';
 
 const Container = styled.div`
   display: flex;
@@ -8,11 +12,12 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const Status = styled.div`
-  margin: 10px 0;
-  font-size: 20px;
-  font-weight: 500;
-`;
+const STATUS = {
+  idle: '準備開始',
+  paused: '暫停中',
+  recording: '錄製中',
+  stopped: '已結束',
+};
 
 const VideoPreview = ({ stream }) => {
   const videoRef = useRef(null);
@@ -27,15 +32,23 @@ const VideoPreview = ({ stream }) => {
     return null;
   }
 
-  return <video ref={videoRef} width={500} height={500} autoPlay controls />;
+  return <video ref={videoRef} width="90%" autoPlay controls />;
 };
 
 const Audio = ({ status, mediaBlobUrl }) => {
-  console.log(mediaBlobUrl);
-
   return (
     <Container>
-      <Status>{status}</Status>
+      <Badge fontSize="1.2em" variant="outline" colorScheme="orange" mb="20px">
+        {STATUS[status]}
+      </Badge>
+      {(status === 'recording' || status === 'paused') && (
+        <Lottie
+          loop
+          animationData={recordingJson}
+          play={status === 'recording'}
+          style={{ width: 400, height: 80 }}
+        />
+      )}
       {status === 'stopped' && (
         <audio src={mediaBlobUrl} controls autoPlay loop />
       )}
@@ -43,16 +56,18 @@ const Audio = ({ status, mediaBlobUrl }) => {
   );
 };
 
-const Video = ({ status, mediaBlobUrl, previewStream}) => {
-
-  console.log(mediaBlobUrl);
+const Video = ({ status, mediaBlobUrl, previewStream }) => {
 
   return (
     <Container>
-      <Status>{status}</Status>
+      <Badge fontSize="1.2em" variant="outline" colorScheme="orange" mb="20px">
+        {STATUS[status]}
+      </Badge>
       {status === 'stopped' ? (
         <video src={mediaBlobUrl} controls autoPlay loop />
-      ) : <VideoPreview stream={previewStream} />}
+      ) : (
+        <VideoPreview stream={previewStream} />
+      )}
     </Container>
   );
 };

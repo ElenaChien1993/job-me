@@ -44,7 +44,7 @@ const RadioGroup = ({ items, value ,setter }) => {
   const group = getRootProps();
 
   return (
-    <HStack {...group}>
+    <HStack spacing="30px" w="100%" {...group}>
       {options.map((value) => {
         const radio = getRadioProps({ value });
         return (

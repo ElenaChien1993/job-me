@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { ReactComponent as LoaderSvg } from "../images/loader.svg";
+import styled from 'styled-components';
+import { ReactComponent as LoaderSvg } from '../images/loader.svg';
 
 const Container = styled.div`
   position: fixed;
@@ -7,7 +7,8 @@ const Container = styled.div`
   bottom: 0px;
   left: 0px;
   right: 0px;
-  background: rgba(255, 255, 255);
+  background: ${props =>
+    props.hasShadow ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255)'};
   z-index: 5;
 `;
 
@@ -18,11 +19,11 @@ const Img = styled(LoaderSvg)`
   transform: translate(-50%, -50%);
 `;
 
-const Loader = ({ isLoading }) => {
+const Loader = ({ isLoading, hasShadow }) => {
   return (
     <>
       {isLoading && (
-        <Container>
+        <Container hasShadow={hasShadow}>
           <Img alt="Loading" />
         </Container>
       )}
