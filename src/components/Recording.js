@@ -14,7 +14,7 @@ import { Audio, Video } from './elements/MediaRecorder';
 import CountDown from './elements/CountDown';
 import firebase from '../utils/firebase';
 import Loader from './Loader';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const ButtonsWrapper = styled.div`
   display: flex;
@@ -46,6 +46,7 @@ const Recording = ({
 }) => {
   const {
     status,
+    error,
     startRecording,
     stopRecording,
     pauseRecording,
@@ -62,6 +63,19 @@ const Recording = ({
   const { company_name, job_title } = brief;
   const user = firebase.auth.currentUser;
   const toast = useToast();
+
+  useEffect(() => {
+    if (error === 'permission_denied') {
+      toast({
+        title: '哎呀',
+        description: '請允許瀏覽器使用您的麥克風 & 鏡頭',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right',
+      });
+    }
+  }, [error]);
 
   const getDownloadURL = async (type, id) => {
     const fileBlob = await fetch(mediaBlobUrl).then(r => r.blob());
@@ -124,13 +138,12 @@ const Recording = ({
     setProgress('before');
   };
 
-  console.log(status);
+  console.log(status, error);
 
   return (
     <>
       {isLoading && <Loader isLoading={isLoading} hasShadow />}
       {status === 'acquiring_media' && <Loader isLoading hasShadow />}
-      {status === 'permission_denied' && <div>請允許瀏覽器使用鏡頭和麥克風</div>}
       {status !== 'stopped' && (
         <CountDownWrapper>
           <Icon as={MdTimer} boxSize="4rem" mr="10px" />

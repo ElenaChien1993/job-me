@@ -68,7 +68,7 @@ const PracticeStart = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (props.practiceQuestions === [] || props.brief === []) {
+    if (props.practiceQuestions === [] || !props.brief) {
       navigate('/practice');
     }
   }, []);
