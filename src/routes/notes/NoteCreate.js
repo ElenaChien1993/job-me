@@ -12,9 +12,10 @@ import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   width: 80%;
+  max-width: 1152px;
   background: #ffffff;
   border-radius: 30px;
-  margin: 40px 10%;
+  margin: 40px auto;
   position: relative;
   min-height: 650px;
 `;

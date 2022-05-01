@@ -17,7 +17,6 @@ const ContentContainer = styled.div`
   width: 100%;
   height: 100%;
   padding-top: 70px;
-  max-width: 1400px;
 `;
 
 const StyledNav = styled.nav`
@@ -73,9 +72,17 @@ const LoginButton = styled.div`
 `;
 
 const StyledNavLink = styled(NavLink)`
-  font-size: 20px;
+  font-size: 24px;
+  margin: 10px 5px;
+`;
+
+const Span = styled.span`
   color: ${props => (props.isActive ? '#e17f45' : 'white')};
-  margin: 10px 20px;
+  font-weight: ${props => (props.isActive ? '700' : '500')};
+  &:hover {
+    color: #e17f45;
+    font-weight: 700;
+  }
 `;
 
 const Nav = ({ userInfo, currentUserId }) => {
@@ -111,14 +118,18 @@ const Nav = ({ userInfo, currentUserId }) => {
         </NavItem>
         <NavItem>
           <StyledNavLink to="/notes">
-            Notes
+            {({ isActive }) => <Span isActive={isActive}>Notes</Span>}
           </StyledNavLink>
         </NavItem>
         <NavItem>
-          <Link to="/practice">Practice</Link>
+          <StyledNavLink to="/practice">
+            {({ isActive }) => <Span isActive={isActive}>Practice</Span>}
+          </StyledNavLink>
         </NavItem>
         <NavItem>
-          <Link to="/messages">Messages</Link>
+          <StyledNavLink to="/messages">
+            {({ isActive }) => <Span isActive={isActive}>Messages</Span>}
+          </StyledNavLink>
         </NavItem>
         {currentUserId ? (
           <Menu>

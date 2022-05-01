@@ -5,13 +5,13 @@ import ProfileRecords from '../../components/ProfileRecords';
 import ProfileSetting from '../../components/ProfileSetting';
 
 const Container = styled.div`
-  background-color: #ffeade;
   height: 100%;
 `;
 
 const Upper = styled.div`
   background-color: #f5cdc5;
   height: 200px;
+  border-bottom: 2px solid black;
 `;
 
 const WebTitle = styled.div`
@@ -19,19 +19,23 @@ const WebTitle = styled.div`
   font-size: 60px;
   line-height: 82px;
   color: black;
-  padding-left: 100px;
+  padding-left: 10%;
   padding-top: 50px;
+  max-width: 1440px;
+  margin: 0 auto;
 `;
 
 const StyledTabList = styled(TabList)`
   position: absolute;
   top: 218px;
-  padding-left: 100px;
   width: 100%;
-`
+`;
 
 const Bottom = styled.div`
   height: 100%;
+  margin: 0 auto;
+  width: 80%;
+  max-width: 1152px;
 `;
 
 const MyProfile = () => {
@@ -41,17 +45,17 @@ const MyProfile = () => {
         <WebTitle>Profile</WebTitle>
       </Upper>
       <Bottom>
-        <Tabs size="lg" height="100%" isLazy>
+        <Tabs size="lg" isLazy variant="soft-rounded" colorScheme="brand">
           <StyledTabList>
             <Tab>Setting</Tab>
             <Tab>Records</Tab>
           </StyledTabList>
 
-          <TabPanels height="100%">
-            <TabPanel height="100%">
+          <TabPanels>
+            <TabPanel>
               <ProfileSetting />
             </TabPanel>
-            <TabPanel height="100%">
+            <TabPanel>
               <ProfileRecords />
             </TabPanel>
           </TabPanels>

@@ -18,21 +18,21 @@ import { Picker } from 'emoji-mart';
 
 import ChatList from '../components/ChatList';
 import firebase from '../utils/firebase';
-import ChatContent from '../components/ChatContent';
 import ProfileImage from '../components/ProfileImage';
 import AddImageModal from '../components/AddImageModal';
 import useClickOutside from '../hooks/useClickOutside';
-import ChatContent2 from '../components/ChatContent2';
+import ChatContent from '../components/ChatContent';
 
 const Container = styled.div`
-  width: ${props => (props.theme.isCorner ? '40vw' : '')};
+  width: ${props => (props.theme.isCorner ? '40vw' : '80%')};
   height: ${props => (props.theme.isCorner ? '400px' : '650px')};
   background-color: white;
   border-radius: 20px;
   position: relative;
   z-index: 1;
-  margin: ${props => (props.theme.isCorner ? '' : '0 10%')};
+  margin: ${props => (props.theme.isCorner ? '' : '0 auto')};
   top: ${props => (props.theme.isCorner ? '' : '70px')};
+  max-width: 1152px;
 `;
 
 const LeftWrapper = styled.div`
@@ -258,7 +258,7 @@ const Messages = () => {
                 send={send}
               />
               <Content ref={rootRef}>
-                <ChatContent2
+                <ChatContent
                   room={active}
                   bottomRef={bottomRef}
                   rootRef={rootRef}

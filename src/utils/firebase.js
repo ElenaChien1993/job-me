@@ -96,7 +96,11 @@ const firebase = {
     });
   },
   listenUserRecordsChange(uid, setAudioRecords, setVideoRecords) {
-    return onSnapshot(collection(db, 'users', uid, 'records'), async (docs) => {
+    const q = query(
+      collection(db, 'users', uid, 'records'), 
+      orderBy('date', 'desc'),
+    );
+    return onSnapshot(q, async (docs) => {
       let data = [];
       docs.forEach((doc) => {
         data.push(doc.data());

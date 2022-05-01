@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
   Button,
@@ -21,10 +21,11 @@ import ChatCorner from './ChatCorner';
 import ProfileImage from './ProfileImage';
 
 const Container = styled.div`
-  margin: 20px 10%;
+  margin: 20px 0;
   padding: 30px 0;
   display: flex;
-  height: 100%;
+  justify-content: center;
+  align-items: center;
 `;
 
 const LeftWrapper = styled.div`
@@ -245,7 +246,7 @@ const ProfileSetting = () => {
         <JobTitle>{userInfo?.title || '尚未提供'}</JobTitle>
         <About>{userInfo?.about_me || '尚未提供'}</About>
         <Counts>
-          <Number>{userInfo?.notes_qty}</Number>
+          <Number>{userInfo?.notes_qty || 0}</Number>
           <p>Notes</p>
         </Counts>
       </LeftWrapper>

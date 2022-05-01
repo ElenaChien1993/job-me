@@ -19,7 +19,9 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 20px 5% 5%;
+  margin: 20px auto 5%;
+  width: 90%;
+  max-width: 1296px;
 `;
 
 const TitleWrapper = styled.div`

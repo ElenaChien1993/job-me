@@ -35,7 +35,9 @@ import RecommendModal from '../../components/RecommendModal';
 import EditableInputField from '../../components/EditableInputField';
 
 const Background = styled.div`
-  margin: 30px 10% 0;
+  margin: 30px auto 0;
+  width: 80%;
+  max-width: 1152px;
 `;
 
 const Container = styled.div`
