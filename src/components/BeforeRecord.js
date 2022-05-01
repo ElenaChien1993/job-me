@@ -5,10 +5,16 @@ import { MdTimer } from 'react-icons/md';
 import styled from 'styled-components';
 
 import SwitchElement from './elements/Switch';
+import { device } from '../style/device';
 
 const PlayerWrapper = styled.div`
-  font-size: 1.5rem;
   margin-bottom: 20px;
+  @media ${device.mobileM} {
+    font-size: 1.2rem;
+  }
+  @media ${device.tablet} {
+    font-size: 1.5rem;
+  }
 `;
 
 const TimerSettingWrapper = styled.div`

@@ -5,16 +5,23 @@ import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
 import NoteElement from './NoteCardEditable';
+import { device } from '../style/device';
 
 
 const HighLight = styled.div`
   width: 20px;
-  height: 182px;
+  height: 100%;
   background-color: #306172;
   position: absolute;
   left: 0px;
   border-radius: 24px 0 0 24px;
   display: none;
+  @media ${device.mobileM} {
+    height: 92%;
+  }
+  @media ${device.laptop} {
+    height: 89%;
+  }
 `;
 
 const Container = styled.div`

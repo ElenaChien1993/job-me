@@ -15,13 +15,19 @@ import CountDown from './elements/CountDown';
 import firebase from '../utils/firebase';
 import Loader from './Loader';
 import { useEffect, useState } from 'react';
+import { device } from '../style/device';
 
 const ButtonsWrapper = styled.div`
   display: flex;
   align-items: center;
-  width: 50%;
   justify-content: space-around;
   margin-top: 30px;
+  @media ${device.mobileM} {
+    width: 100%;
+  }
+  @media ${device.tablet} {
+    width: 50%;
+  }
 `;
 
 const Reminder = styled.div`

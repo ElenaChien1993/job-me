@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { device } from '../../style/device';
 
 const NoteWrapper = styled.div`
   display: flex;
@@ -14,16 +15,26 @@ const NoteWrapper = styled.div`
 
 const CompanyName = styled.span`
   font-weight: 700;
-  font-size: 25px;
   color: #306172;
+  @media ${device.mobileM} {
+    font-size: 22px;
+  }
+  @media ${device.tablet} {
+    font-size: 25px;
+  }
 `;
 
 const JobTitle = styled.p`
   display: flex;
   align-items: center;
   font-weight: 700;
-  font-size: 32px;
   color: black;
+  @media ${device.mobileM} {
+    font-size: 28px;
+  }
+  @media ${device.tablet} {
+    font-size: 32px;
+  }
 `;
 
 const NoteBar = ({ brief, className }) => {

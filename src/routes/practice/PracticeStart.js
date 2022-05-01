@@ -14,6 +14,7 @@ import NoteBar from '../../components/elements/NoteBar';
 import BeforeRecord from '../../components/BeforeRecord';
 import Recording from '../../components/Recording';
 import finishJson from '../../images/finish.json'
+import { device } from '../../style/device';
 
 const Container = styled.div`
   display: flex;
@@ -29,6 +30,12 @@ const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  @media ${device.mobileM} {
+    flex-direction: column;
+  }
+  @media ${device.tablet} {
+    flex-direction: row;
+  }
 `;
 
 const StyledNoteBar = styled(NoteBar)`
@@ -36,17 +43,28 @@ const StyledNoteBar = styled(NoteBar)`
 `;
 
 const Question = styled.div`
-  font-size: 3.5rem;
   font-weight: 700;
   color: #306172;
   margin-bottom: 30px;
+  text-align: center;
+  @media ${device.mobileM} {
+    font-size: 2.5rem;
+  }
+  @media ${device.tablet} {
+    font-size: 3.5rem;
+  }
 `;
 
 const Title = styled.div`
-  font-size: 30px;
   font-weight: 700;
   color: #306172;
   margin-bottom: 20px;
+  @media ${device.mobileM} {
+    font-size: 24px;
+  }
+  @media ${device.tablet} {
+    font-size: 30px;
+  }
 `;
 
 const StyledButton = styled(Button)`

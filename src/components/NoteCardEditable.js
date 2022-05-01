@@ -12,21 +12,31 @@ import { EditIcon, CheckCircleIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
+import { device } from '../style/device';
 
 const Container = styled.div`
   display: flex;
-  align-items: center;
-  height: 182px;
   border-radius: 24px;
   background: white;
-  padding: 0 40px;
+  padding: 20px 40px;
   margin-bottom: 25px;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  @media ${device.mobileM} {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  @media ${device.laptop} {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  
 `;
 
 const HeadWrapper = styled.div`
-  width: 140px;
-  height: 140px;
+  min-width: 140px;
+  min-height: 140px;
   border-radius: 70px;
   background: #ffe6ca;
   margin-right: 30px;
@@ -35,6 +45,12 @@ const HeadWrapper = styled.div`
   align-items: center;
   font-size: 70px;
   font-weight: 700;
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.laptop} {
+    display: flex;
+  }
 `;
 
 const ContentWrapper = styled.div`
@@ -80,13 +96,6 @@ const StyledAddressPreview = styled(EditablePreview)`
   }
 `;
 
-const Line = styled.div`
-  font-weight: 700;
-  font-size: 16px;
-  color: #999999;
-  margin: 0 10px;
-`;
-
 const Status = styled.p`
   font-weight: 700;
   font-size: 16px;
@@ -105,25 +114,37 @@ const StyledSelect = styled(Select)`
 const StatusWrapper = styled.div`
   display: flex;
   align-items: center;
+  @media ${device.mobileM} {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
 
 const TagsWrapper = styled.div`
-  display: flex;
-  margin-left: auto;
+  @media ${device.mobileM} {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    margin-left: 0;
+    margin-top: 10px;
+  }
+  @media ${device.laptop} {
+    margin-top: 0;
+    margin-left: 20px;
+  }
 `;
 
 const Tag = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 20px;
-  height: 40px;
+  padding: 5px 10px;
   background: #d5f4f7;
   border-radius: 6px;
   color: #306172;
   font-weight: 700;
   font-size: 16px;
-  margin-right: 14px;
 `;
 
 const StyledInput = styled(Input)`
@@ -131,6 +152,7 @@ const StyledInput = styled(Input)`
     border-radius: 10px;
   }
 `;
+
 
 const NoteElement = React.memo(
   ({ uid, noteId, note, setNote, editable, isPublic }) => {
@@ -208,7 +230,6 @@ const NoteElement = React.memo(
                   <option value="無聲卡">無聲卡</option>
                   <option value="等待中">等待中</option>
                 </StyledSelect>
-                <Line>｜</Line>
                 <Editable
                   defaultValue={
                     note.address === '' ? '尚未填寫資料' : note.address

@@ -10,14 +10,20 @@ import RadioGroup from '../../components/elements/RadioGroup';
 import Loader from '../../components/Loader';
 import NoteBar from '../../components/elements/NoteBar';
 import BackButton from '../../components/elements/BackButton';
+import { device } from '../../style/device';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 20px auto 0;
-  width: 80%;
   max-width: 1152px;
+  @media ${device.mobileM} {
+    width: 90%;
+  }
+  @media ${device.laptop} {
+    width: 80%;
+  }
 `;
 
 const TopWrapper = styled.div`
@@ -30,6 +36,12 @@ const TitleWrapper = styled.div`
   justify-content: center;
   position: relative;
   margin-top: 10px;
+  @media ${device.mobileM} {
+    flex-direction: column;
+  }
+  @media ${device.tablet} {
+    flex-direction: row;
+  }
 `;
 
 const Title = styled.div`
@@ -44,7 +56,15 @@ const SettingWrapper = styled.div`
   justify-content: center;
   border-radius: 15px;
   background: white;
-  padding: 20px 80px;
+  @media ${device.mobileM} {
+    padding: 20px 20px;
+  }
+  @media ${device.tablet} {
+    padding: 20px 40px;
+  }
+  @media ${device.laptop} {
+    padding: 20px 80px;
+  }
 `;
 
 const OptionWrapper = styled.div`
@@ -64,7 +84,12 @@ const OptionTitle = styled.div`
   font-size: 24px;
   font-weight: 700;
   color: #306172;
-  min-width: 140px;
+  @media ${device.mobileM} {
+    min-width: 120px;
+  }
+  @media ${device.tablet} {
+    min-width: 140px;
+  }
 `;
 
 const CheckBoxWrapper = styled.div`

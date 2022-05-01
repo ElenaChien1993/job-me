@@ -1,11 +1,25 @@
 import { useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, NavLink } from 'react-router-dom';
-import { Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
+import {
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  IconButton,
+  useDisclosure,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  DrawerBody,
+} from '@chakra-ui/react';
+import { HamburgerIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 import Avatar from 'boring-avatars';
 
 import firebase from '../utils/firebase';
 import logo from '../images/logo.png';
+import { device } from '../style/device';
 
 const Container = styled.div`
   height: auto;
@@ -35,12 +49,18 @@ const Ul = styled.ul`
 
 const Logo = styled.img`
   width: 180px;
+  margin: 10px 20px;
 `;
 
 const NavItem = styled.li`
   font-size: 20px;
-  color: ${props => (props.isActive ? '#e17f45' : 'white')};
   margin: 10px 20px;
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.tablet} {
+    display: block;
+  }
 `;
 
 const ImageWrapper = styled.div`
@@ -52,6 +72,12 @@ const ImageWrapper = styled.div`
   overflow: hidden;
   margin-right: 20px;
   cursor: pointer;
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.tablet} {
+    display: block;
+  }
 `;
 
 const StyledImg = styled.img`
@@ -65,6 +91,16 @@ const LoginButton = styled.div`
   padding: 10px 30px;
   cursor: pointer;
   color: white;
+  font-weight: 700;
+  &:hover {
+    background: #e3e3e3;
+  }
+`;
+
+const LogoutButton = styled.div`
+  padding: 0 5px;
+  cursor: pointer;
+  color: #999;
   font-weight: 700;
   &:hover {
     background: #e3e3e3;
@@ -85,8 +121,28 @@ const Span = styled.span`
   }
 `;
 
+const MobileUl = styled.ul`
+  display: flex;
+  flex-direction: column;
+`;
+
+const MobileNavItem = styled.li`
+  font-size: 20px;
+  margin: 10px 20px;
+`;
+
+const MobileSpan = styled.span`
+  color: ${props => (props.isActive ? '#e17f45' : '#999')};
+  font-weight: ${props => (props.isActive ? '700' : '500')};
+  &:hover {
+    color: #e17f45;
+    font-weight: 700;
+  }
+`;
+
 const Nav = ({ userInfo, currentUserId }) => {
   const navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleLogout = () => {
     firebase
@@ -109,63 +165,129 @@ const Nav = ({ userInfo, currentUserId }) => {
   };
 
   return (
-    <StyledNav>
-      <Ul>
-        <NavItem>
+    <>
+      <StyledNav>
+        <Ul>
           <Link to="/notes">
             <Logo alt="logo" src={logo} />
           </Link>
-        </NavItem>
-        <NavItem>
-          <StyledNavLink to="/notes">
-            {({ isActive }) => <Span isActive={isActive}>Notes</Span>}
-          </StyledNavLink>
-        </NavItem>
-        <NavItem>
-          <StyledNavLink to="/practice">
-            {({ isActive }) => <Span isActive={isActive}>Practice</Span>}
-          </StyledNavLink>
-        </NavItem>
-        <NavItem>
-          <StyledNavLink to="/messages">
-            {({ isActive }) => <Span isActive={isActive}>Messages</Span>}
-          </StyledNavLink>
-        </NavItem>
-        {currentUserId ? (
-          <Menu>
-            <MenuButton ml="auto">
-              <ImageWrapper>
-                {userInfo?.photo_url ? (
-                  <StyledImg
-                    src={userInfo && userInfo.photo_url}
-                    alt="head-shot"
-                  />
-                ) : (
-                  <Avatar
-                    size={60}
-                    name={userInfo?.display_name}
-                    variant="beam"
-                    colors={[
-                      '#C1DDC7',
-                      '#F5E8C6',
-                      '#BBCD77',
-                      '#DC8051',
-                      '#F4D279',
-                    ]}
-                  />
-                )}
-              </ImageWrapper>
-            </MenuButton>
-            <MenuList w="100px">
-              <MenuItem onClick={goToProfile}>Profile</MenuItem>
-              <MenuItem onClick={handleLogout}>登出</MenuItem>
-            </MenuList>
-          </Menu>
-        ) : (
-          <LoginButton onClick={handleLogIn}>登入</LoginButton>
-        )}
-      </Ul>
-    </StyledNav>
+          <NavItem>
+            <StyledNavLink to="/notes">
+              {({ isActive }) => <Span isActive={isActive}>Notes</Span>}
+            </StyledNavLink>
+          </NavItem>
+          <NavItem>
+            <StyledNavLink to="/practice">
+              {({ isActive }) => <Span isActive={isActive}>Practice</Span>}
+            </StyledNavLink>
+          </NavItem>
+          <NavItem>
+            <StyledNavLink to="/messages">
+              {({ isActive }) => <Span isActive={isActive}>Messages</Span>}
+            </StyledNavLink>
+          </NavItem>
+          {currentUserId ? (
+            <Menu>
+              <MenuButton ml="auto">
+                <ImageWrapper>
+                  {userInfo?.photo_url ? (
+                    <StyledImg
+                      src={userInfo && userInfo.photo_url}
+                      alt="head-shot"
+                    />
+                  ) : (
+                    <Avatar
+                      size={60}
+                      name={userInfo?.display_name}
+                      variant="beam"
+                      colors={[
+                        '#C1DDC7',
+                        '#F5E8C6',
+                        '#BBCD77',
+                        '#DC8051',
+                        '#F4D279',
+                      ]}
+                    />
+                  )}
+                </ImageWrapper>
+              </MenuButton>
+              <MenuList w="100px">
+                <MenuItem onClick={goToProfile}>Profile</MenuItem>
+                <MenuItem onClick={handleLogout}>登出</MenuItem>
+              </MenuList>
+            </Menu>
+          ) : (
+            <LoginButton onClick={handleLogIn}>登入</LoginButton>
+          )}
+          {currentUserId && (
+            <>
+              <IconButton
+                display={['block', null, null, 'none']}
+                mr="20px"
+                aria-label="Options"
+                icon={<HamburgerIcon />}
+                variant="outline"
+                color="white"
+                onClick={onOpen}
+              />
+              <Drawer
+                size="xs"
+                isOpen={isOpen}
+                placement="right"
+                onClose={onClose}
+              >
+                <DrawerOverlay />
+                <DrawerContent>
+                  <DrawerCloseButton />
+                  <DrawerBody>
+                    <MobileUl>
+                      <MobileNavItem>
+                        <StyledNavLink to="/notes" onClick={onClose}>
+                          {({ isActive }) => (
+                            <MobileSpan isActive={isActive}>Notes</MobileSpan>
+                          )}
+                        </StyledNavLink>
+                      </MobileNavItem>
+                      <MobileNavItem>
+                        <StyledNavLink to="/practice" onClick={onClose}>
+                          {({ isActive }) => (
+                            <MobileSpan isActive={isActive}>
+                              Practice
+                            </MobileSpan>
+                          )}
+                        </StyledNavLink>
+                      </MobileNavItem>
+                      <MobileNavItem>
+                        <StyledNavLink to="/messages" onClick={onClose}>
+                          {({ isActive }) => (
+                            <MobileSpan isActive={isActive}>
+                              Messages
+                            </MobileSpan>
+                          )}
+                        </StyledNavLink>
+                      </MobileNavItem>
+                      <MobileNavItem>
+                        <StyledNavLink
+                          to={`/profile/${currentUserId}`}
+                          onClick={onClose}
+                        >
+                          {({ isActive }) => (
+                            <MobileSpan isActive={isActive}>Profile</MobileSpan>
+                          )}
+                        </StyledNavLink>
+                      </MobileNavItem>
+                      <MobileNavItem>
+                        <LogoutButton onClick={handleLogout}>登出</LogoutButton>
+                      </MobileNavItem>
+                    </MobileUl>
+                  </DrawerBody>
+                </DrawerContent>
+              </Drawer>
+            </>
+          )}
+        </Ul>
+      </StyledNav>
+    </>
   );
 };
 

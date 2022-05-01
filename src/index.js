@@ -22,7 +22,17 @@ import Login from './routes/Login';
 import NotFound from './routes/NotFound';
 import NotePublic from './routes/notes/NotePublic';
 
+const breakpoints = {
+  xs: '375px',
+  sm: '425px',
+  md: '768px',
+  lg: '1024px',
+  xl: '1440px',
+  '2xl': '1536px'
+};
+
 const theme = extendTheme({
+  breakpoints,
   colors: {
     brand: {
       50: 'white',
@@ -40,10 +50,10 @@ const theme = extendTheme({
   styles: {
     global: {
       body: {
-        fontFamily: 'Noto Sans TC', 
+        fontFamily: 'Noto Sans TC',
       },
-    }
-  }
+    },
+  },
 });
 
 const App = () => {
@@ -51,7 +61,7 @@ const App = () => {
   const [isLogIn, setIsLogIn] = useState(false);
 
   useEffect(() => {
-    firebase.checklogin((user) => {
+    firebase.checklogin(user => {
       if (user) {
         console.log(user);
         setIsLogIn(true);
@@ -113,7 +123,7 @@ const App = () => {
                 </Route>
               </Route>
 
-              <Route path="*" element={<NotFound />}/>
+              <Route path="*" element={<NotFound />} />
             </Route>
             <Route
               path="login"
