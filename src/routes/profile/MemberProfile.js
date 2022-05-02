@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import ChatCorner from '../../components/ChatCorner';
 import Loader from '../../components/Loader';
 import ProfileImage from '../../components/ProfileImage';
+import { device } from '../../style/device';
 
 import firebase from '../../utils/firebase';
 
@@ -13,7 +14,12 @@ const Container = styled.div``;
 
 const Upper = styled.div`
   background-color: #f5cdc5;
-  height: 250px;
+  @media ${device.mobileM} {
+    height: 130px;
+  }
+  @media ${device.tablet} {
+    height: 180px;
+  }
 `;
 
 const InfoContainer = styled.div`
@@ -22,47 +28,79 @@ const InfoContainer = styled.div`
   align-items: center;
   justify-content: center;
   position: absolute;
-  top: 220px;
   left: 50%;
   transform: translate(-50%, 0);
+  @media ${device.mobileM} {
+    top: 100px;
+  }
+  @media ${device.tablet} {
+    top: 150px;
+  }
 `;
 
 const NameWrapper = styled.div`
-  font-size: 48px;
-  line-height: 65px;
   color: #000000;
   margin-top: 20px;
   text-align: center;
+  @media ${device.mobileM} {
+    font-size: 36px;
+    line-height: 36px;
+  }
+  @media ${device.tablet} {
+    font-size: 48px;
+    line-height: 65px;
+  }
 `;
 
 const JobTitle = styled.div`
-  font-size: 30px;
   color: #6c6c6c;
   margin-top: 10px;
   text-align: center;
+  @media ${device.mobileM} {
+    font-size: 24px;
+  }
+  @media ${device.tablet} {
+    font-size: 30px;
+  }
 `;
 
 const About = styled.div`
-  font-size: 22px;
   color: #6c6c6c;
   margin-top: 10px;
   text-align: center;
+  @media ${device.mobileM} {
+    font-size: 18px;
+  }
+  @media ${device.tablet} {
+    font-size: 22px;
+  }
 `;
 
 const Counts = styled.div`
-  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  & p {
-    font-size: 24px;
+  @media ${device.mobileM} {
+    margin: 10px 0 20px;
+    & p {
+      font-size: 18px;
+    }
   }
-  margin-top: 20px;
+  @media ${device.tablet} {
+    margin: 20px 0;
+    & p {
+      font-size: 24px;
+    }
+  }
 `;
 
 const Number = styled.div`
-  font-size: 50px;
-  color: black;
+  @media ${device.mobileM} {
+    font-size: 36px;
+  }
+  @media ${device.tablet} {
+    font-size: 50px;
+  }
 `;
 
 const MemberProfile = React.memo(() => {

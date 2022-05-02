@@ -221,8 +221,13 @@ const StyledEditable = styled(Editable)`
 
 const QuestionCardsWrapper = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 15px;
+  @media ${device.mobileM} {
+    grid-template-columns: 1fr;
+  }
+  @media ${device.laptop} {
+    grid-template-columns: 1fr 1fr;
+  }
 `;
 
 const QuestionTitle = styled.div`

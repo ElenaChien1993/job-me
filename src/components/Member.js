@@ -13,7 +13,7 @@ const Container = styled.div`
   @media ${device.mobileM} {
     flex-direction: column;
     align-items: flex-start;
-    padding: 20px 30px;
+    padding: 20px 20px;
   }
   @media ${device.tablet} {
     align-items: center;
@@ -46,6 +46,7 @@ const CompanyName = styled.p`
   font-weight: 700;
   font-size: 25px;
   color: #306172;
+  text-overflow: ellipsis;
 `;
 
 const JobTitle = styled.p`
@@ -74,7 +75,7 @@ const Member = ({ note }) => {
           user={note.creator_info}
           size={100}
           hasBorder={false}
-          marginRight={30}
+          marginRight={20}
         />
         <ContentWrapper>
           <CompanyName>{note.company_name}</CompanyName>

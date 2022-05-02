@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { Input } from '@chakra-ui/react';
+import { device } from '../../style/device';
 
 const StyledInput = styled(Input)`
   && {
@@ -10,26 +11,49 @@ const StyledInput = styled(Input)`
 
 const FilesWrap = styled.div`
   display: flex;
-  align-items: center;
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   justify-content: space-between;
   & input {
-    margin-right: 10px;
+    @media ${device.tablet} {
+      margin-right: 10px;
+    }
   }
   & label {
     width: 30%;
+    @media ${device.mobileM} {
+      width: auto;
+      margin-bottom: 5px;
+    }
+    @media ${device.tablet} {
+      width: 30%;
+    }
+  }
+  @media ${device.mobileM} {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  @media ${device.tablet} {
+    align-items: center;
+    flex-direction: row;
   }
 `;
 
 const FileName = styled.div`
   display: flex;
   align-items: center;
-  width: 40%;
-  margin-right: 10px;
   justify-content: space-between;
   & label {
     width: 50px;
+    margin-bottom: 0;
+  }
+  @media ${device.mobileM} {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+  @media ${device.tablet} {
+    width: 40%;
+    margin-right: 10px;
   }
 `;
 
@@ -37,11 +61,17 @@ const FileLink = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 60%;
   & label {
     width: 50px;
+    margin-bottom: 0;
   }
-`
+  @media ${device.mobileM} {
+    width: 100%;
+  }
+  @media ${device.tablet} {
+    width: 60%;
+  }
+`;
 
 const EditFiles = ({ details, setDetails }) => {
   const getObjectInArrayChangedValue = (value, index, objectKey, targetKey) => {

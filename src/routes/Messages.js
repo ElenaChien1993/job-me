@@ -139,7 +139,7 @@ const Name = styled.div`
 const Content = styled.div`
   overflow: scroll;
   @media ${device.mobileM} {
-    height: ${props => (props.theme.isCorner ? '272px' : '410px')};
+    height: ${props => (props.theme.isCorner ? '285px' : '410px')};
   }
   @media ${device.laptop} {
     height: ${props => (props.theme.isCorner ? '272px' : '522px')};
