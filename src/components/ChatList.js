@@ -2,14 +2,20 @@ import React, { useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
 import { v4 as uuid } from 'uuid';
+import { device } from '../style/device';
 
 import ProfileImage from './ProfileImage';
 
 const Container = styled.div`
   display: flex;
-  flex-direction: column;
   width: 100%;
   overflow: scroll;
+  @media ${device.mobileM} {
+    flex-direction: row;
+  }
+  @media ${device.laptop} {
+    flex-direction: column;
+  }
 `;
 
 const ChatWrapper = styled.div`
@@ -22,6 +28,14 @@ const ChatWrapper = styled.div`
   &:hover {
     background-color: #d5f4f7;
   }
+  @media ${device.mobileM} {
+    padding: 10px 10px;
+    flex-direction: column;
+  }
+  @media ${device.laptop} {
+    padding: 15px 16px;
+    flex-direction: row;
+  }
 `;
 
 const BriefContent = styled.div`
@@ -30,29 +44,54 @@ const BriefContent = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  @media ${device.mobileM} {
+    margin-left: 0;
+  }
+  @media ${device.laptop} {
+    margin-left: 13px;
+  }
 `;
 
 const Name = styled.div`
   font-weight: 600;
-  font-size: 20px;
   color: #141414;
-  margin-bottom: 10px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  @media ${device.mobileM} {
+    font-size: 16px;
+    margin: 5px 0;
+  }
+  @media ${device.laptop} {
+    font-size: 20px;
+    margin: 0 0 10px;
+  }
 `;
 
 const LatestMessage = styled.div`
   color: #4f5665;
   font-size: 16px;
   font-weight: ${(props) => (props.isRead ? '400' : '700')};
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.laptop} {
+    display: block;
+  }
 `;
 
 const DateText = styled.div`
+  text-align: right;
   align-self: flex-start;
   font-size: 14px;
   margin-left: auto;
   display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.laptop} {
+    display: block;
+  }
 `;
 
 const NewMessage = styled.div`
@@ -112,7 +151,9 @@ const ChatList = React.memo(({ rooms, active, setActive, isCorner, setRenderRoom
     return () => {
       observer.unobserve(target);
     };
-  }, [databaseRooms, rooms]);
+  }, [databaseRooms]);
+
+  console.log(rooms)
 
   return (
     <ThemeProvider theme={{ isCorner }}>
@@ -127,7 +168,7 @@ const ChatList = React.memo(({ rooms, active, setActive, isCorner, setRenderRoom
               user={room.members}
               size={50}
               hasBorder={false}
-              marginRight={13}
+              marginRight={0}
             />
             <BriefContent>
               <Name>{room.members.display_name}</Name>

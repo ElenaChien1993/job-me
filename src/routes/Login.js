@@ -26,16 +26,29 @@ import styled from 'styled-components';
 
 import image from '../images/login.png';
 import firebase from '../utils/firebase';
+import { device } from '../style/device';
 
 const WebTitle = styled.div`./
   color: #306172;
   font-weight: bold;
-  font-size: 50px;
-  margin-bottom: 40px;
+  @media ${device.mobileM} {
+    font-size: 34px;
+    margin-bottom: 20px;
+  }
+  @media ${device.tablet} {
+    font-size: 50px;
+    margin-bottom: 40px;
+  }
 `;
 
 const ImageWrapper = styled.div`
   width: 90%;
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.tablet} {
+    display: block;
+  }
 `;
 
 const Image = styled.img`
@@ -108,7 +121,7 @@ const Login = () => {
   };
 
   const handleRegister = async () => {
-    if (Object.values(values).some((value) => !value)) {
+    if (Object.values(values).some(value => !value)) {
       toast({
         title: '哎呀',
         description: '請填寫所有欄位',
@@ -169,10 +182,10 @@ const Login = () => {
     }
   };
 
-  const signInWithProvider = async (provider) => {
+  const signInWithProvider = async provider => {
     try {
       await firebase.signInWithProvider(provider);
-      console.log('login')
+      console.log('login');
       toast({
         title: '成功登入！',
         description: '已為您自動導向首頁',
@@ -186,33 +199,40 @@ const Login = () => {
     }
   };
 
-  const handleChange = (prop) => (event) => {
-    setValues((prev) => {
+  const handleChange = prop => event => {
+    setValues(prev => {
       return { ...prev, [prop]: event.target.value };
     });
     if (!isInvalid[prop]) return;
-    setIsInvalid((prev) => {
+    setIsInvalid(prev => {
       return { ...prev, [prop]: false };
     });
   };
 
   return (
-    <Flex bg="#ffeade" justify="center" align="center" my="5%" px="5%">
-      <Flex flexDir="column" w="45%" align="center">
+    <Flex
+      bg="#ffeade"
+      justify="center"
+      align="center"
+      my="5%"
+      px="5%"
+      flexDir={['column', null, null, 'row']}
+    >
+      <Flex flexDir="column" w={["95%", null, null, "45%"]} align="center">
         <WebTitle>Welcome To JobMe</WebTitle>
         <ImageWrapper>
           <Image src={image} alt="Login" />
         </ImageWrapper>
       </Flex>
       <Flex
-        w="55%"
+        w={["95%", null, null, "55%"]}
         h="auto"
         bg="white"
         borderRadius="8px"
         flexDir="column"
         align="center"
         p="3%"
-        ml="5%"
+        ml={["", null, null, "5%"]}
       >
         <Wrapper
           variant="ghost"

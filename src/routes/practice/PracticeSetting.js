@@ -315,7 +315,7 @@ const PracticeSetting = () => {
             colorScheme="brand"
             onClick={handleStartPractice}
             rightIcon={<ArrowForwardIcon />}
-            mt="30px"
+            my="30px"
           >
             開始練習
           </Button>

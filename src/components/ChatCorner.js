@@ -6,18 +6,26 @@ import styled from 'styled-components';
 
 import useClickOutside from '../hooks/useClickOutside';
 import Messages from '../routes/Messages';
+import { device } from '../style/device';
 
 const Container = styled.div`
   position: fixed;
-  bottom: 60px;
-  right: 100px;
+  @media ${device.mobileM} {
+    bottom: 40px;
+    right: 40px;
+  }
+  @media ${device.tablet} {
+    right: 100px;
+    bottom: 60px;
+  }
 `;
 
 const IconWrapper = styled.div`
   position: absolute;
+  z-index: 0;
   right: 0;
   bottom: 0;
-  z-index: 0;
+
 `;
 
 const ChatCorner = () => {

@@ -22,17 +22,26 @@ import ProfileImage from '../components/ProfileImage';
 import AddImageModal from '../components/AddImageModal';
 import useClickOutside from '../hooks/useClickOutside';
 import ChatContent from '../components/ChatContent';
+import { device } from '../style/device';
 
 const Container = styled.div`
-  width: ${props => (props.theme.isCorner ? '40vw' : '80%')};
-  height: ${props => (props.theme.isCorner ? '400px' : '650px')};
   background-color: white;
   border-radius: 20px;
   position: relative;
   z-index: 1;
-  margin: ${props => (props.theme.isCorner ? '' : '0 auto')};
-  top: ${props => (props.theme.isCorner ? '' : '70px')};
   max-width: 1152px;
+  @media ${device.mobileM} {
+    margin: ${props => (props.theme.isCorner ? '' : '0 auto 80px')};
+    top: ${props => (props.theme.isCorner ? '' : '40px')};
+    width: ${props => (props.theme.isCorner ? '300px' : '90%')};
+    height: ${props => (props.theme.isCorner ? '454px' : 'auto')};
+  }
+  @media ${device.laptop} {
+    margin: ${props => (props.theme.isCorner ? '' : '0 auto')};
+    top: ${props => (props.theme.isCorner ? '' : '70px')};
+    width: ${props => (props.theme.isCorner ? '40vw' : '80%')};
+    height: ${props => (props.theme.isCorner ? '400px' : '650px')};
+  }
 `;
 
 const LeftWrapper = styled.div`
@@ -42,8 +51,26 @@ const LeftWrapper = styled.div`
   width: 35%;
   background-color: #fafafa;
   border-radius: 20px 0 0 20px;
-  display: flex;
   flex-direction: column;
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.laptop} {
+    display: flex;
+  }
+`;
+
+const MobileRoomList = styled.div`
+  flex-direction: column;
+  background-color: #ffe6ca;
+  border-radius: 20px 20px 0 0;
+  padding: 0 10px;
+  @media ${device.mobileM} {
+    display: flex;
+  }
+  @media ${device.laptop} {
+    display: none;
+  }
 `;
 
 const TitleWrapper = styled.div`
@@ -56,28 +83,51 @@ const Title = styled.div`
   font-weight: 600;
   font-size: 24px;
   margin-bottom: 20px;
+  @media ${device.mobileM} {
+    font-size: 18px;
+  }
+  @media ${device.laptop} {
+    font-size: 24px;
+  }
 `;
 
 const RightWrapper = styled.div`
-  width: 65%;
-  margin-left: 35%;
   display: flex;
   flex-direction: column;
+  @media ${device.mobileM} {
+    width: 100%;
+    margin-left: 0;
+  }
+  @media ${device.laptop} {
+    width: 65%;
+    margin-left: 35%;
+  }
 `;
 
 const SearchBar = styled.div`
   width: 90%;
-  margin-bottom: 30px;
   display: ${props => (props.theme.isCorner ? 'none' : 'block')};
+  @media ${device.mobileM} {
+    align-self: center;
+    margin: 15px 0;
+  }
+  @media ${device.laptop} {
+    margin: 0 0 30px;
+
+  }
 `;
 
 const TopWrapper = styled.div`
-  height: 64px;
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.25);
-  border-radius: 0 20px 0 0;
-  display: flex;
   align-items: center;
   padding-left: 20px;
+  height: 64px;
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.laptop} {
+    display: flex;
+  }
 `;
 
 const Name = styled.div`
@@ -87,17 +137,22 @@ const Name = styled.div`
 `;
 
 const Content = styled.div`
-  height: ${props => (props.theme.isCorner ? '272px' : '522px')};
   overflow: scroll;
+  @media ${device.mobileM} {
+    height: ${props => (props.theme.isCorner ? '272px' : '410px')};
+  }
+  @media ${device.laptop} {
+    height: ${props => (props.theme.isCorner ? '272px' : '522px')};
+  }
 `;
 
 const BottomWrapper = styled.div`
   height: 64px;
   display: flex;
   align-items: center;
-  border-radius: 0 0 20px 0;
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.25);
   padding: 0 10px;
+  border-radius: 0 0 20px 0;
 `;
 
 const MessageBar = styled(Input)`
@@ -146,8 +201,6 @@ const Messages = () => {
 
   const { onOpen, isOpen, onClose } = useDisclosure({ id: 'addImage' });
 
-  console.log(databaseRooms, renderRooms)
-
   useEffect(() => {
     if (pathname === '/messages') {
       setIsCorner(false);
@@ -157,7 +210,10 @@ const Messages = () => {
   }, [pathname]);
 
   useEffect(() => {
-    const unsubscribe = firebase.listenRoomsChange(currentUserId, setDatabaseRooms);
+    const unsubscribe = firebase.listenRoomsChange(
+      currentUserId,
+      setDatabaseRooms
+    );
 
     return () => unsubscribe();
   }, [currentUserId]);
@@ -239,6 +295,29 @@ const Messages = () => {
             databaseRooms={databaseRooms}
           />
         </LeftWrapper>
+        <MobileRoomList>
+          <SearchBar>
+            <InputGroup>
+              <InputLeftElement
+                pointerEvents="none"
+                children={<Search2Icon color="gray.300" />}
+              />
+              <Input
+                type="text"
+                placeholder="Search people or message"
+                onChange={handleSearch}
+              />
+            </InputGroup>
+          </SearchBar>
+          <ChatList
+            rooms={renderRooms}
+            setRenderRooms={setRenderRooms}
+            active={active}
+            setActive={setActive}
+            isCorner={isCorner}
+            databaseRooms={databaseRooms}
+          />
+        </MobileRoomList>
         <RightWrapper>
           {active ? (
             <>
@@ -303,7 +382,13 @@ const Messages = () => {
               </BottomWrapper>
             </>
           ) : (
-            <Flex flexDir="column" align="center" justify="center" mt="100px">
+            <Flex
+              flexDir="column"
+              align="center"
+              justify="center"
+              mt={['50px', null, null, null, '100px']}
+              mb={['30px', null, null, null, 0]}
+            >
               <Icon w="200px" h="200px" color="#A0AEC0" as={BiGame} />
               <EmptyText>請選取聊天室</EmptyText>
             </Flex>

@@ -21,7 +21,7 @@ const ButtonsWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-around;
-  margin-top: 30px;
+  margin: 30px 0;
   @media ${device.mobileM} {
     width: 100%;
   }
