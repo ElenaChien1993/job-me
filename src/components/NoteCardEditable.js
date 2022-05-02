@@ -21,6 +21,9 @@ const Container = styled.div`
   padding: 20px 40px;
   margin-bottom: 25px;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
+  &:hover {
+    transform: translate(5px, 5px);
+  }
   @media ${device.mobileM} {
     flex-direction: column;
     align-items: flex-start;
@@ -131,7 +134,8 @@ const TagsWrapper = styled.div`
   }
   @media ${device.laptop} {
     margin-top: 0;
-    margin-left: 20px;
+    margin-left: auto;
+    max-width: 55%;
   }
 `;
 

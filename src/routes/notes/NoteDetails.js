@@ -33,11 +33,17 @@ import EditFiles from '../../components/elements/EditFiles';
 import EditorArea from '../../components/elements/Editor';
 import RecommendModal from '../../components/RecommendModal';
 import EditableInputField from '../../components/EditableInputField';
+import { device } from '../../style/device';
 
 const Background = styled.div`
   margin: 30px auto 0;
-  width: 80%;
   max-width: 1152px;
+  @media ${device.mobileM} {
+    width: 90%;
+  }
+  @media ${device.tablet} {
+    width: 80%;
+  }
 `;
 
 const Container = styled.div`
@@ -45,17 +51,28 @@ const Container = styled.div`
   flex-direction: column;
   border-radius: 24px;
   background: white;
-  padding: 20px 40px 0;
   margin-bottom: 60px;
   position: relative;
+  @media ${device.mobileM} {
+    padding: 20px 20px 0;
+  }
+  @media ${device.tablet} {
+    padding: 20px 40px 0;
+  }
 `;
 
 const PublicButtons = styled.div`
+  display: flex;
+  align-items: center;
+  @media ${device.mobileM} {
+    position: static;
+    justify-content: flex-end;
+  }
+  @media ${device.tablet} {
+  }
   position: absolute;
   right: 40px;
   top: 32px;
-  display: flex;
-  align-items: center;
 `;
 
 const DeleteButton = styled(IconButton)`
@@ -77,7 +94,7 @@ const ButtonWrapper = styled.div`
 `;
 
 const FieldWrapper = styled.div`
-  width: 90%;
+  width: 100%;
   margin: 0 auto;
   margin-bottom: 20px;
   position: relative;
@@ -169,7 +186,6 @@ const Line = styled.div`
   width: 100%;
   height: 5px;
   background-color: #306172;
-  margin-bottom: 20px;
 `;
 
 const StyledLink = styled.a`
@@ -228,6 +244,8 @@ const NoteDetails = () => {
   const { onOpen, isOpen, onClose } = useDisclosure({ id: 'recommend' });
   let params = useParams();
   const noteId = params.noteId;
+
+  const tabs = ['公司資訊', '工作內容', '面試準備', '筆記心得'];
 
   useEffect(() => {
     firebase.getNote(currentUserId, noteId).then(snap => {
@@ -423,12 +441,24 @@ const NoteDetails = () => {
               {brief.is_share ? '公開中' : '隱藏中'}
             </Button>
           </PublicButtons>
-          <Tabs size="lg" variant="soft-rounded" colorScheme="brand">
+          <Tabs
+            variant="soft-rounded"
+            colorScheme="brand"
+          >
             <TabList>
-              <Tab m="10px">公司資訊</Tab>
-              <Tab m="10px">工作內容</Tab>
-              <Tab m="10px">面試準備</Tab>
-              <Tab m="10px">筆記心得</Tab>
+              {tabs.map((tab, i) => {
+                return (
+                  <Tab
+                    key={i}
+                    borderRadius={['18px', null, null, 'full']}
+                    p={['9px', null, null, '10px']}
+                    m="10px"
+                    fontSize={['16px', null, null, '20px']}
+                  >
+                    {tab}
+                  </Tab>
+                );
+              })}
             </TabList>
             <Line />
             <TabPanels>

@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Button, Input, Textarea } from '@chakra-ui/react';
 import AddField from '../../components/elements/AddField';
+import { device } from '../../style/device';
 
 const InputWrap = styled.div`
   display: flex;
@@ -32,7 +33,7 @@ const SalaryContainer = styled.div`
 const SalaryWrap = styled.div`
   display: flex;
   align-items: center;
-  width: 75%;
+  width: 100%;
   & input {
     margin-right: 10px;
   }
@@ -40,7 +41,7 @@ const SalaryWrap = styled.div`
 
 const StyledDiv = styled.div`
   margin-right: 10px;
-  width: 160px;
+  min-width: 40px;
 `;
 
 const TagsWrapper = styled.div`
@@ -66,6 +67,14 @@ const TagButton = styled.label`
   border: 1px solid #667080;
   text-align: center;
   padding-top: 5px;
+  @media ${device.mobileM} {
+    width: 70px;
+    margin-right: 5px;
+  }
+  @media ${device.tablet} {
+    width: 90px;
+    margin-right: 15px;
+  }
 `;
 
 const StyledText = styled(Textarea)`

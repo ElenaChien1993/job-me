@@ -13,6 +13,8 @@ const InputLabel = styled.label`
   margin-bottom: 6px;
   font-weight: 500;
   font-size: 18px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const StyledInput = styled(Input)`
@@ -50,7 +52,7 @@ const FilesWrap = styled.div`
     margin-right: 10px;
   }
   & label {
-    width: 50px;
+    min-width: 40px;
   }
 `;
 

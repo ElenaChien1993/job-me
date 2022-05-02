@@ -18,6 +18,7 @@ import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
 import SearchableInput from '../../components/SearchableInput';
+import { device } from '../../style/device';
 
 const InputWrap = styled.div`
   display: flex;
@@ -30,6 +31,8 @@ const InputLabel = styled.label`
   margin-bottom: 6px;
   font-weight: 500;
   font-size: 18px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const StyledInput = styled(Input)`
@@ -39,8 +42,10 @@ const StyledInput = styled(Input)`
 `;
 
 const TagsWrapper = styled.div`
-  display: flex;
   margin: 8px 0 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 10px;
 `;
 
 const RadioInput = styled.input`
@@ -55,13 +60,18 @@ const TagButton = styled.label`
   background: ${props => (props.checked ? '#306172' : '#E3E3E3')};
   border-radius: 20px;
   color: ${props => (props.checked ? 'white' : '#707070')};
-  font-size: 16px;
   line-height: 22px;
   margin-right: 15px;
   cursor: pointer;
   border: 1px solid #667080;
   text-align: center;
   padding-top: 5px;
+  @media ${device.mobileM} {
+    font-size: 14px;
+  }
+  @media ${device.laptop} {
+    font-size: 16px;
+  }
 `;
 
 const CheckBoxWrapper = styled.div`
@@ -86,7 +96,7 @@ const CheckBox = styled.input`
 const SideNote = styled.span`
   color: #999999;
   margin-left: 5px;
-  font-size: 15px;
+  font-size: 14px;
 `;
 
 const ButtonGroup = styled.div`
@@ -292,6 +302,8 @@ const NoteCreateBrief = props => {
       <ButtonGroup>
         <Button
           size="lg"
+          h={['2.2rem', null, null, '3rem']}
+          fontSize={['16px', null, null, '1.125rem']}
           colorScheme="brand"
           borderRadius="full"
           onClick={createNote}
@@ -300,6 +312,8 @@ const NoteCreateBrief = props => {
         </Button>
         <Button
           size="lg"
+          h={['2.2rem', null, null, '3rem']}
+          fontSize={['16px', null, null, '1.125rem']}
           colorScheme="brand"
           borderRadius="full"
           onClick={nextStep}

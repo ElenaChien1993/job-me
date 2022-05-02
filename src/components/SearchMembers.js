@@ -44,6 +44,12 @@ const StyledListItem = styled.div`
   }
 `;
 
+const SearchWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
 const RenderList = ({ data, value, setValue, toggle, setToggle }) => {
   if (value && data) {
     const filteredList = data.filter(item => {
@@ -129,22 +135,24 @@ const SearchMembers = () => {
         要不要搜尋其他公司看看？
       </Title>
       <InputGroup size="md">
-        <Input
-          pr="4.5rem"
-          placeholder="請輸入完整公司名 / 職稱"
-          value={term}
-          onChange={e => {
-            setTerm(e.target.value);
-            setToggle(true);
-          }}
-        />
-        <RenderList
-          data={data}
-          value={term}
-          setValue={setTerm}
-          toggle={toggle}
-          setToggle={setToggle}
-        />
+        <SearchWrapper>
+          <Input
+            pr="4.5rem"
+            placeholder="請輸入完整公司名 / 職稱"
+            value={term}
+            onChange={e => {
+              setTerm(e.target.value);
+              setToggle(true);
+            }}
+          />
+          <RenderList
+            data={data}
+            value={term}
+            setValue={setTerm}
+            toggle={toggle}
+            setToggle={setToggle}
+          />
+        </SearchWrapper>
         <InputRightElement width="4.5rem">
           <Button
             mr="10px"
@@ -159,7 +167,8 @@ const SearchMembers = () => {
         </InputRightElement>
       </InputGroup>
       <ResultWrapper>
-        {searchResult && searchResult.length !== 0 &&
+        {searchResult &&
+          searchResult.length !== 0 &&
           searchResult.map((member, i) => {
             return <Member key={i} note={member} />;
           })}

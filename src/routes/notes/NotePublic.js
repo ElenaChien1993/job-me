@@ -16,10 +16,16 @@ import EditorArea from '../../components/elements/Editor';
 import Loader from '../../components/Loader';
 import NoteElement from '../../components/NoteCardEditable';
 import ProfileImage from '../../components/ProfileImage';
+import { device } from '../../style/device';
 import firebase from '../../utils/firebase';
 
 const Background = styled.div`
-  margin: 30px 10% 0;
+  @media ${device.mobileM} {
+    margin: 30px 5% 0;
+  }
+  @media ${device.tablet} {
+    margin: 30px 10% 0;
+  }
 `;
 
 const UpperContainer = styled.div`
@@ -28,10 +34,28 @@ const UpperContainer = styled.div`
   border-radius: 24px;
   background-color: #ee9c91;
   padding: 15px 40px;
-  margin-bottom: 25px;
   cursor: pointer;
   &:hover {
     filter: brightness(110%);
+  }
+  @media ${device.mobileM} {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  @media ${device.tablet} {
+    flex-direction: row;
+    margin-bottom: 25px;
+  }
+`;
+
+const Creator = styled.div`
+  display: flex;
+  @media ${device.mobileM} {
+    margin-top: 10px;
+  }
+  @media ${device.tablet} {
+    margin-top: 0;
   }
 `;
 
@@ -53,19 +77,23 @@ const DetailsContainer = styled.div`
   flex-direction: column;
   border-radius: 24px;
   background: white;
-  padding: 20px 40px 0;
   margin-bottom: 60px;
+  @media ${device.mobileM} {
+    padding: 20px 20px 0;
+  }
+  @media ${device.tablet} {
+    padding: 20px 40px 0;
+  }
 `;
 
 const Line = styled.div`
   width: 100%;
   height: 5px;
   background-color: #306172;
-  margin-bottom: 20px;
 `;
 
 const FieldWrapper = styled.div`
-  width: 90%;
+  width: 100%;
   margin: 0 auto;
   margin-bottom: 20px;
   position: relative;
@@ -150,6 +178,8 @@ const NotePublic = () => {
   const noteId = params.noteId;
   const uid = params.uid;
 
+  const tabs = ['公司資訊', '工作內容', '面試準備', '筆記心得'];
+
   useEffect(() => {
     firebase.getNote(uid, noteId).then(snap => {
       setBrief(snap.data());
@@ -163,7 +193,7 @@ const NotePublic = () => {
   }, [uid, noteId]);
 
   const goToProfile = id => {
-    window.open(`/profile/${id}`, "_blank");
+    window.open(`/profile/${id}`, '_blank');
   };
 
   if (!info || !brief || !details) return <Loader />;
@@ -174,26 +204,37 @@ const NotePublic = () => {
         <Tag mr="10px" size="lg" colorScheme="red" borderRadius="full">
           <TagLabel>作者</TagLabel>
         </Tag>
-        <ProfileImage
-          user={info}
-          size={50}
-          hasBorder={false}
-          marginRight={15}
-        />
-        <Name>
-          {info.display_name} ｜
-          <JobTitle>{info.title || '未提供個人職稱'}</JobTitle>
-        </Name>
+        <Creator>
+          <ProfileImage
+            user={info}
+            size={50}
+            hasBorder={false}
+            marginRight={15}
+          />
+          <Name>
+            {info.display_name} ｜
+            <JobTitle>{info.title || '未提供個人職稱'}</JobTitle>
+          </Name>
+        </Creator>
       </UpperContainer>
       {brief && <NoteElement uid={uid} noteId={noteId} note={brief} isPublic />}
       {details && (
         <DetailsContainer>
-          <Tabs size="lg" variant="soft-rounded" colorScheme="brand">
+          <Tabs variant="soft-rounded" colorScheme="brand">
             <TabList>
-              <Tab m="10px">公司資訊</Tab>
-              <Tab m="10px">工作內容</Tab>
-              <Tab m="10px">面試準備</Tab>
-              <Tab m="10px">筆記心得</Tab>
+              {tabs.map((tab, i) => {
+                return (
+                  <Tab
+                    key={i}
+                    borderRadius={['18px', null, null, 'full']}
+                    p={['9px', null, null, '10px']}
+                    m="10px"
+                    fontSize={['16px', null, null, '20px']}
+                  >
+                    {tab}
+                  </Tab>
+                );
+              })}
             </TabList>
             <Line />
             <TabPanels>

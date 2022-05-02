@@ -10,7 +10,7 @@ const StyledInput = styled(Input)`
 
 const StyledList = styled.div`
   width: 100%;
-  background-color: white;
+  background-color: #ffeadd;
   border-radius: 5px;
   margin-top: 5px;
   padding: 5px 0;
@@ -55,7 +55,7 @@ const RenderList = ({ data, value, setValue, toggle, setToggle }) => {
 
     return (
       <div>
-        <li>紀錄查無此公司，將為您直接新增</li>
+        <li style={{marginTop: '10px'}}>紀錄查無此公司，將為您直接新增</li>
       </div>
     );
   }
