@@ -19,33 +19,60 @@ import styled from 'styled-components';
 import ChatCorner from './ChatCorner';
 import firebase from '../utils/firebase';
 import { MdSaveAlt } from 'react-icons/md';
+import { device } from '../style/device';
 
 const Container = styled.div`
+  width: 100%;
   margin: 20px 0;
   padding: 30px 0;
   display: flex;
   justify-content: center;
+  @media ${device.mobileM} {
+    margin-top: 240px;
+    flex-direction: column;
+    align-items: center;
+  }
+  @media ${device.tablet} {
+    margin-top: 0;
+    flex-direction: row;
+    align-items: flex-start;
+  }
 `;
 
 const LeftWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  border-right: 5px solid #c4c4c4;
   align-items: center;
-  padding-right: 20px;
+  @media ${device.mobileM} {
+    border-right: none;
+    padding-right: 0;
+    width: 100%;
+  }
+  @media ${device.tablet} {
+    border-right: 5px solid #c4c4c4;
+    padding-right: 20px;
+    width: auto;
+  }
 `;
 
 const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding-left: 50px;
-  width: 60%;
+  @media ${device.mobileM} {
+    width: 100%;
+    padding-left: 0;
+    margin-top: 20px;
+  }
+  @media ${device.tablet} {
+    width: 60%;
+    padding-left: 50px;
+    margin-top: 0;
+  }
 `;
 
 const RecordsList = styled.div`
   width: 100%;
   height: 500px;
-  padding-top: 20px;
   background: #ffffff;
   border-radius: 20px;
   overflow: scroll;
@@ -64,15 +91,25 @@ const Record = styled.div`
     color: black;
   }
   & h2 {
-    font-size: 24px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    @media ${device.mobileM} {
+      font-size: 20px;
+    }
+    @media ${device.tablet} {
+      font-size: 24px;
+    }
   }
   & p {
-    font-size: 18px;
     text-align: end;
     max-width: 20%;
+    @media ${device.mobileM} {
+      font-size: 16px;
+    }
+    @media ${device.tablet} {
+      font-size: 18px;
+    }
   }
 `;
 
@@ -99,6 +136,7 @@ const Reminder = styled.div`
 const Text = styled.div`
   margin: 0 20px;
   font-size: 20px;
+  text-align: center;
 `;
 
 const NoFileWrapper = styled.div`
@@ -107,7 +145,7 @@ const NoFileWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-`
+`;
 
 const ProfileRecords = () => {
   const [audioRecords, setAudioRecords] = useState([]);
@@ -168,6 +206,7 @@ const ProfileRecords = () => {
     <Container>
       <LeftWrapper>
         <Tabs
+          w={['100%', null, null, 'auto']}
           isFitted
           orientation="vertical"
           variant="soft-rounded"
@@ -176,15 +215,15 @@ const ProfileRecords = () => {
           onChange={index => setTabIndex(index)}
         >
           <TabList>
-            <Tab>
+            <Tab px={['5px', null, null, '1rem']}>
               <FaMicrophone />
             </Tab>
-            <Tab>
+            <Tab px={['5px', null, null, '1rem']}>
               <FaFilm />
             </Tab>
           </TabList>
           <TabPanels>
-            <TabPanel>
+            <TabPanel pr={[0, null, null, '1rem']} pt={[0, null, null, '1rem']}>
               <RecordsList>
                 {audioRecords.length !== 0 ? (
                   audioRecords.map(record => {
