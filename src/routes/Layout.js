@@ -148,7 +148,6 @@ const Nav = ({ userInfo, currentUserId }) => {
     firebase
       .signOut()
       .then(() => {
-        alert('已成功登出');
         navigate('/login', { state: { from: { pathname: '/notes' } } });
       })
       .catch(error => {
@@ -242,14 +241,14 @@ const Nav = ({ userInfo, currentUserId }) => {
                   <DrawerBody>
                     <MobileUl>
                       <MobileNavItem>
-                        <StyledNavLink to="/notes" onClick={onClose}>
+                        <StyledNavLink to="/notes">
                           {({ isActive }) => (
                             <MobileSpan isActive={isActive}>Notes</MobileSpan>
                           )}
                         </StyledNavLink>
                       </MobileNavItem>
                       <MobileNavItem>
-                        <StyledNavLink to="/practice" onClick={onClose}>
+                        <StyledNavLink to="/practice">
                           {({ isActive }) => (
                             <MobileSpan isActive={isActive}>
                               Practice
@@ -258,7 +257,7 @@ const Nav = ({ userInfo, currentUserId }) => {
                         </StyledNavLink>
                       </MobileNavItem>
                       <MobileNavItem>
-                        <StyledNavLink to="/messages" onClick={onClose}>
+                        <StyledNavLink to="/messages">
                           {({ isActive }) => (
                             <MobileSpan isActive={isActive}>
                               Messages
@@ -269,7 +268,6 @@ const Nav = ({ userInfo, currentUserId }) => {
                       <MobileNavItem>
                         <StyledNavLink
                           to={`/profile/${currentUserId}`}
-                          onClick={onClose}
                         >
                           {({ isActive }) => (
                             <MobileSpan isActive={isActive}>Profile</MobileSpan>

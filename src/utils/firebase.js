@@ -385,10 +385,6 @@ const firebase = {
           }
         });
         data.sort((a, b) => !b.create_at - a.create_at);
-        // const transformed = data.map((message) => {
-        //   const timeString = useFormatedTime(message.create_at);
-        //   return { ...message, create_at: timeString };
-        // });
         callback((prev) => {
           if (!prev[room.id]) {
             return {

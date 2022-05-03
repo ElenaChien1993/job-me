@@ -192,7 +192,7 @@ const Messages = () => {
   const [renderRooms, setRenderRooms] = useState([]);
   const [isCorner, setIsCorner] = useState(true);
   const [showEmojis, setShowEmojis] = useState(false);
-  // const observeTargetRef = useRef();
+  const [messages, setMessages] = useState({});
   const rootRef = useRef();
   const bottomRef = useRef();
   const emojisRef = useRef();
@@ -227,14 +227,16 @@ const Messages = () => {
     firebase.updateRoom(active.id, { receiver_has_read: true });
   }, [active, currentUserId]);
 
-  const send = (value, type) => {
+  console.log(active);
+
+  const send = async (value, type) => {
     const MessageData = {
       uid: currentUserId,
       text: value,
       create_at: firebase.Timestamp.fromDate(new Date()),
       type: type,
     };
-    firebase.sendMessage(active.id, MessageData);
+    await firebase.sendMessage(active.id, MessageData);
     setText('');
     bottomRef.current.scrollIntoView({ behavior: 'auto' });
   };
@@ -338,10 +340,13 @@ const Messages = () => {
               />
               <Content ref={rootRef}>
                 <ChatContent
+                  key={active.id}
                   room={active}
                   bottomRef={bottomRef}
                   rootRef={rootRef}
                   isCorner={isCorner}
+                  messages={messages}
+                  setMessages={setMessages}
                 />
               </Content>
               <BottomWrapper>

@@ -153,8 +153,6 @@ const ChatList = React.memo(({ rooms, active, setActive, isCorner, setRenderRoom
     };
   }, [databaseRooms]);
 
-  console.log(rooms)
-
   return (
     <ThemeProvider theme={{ isCorner }}>
       <Container ref={rootRef}>

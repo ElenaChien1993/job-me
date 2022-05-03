@@ -200,12 +200,12 @@ const Login = () => {
   };
 
   const handleChange = prop => event => {
+
     setValues(prev => {
       return { ...prev, [prop]: event.target.value };
     });
-    if (!isInvalid[prop]) return;
     setIsInvalid(prev => {
-      return { ...prev, [prop]: false };
+      return { ...prev, [prop]: event.target.value === '' };
     });
   };
 

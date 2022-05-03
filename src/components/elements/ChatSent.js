@@ -28,25 +28,27 @@ const DateText = styled.div`
   margin-right: 10px;
 `;
 
-const Text = ({ text }) => {
-  return <Content>{text}</Content>;
-};
+const Text = React.forwardRef((props, ref) => {
+  return <Content ref={ref}>{props.text}</Content>;
+});
 
-const ImageMessage = ({ url }) => {
+const ImageMessage = React.forwardRef((props, ref) => {
   return (
+    <div ref={ref}>
     <Image
       objectFit='contain'
       alt="message"
-      src={url}
+      src={props.url}
       boxSize="100px"
       fallback={<CircularProgress isIndeterminate color='green.300' />}
     />
+    </div>
   );
-};
+});
 
 const MESSAGE_TYPE = props => ({
-  0: <Text text={props.message.text} />,
-  1: <ImageMessage url={props.message.text} />,
+  0: <Text text={props.message.text} ref={props.bottomRef}/>,
+  1: <ImageMessage url={props.message.text} ref={props.bottomRef} />,
 });
 
 const ChatSent = React.forwardRef((props, ref) => {
