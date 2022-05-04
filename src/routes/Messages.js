@@ -31,16 +31,16 @@ const Container = styled.div`
   z-index: 1;
   max-width: 1152px;
   @media ${device.mobileM} {
-    margin: ${props => (props.theme.isCorner ? '' : '0 auto 80px')};
-    top: ${props => (props.theme.isCorner ? '' : '40px')};
-    width: ${props => (props.theme.isCorner ? '300px' : '90%')};
-    height: ${props => (props.theme.isCorner ? '454px' : 'auto')};
+    margin: ${(props) => (props.theme.isCorner ? '' : '0 auto 80px')};
+    top: ${(props) => (props.theme.isCorner ? '' : '40px')};
+    width: ${(props) => (props.theme.isCorner ? '300px' : '90%')};
+    height: ${(props) => (props.theme.isCorner ? '454px' : 'auto')};
   }
   @media ${device.laptop} {
-    margin: ${props => (props.theme.isCorner ? '' : '0 auto')};
-    top: ${props => (props.theme.isCorner ? '' : '70px')};
-    width: ${props => (props.theme.isCorner ? '40vw' : '80%')};
-    height: ${props => (props.theme.isCorner ? '400px' : '650px')};
+    margin: ${(props) => (props.theme.isCorner ? '' : '0 auto')};
+    top: ${(props) => (props.theme.isCorner ? '' : '70px')};
+    width: ${(props) => (props.theme.isCorner ? '40vw' : '80%')};
+    height: ${(props) => (props.theme.isCorner ? '400px' : '650px')};
   }
 `;
 
@@ -75,8 +75,13 @@ const MobileRoomList = styled.div`
 
 const TitleWrapper = styled.div`
   padding: 25px 0 0 17px;
-  display: flex;
   flex-direction: column;
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.laptop} {
+    display: flex;
+  }
 `;
 
 const Title = styled.div`
@@ -106,14 +111,13 @@ const RightWrapper = styled.div`
 
 const SearchBar = styled.div`
   width: 90%;
-  display: ${props => (props.theme.isCorner ? 'none' : 'block')};
+  display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
   @media ${device.mobileM} {
     align-self: center;
     margin: 15px 0;
   }
   @media ${device.laptop} {
     margin: 0 0 30px;
-
   }
 `;
 
@@ -139,10 +143,10 @@ const Name = styled.div`
 const Content = styled.div`
   overflow: scroll;
   @media ${device.mobileM} {
-    height: ${props => (props.theme.isCorner ? '285px' : '410px')};
+    height: ${(props) => (props.theme.isCorner ? '285px' : '410px')};
   }
   @media ${device.laptop} {
-    height: ${props => (props.theme.isCorner ? '272px' : '522px')};
+    height: ${(props) => (props.theme.isCorner ? '272px' : '522px')};
   }
 `;
 
@@ -188,8 +192,6 @@ const EmptyText = styled.div`
 
 const Messages = () => {
   const [text, setText] = useState('');
-  const [databaseRooms, setDatabaseRooms] = useState([]);
-  const [renderRooms, setRenderRooms] = useState([]);
   const [isCorner, setIsCorner] = useState(true);
   const [showEmojis, setShowEmojis] = useState(false);
   const [messages, setMessages] = useState({});
@@ -210,24 +212,9 @@ const Messages = () => {
   }, [pathname]);
 
   useEffect(() => {
-    const unsubscribe = firebase.listenRoomsChange(
-      currentUserId,
-      setDatabaseRooms
-    );
-
-    return () => unsubscribe();
-  }, [currentUserId]);
-
-  useEffect(() => {
-    setRenderRooms(databaseRooms.slice(0, 5));
-  }, [databaseRooms]);
-
-  useEffect(() => {
     if (!active || currentUserId === active.latest_sender) return;
     firebase.updateRoom(active.id, { receiver_has_read: true });
   }, [active, currentUserId]);
-
-  console.log(active);
 
   const send = async (value, type) => {
     const MessageData = {
@@ -247,22 +234,9 @@ const Messages = () => {
     }
   };
 
-  const handleSearch = e => {
-    const term = e.target.value;
-    if (!term) {
-      setRenderRooms(databaseRooms.slice(0, 5));
-      return;
-    }
-    const filtered = databaseRooms.filter(room => {
-      const regex = new RegExp(term, 'gi');
-      return room.members.display_name.match(regex);
-    });
-    setRenderRooms(filtered);
-  };
-
-  const addEmoji = e => {
+  const addEmoji = (e) => {
     let emoji = e.native;
-    setText(prev => prev + emoji);
+    setText((prev) => prev + emoji);
     setShowEmojis(false);
   };
 
@@ -272,53 +246,10 @@ const Messages = () => {
     <ThemeProvider theme={{ isCorner }}>
       <Container>
         <LeftWrapper>
-          <TitleWrapper>
-            <Title>Messages</Title>
-            <SearchBar>
-              <InputGroup>
-                <InputLeftElement
-                  pointerEvents="none"
-                  children={<Search2Icon color="gray.300" />}
-                />
-                <Input
-                  type="text"
-                  placeholder="Search people or message"
-                  onChange={handleSearch}
-                />
-              </InputGroup>
-            </SearchBar>
-          </TitleWrapper>
-          <ChatList
-            rooms={renderRooms}
-            setRenderRooms={setRenderRooms}
-            active={active}
-            setActive={setActive}
-            isCorner={isCorner}
-            databaseRooms={databaseRooms}
-          />
+          <ChatList active={active} setActive={setActive} isCorner={isCorner} />
         </LeftWrapper>
         <MobileRoomList>
-          <SearchBar>
-            <InputGroup>
-              <InputLeftElement
-                pointerEvents="none"
-                children={<Search2Icon color="gray.300" />}
-              />
-              <Input
-                type="text"
-                placeholder="Search people or message"
-                onChange={handleSearch}
-              />
-            </InputGroup>
-          </SearchBar>
-          <ChatList
-            rooms={renderRooms}
-            setRenderRooms={setRenderRooms}
-            active={active}
-            setActive={setActive}
-            isCorner={isCorner}
-            databaseRooms={databaseRooms}
-          />
+          <ChatList active={active} setActive={setActive} isCorner={isCorner} />
         </MobileRoomList>
         <RightWrapper>
           {active ? (
@@ -354,8 +285,8 @@ const Messages = () => {
                   type="text"
                   placeholder="Type your message"
                   value={text}
-                  onChange={event => setText(event.target.value)}
-                  onKeyDown={e => handleEnter(e, text, 0)}
+                  onChange={(event) => setText(event.target.value)}
+                  onKeyDown={(e) => handleEnter(e, text, 0)}
                 />
                 {showEmojis && (
                   <EmojisPicker ref={emojisRef}>

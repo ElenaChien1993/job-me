@@ -97,8 +97,8 @@ const firebase = {
   },
   listenUserRecordsChange(uid, setAudioRecords, setVideoRecords) {
     const q = query(
-      collection(db, 'users', uid, 'records'), 
-      orderBy('date', 'desc'),
+      collection(db, 'users', uid, 'records'),
+      orderBy('date', 'desc')
     );
     return onSnapshot(q, async (docs) => {
       let data = [];
@@ -323,7 +323,7 @@ const firebase = {
     const q = query(
       collection(db, 'chatrooms'),
       where('members', 'array-contains', uid),
-      orderBy('latest.timestamp', 'desc'),
+      orderBy('latest.timestamp', 'desc')
     );
     return onSnapshot(q, async (snapshot) => {
       let data = [];
@@ -369,7 +369,7 @@ const firebase = {
     data.sort((a, b) => !b.create_at - a.create_at);
     return data;
   },
-  async listenMessagesChange(room, callback, uid) {
+  listenMessagesChange(room, callback, uid) {
     const q = query(
       collection(db, 'chatrooms', room.id, 'messages'),
       orderBy('create_at', 'desc'),
@@ -378,6 +378,7 @@ const firebase = {
     return onSnapshot(
       q,
       async (snapshot) => {
+        console.log('msg listener 1');
         let data = [];
         snapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
@@ -392,10 +393,21 @@ const firebase = {
               [room.id]: data,
             };
           } else {
-            return { ...prev, [room.id]: [...prev[room.id], ...data] };
+            // 我這邊是先比較後來監聽拿到的 messages 是不是已經存在之前的 state 中
+            const stateIds = prev[room.id].map(item => item.id);
+            const dataIds = data.map(item => item.id);
+            const filteredIds = dataIds.filter(id => stateIds.indexOf(id) === -1);
+            if (filteredIds.length === 0) return prev;
+            const filteredData = data.filter(message => filteredIds.indexOf(message.id) !== -1);
+            if (prev[room.id][0].id === data[0].id) {
+              return prev;
+            }
+            return { ...prev, [room.id]: [...prev[room.id], ...filteredData] };
           }
         });
-        if (!room.id || uid === room.latest_sender) return;
+        const roomSnap = await getDoc(doc(db, 'chatrooms', room.id));
+        const lastSender = roomSnap.data().latest_sender;
+        if (uid === lastSender) return;
         this.updateRoom(room.id, { receiver_has_read: true });
       },
       (error) => {
@@ -405,7 +417,6 @@ const firebase = {
   },
   async sendMessage(roomId, data) {
     try {
-      await addDoc(collection(db, 'chatrooms', roomId, 'messages'), data);
       await updateDoc(doc(db, 'chatrooms', roomId), {
         latest: {
           timestamp: data.create_at,
@@ -415,6 +426,9 @@ const firebase = {
         receiver_has_read: false,
         latest_sender: data.uid,
       });
+      console.log('update room');
+      const newDocRef = doc(collection(db, 'chatrooms', roomId, 'messages'));
+      await setDoc(newDocRef, { ...data, id: newDocRef.id });
     } catch (err) {
       console.log(err);
     }

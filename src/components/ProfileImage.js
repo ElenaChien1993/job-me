@@ -1,37 +1,52 @@
+import React from 'react';
 import styled from 'styled-components';
 import Avatar from 'boring-avatars';
 
 const ImageWrapper = styled.div`
-  min-width: ${props => props.size}px;
-  min-height: ${props => props.size}px;
-  border-radius: ${props => props.size/2}px;
-  border: ${props => props.hasBorder ? '5px solid #ee9c91' : 'none'};
-  margin-right: ${props => props.marginRight}px;
+  min-width: ${(props) => props.size}px;
+  min-height: ${(props) => props.size}px;
+  border-radius: ${(props) => props.size / 2}px;
+  border: ${(props) => (props.hasBorder ? '5px solid #ee9c91' : 'none')};
+  margin-right: ${(props) => props.marginRight}px;
   overflow: hidden;
 `;
 
 const StyledImg = styled.img`
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
+  width: ${(props) => props.size}px;
+  height: ${(props) => props.size}px;
   object-fit: cover;
 `;
 
-const ProfileImage = ({ user, size, hasBorder, marginRight, preview}) => {
+const isEqual = (prevProps, nextProps) => {
+  if (prevProps.user !== nextProps.user) {
+    return false;
+  }
+  return true;
+};
 
-  return (
-    <ImageWrapper size={size} hasBorder={hasBorder} marginRight={marginRight}>
-      {user.photo_url || preview ? (
-        <StyledImg src={preview ? preview : user.photo_url} alt="head-shot" size={size} referrerpolicy="no-referrer"/>
-      ) : (
-        <Avatar
-          size={size}
-          name={user.display_name}
-          variant="beam"
-          colors={['#C1DDC7', '#F5E8C6', '#BBCD77', '#DC8051', '#F4D279']}
-        />
-      )}
-    </ImageWrapper>
-  )
-}
+const ProfileImage = React.memo(
+  ({ user, size, hasBorder, marginRight, preview }) => {
+    return (
+      <ImageWrapper size={size} hasBorder={hasBorder} marginRight={marginRight}>
+        {user.photo_url || preview ? (
+          <StyledImg
+            src={preview ? preview : user.photo_url}
+            alt="head-shot"
+            size={size}
+            referrerpolicy="no-referrer"
+          />
+        ) : (
+          <Avatar
+            size={size}
+            name={user.display_name}
+            variant="beam"
+            colors={['#C1DDC7', '#F5E8C6', '#BBCD77', '#DC8051', '#F4D279']}
+          />
+        )}
+      </ImageWrapper>
+    );
+  },
+  isEqual
+);
 
 export default ProfileImage;

@@ -1,8 +1,11 @@
-import React, { useRef, useEffect } from 'react';
+import { Search2Icon } from '@chakra-ui/icons';
+import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 import { device } from '../style/device';
+import firebase from '../utils/firebase';
 
 import ProfileImage from './ProfileImage';
 
@@ -104,13 +107,50 @@ const NewMessage = styled.div`
   display: ${(props) => (props.isRead ? 'none' : 'block')};
 `;
 
+const TitleWrapper = styled.div`
+  padding: 25px 0 0 17px;
+  flex-direction: column;
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.laptop} {
+    display: flex;
+  }
+`;
+
+const Title = styled.div`
+  font-weight: 600;
+  font-size: 24px;
+  margin-bottom: 20px;
+  @media ${device.mobileM} {
+    font-size: 18px;
+  }
+  @media ${device.laptop} {
+    font-size: 24px;
+  }
+`;
+
+const SearchBar = styled.div`
+  width: 90%;
+  display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
+  @media ${device.mobileM} {
+    align-self: center;
+    margin: 15px 0;
+  }
+  @media ${device.laptop} {
+    margin: 0 0 30px;
+  }
+`;
+
 const LATEST_MESSAGE_TYPE = (props) => ({
   0: props.latest.message,
   1: '傳送了一張照片',
   default: '',
 });
 
-const ChatList = React.memo(({ rooms, active, setActive, isCorner, setRenderRooms, databaseRooms }) => {
+const ChatList = React.memo(({ active, setActive, isCorner }) => {
+  const [databaseRooms, setDatabaseRooms] = useState([]);
+  const [renderRooms, setRenderRooms] = useState([]);
   const { currentUserId } = useOutletContext();
   const rootRef = useRef();
   const observeTargetRef = useRef();
@@ -118,8 +158,34 @@ const ChatList = React.memo(({ rooms, active, setActive, isCorner, setRenderRoom
   const roomsQtyRef = useRef(0);
 
   useEffect(() => {
-    roomsQtyRef.current = rooms.length;
-  }, [rooms])
+    const unsubscribe = firebase.listenRoomsChange(
+      currentUserId,
+      setDatabaseRooms
+    );
+
+    return () => unsubscribe();
+  }, [currentUserId]);
+
+  useEffect(() => {
+    setRenderRooms(databaseRooms.slice(0, 5));
+  }, [databaseRooms]);
+
+  useEffect(() => {
+    roomsQtyRef.current = renderRooms.length;
+  }, [renderRooms]);
+
+  const handleSearch = (e) => {
+    const term = e.target.value;
+    if (!term) {
+      setRenderRooms(databaseRooms.slice(0, 5));
+      return;
+    }
+    const filtered = databaseRooms.filter((room) => {
+      const regex = new RegExp(term, 'gi');
+      return room.members.display_name.match(regex);
+    });
+    setRenderRooms(filtered);
+  };
 
   useEffect(() => {
     const callback = ([entry]) => {
@@ -128,12 +194,19 @@ const ChatList = React.memo(({ rooms, active, setActive, isCorner, setRenderRoom
         firstRenderRef.current = false;
         return;
       }
-      
+
       const startIndex = roomsQtyRef.current;
       if (startIndex === databaseRooms.length) return;
-      
-      console.log('observer fire',startIndex ,databaseRooms.slice(startIndex, startIndex + 5));
-      setRenderRooms(prev => [...prev, ...databaseRooms.slice(startIndex, startIndex + 5)])
+
+      console.log(
+        'observer fire',
+        startIndex,
+        databaseRooms.slice(startIndex, startIndex + 5)
+      );
+      setRenderRooms((prev) => [
+        ...prev,
+        ...databaseRooms.slice(startIndex, startIndex + 5),
+      ]);
     };
 
     const options = {
@@ -155,11 +228,27 @@ const ChatList = React.memo(({ rooms, active, setActive, isCorner, setRenderRoom
 
   return (
     <ThemeProvider theme={{ isCorner }}>
+      <TitleWrapper>
+        <Title>Messages</Title>
+        <SearchBar>
+          <InputGroup>
+            <InputLeftElement
+              pointerEvents="none"
+              children={<Search2Icon color="gray.300" />}
+            />
+            <Input
+              type="text"
+              placeholder="Search people or message"
+              onChange={handleSearch}
+            />
+          </InputGroup>
+        </SearchBar>
+      </TitleWrapper>
       <Container ref={rootRef}>
-        {rooms.map((room) => (
+        {renderRooms.map((room) => (
           <ChatWrapper
             isSelected={active?.id === room.id}
-            key={uuid()}
+            key={room.id}
             onClick={() => setActive(room)}
           >
             <ProfileImage
