@@ -1,33 +1,22 @@
-export const initMap = async query => {
-  const taipei = new window.google.maps.LatLng(25.037, 121.564);
+export const initMap = async setValues => {
+  const input = document.getElementById('autocomplete-input');
 
-  const map = new window.google.maps.Map(document.getElementById('map'), {
-    center: taipei,
-    zoom: 15,
-  });
-
-  const request = {
-    query: query,
-    fields: ['name', 'formatted_address'],
+  const options = {
+    fields: ['formatted_address'],
+    strictBounds: false,
+    types: ['establishment'],
   };
 
-  const service = new window.google.maps.places.PlacesService(map);
+  const autocomplete = new window.google.maps.places.Autocomplete(
+    input,
+    options
+  );
 
-  return new Promise(res => {
-    service.findPlaceFromQuery(request, (results, status) => {
-      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-        console.log(results);
-        res(results);
-      }
+  autocomplete.addListener('place_changed', () => {
+    const place = autocomplete.getPlace();
+    console.log(place);
+    setValues(prev => {
+      return { ...prev, address: place.formatted_address };
     });
   });
-  // let resultsData;
-  // return new Promise(res => {
-  //   service.textSearch(request, (results, status) => {
-  //     if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-  //       console.log(results);
-  //       res(results);
-  //     }
-  //   });
-  // });
 };

@@ -399,9 +399,6 @@ const firebase = {
             const filteredIds = dataIds.filter(id => stateIds.indexOf(id) === -1);
             if (filteredIds.length === 0) return prev;
             const filteredData = data.filter(message => filteredIds.indexOf(message.id) !== -1);
-            if (prev[room.id][0].id === data[0].id) {
-              return prev;
-            }
             return { ...prev, [room.id]: [...prev[room.id], ...filteredData] };
           }
         });

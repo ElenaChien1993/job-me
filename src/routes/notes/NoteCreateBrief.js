@@ -19,6 +19,7 @@ import styled from 'styled-components';
 import firebase from '../../utils/firebase';
 import SearchableInput from '../../components/SearchableInput';
 import { device } from '../../style/device';
+import { initMap } from '../../components/GoogleSearch';
 
 const InputWrap = styled.div`
   display: flex;
@@ -161,6 +162,7 @@ const NoteCreateBrief = props => {
     firebase.getWholeCollection('job_titles').then(data => {
       setJobTitles(data);
     });
+    initMap(setValues);
   }, []);
 
   const handleCheckboxChange = () => {
@@ -209,8 +211,8 @@ const NoteCreateBrief = props => {
     });
   };
 
-  console.log(companies, jobTitles);
-  console.log(props);
+  // console.log(companies, jobTitles);
+  console.log(values.address);
 
   return (
     <>
@@ -242,9 +244,11 @@ const NoteCreateBrief = props => {
         <InputWrap>
           <InputLabel>公司地點</InputLabel>
           <StyledInput
+            id="autocomplete-input"
             size="sm"
-            defaultValue={values.address}
+            value={values.address}
             onChange={handleChange('address')}
+            placeholder="可輸入公司搜尋地址 or 直接輸入地址"
           />
         </InputWrap>
         <div>

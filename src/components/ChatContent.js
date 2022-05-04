@@ -34,12 +34,9 @@ const ChatContent = ({
 
   useEffect(() => {
     const callback = async ([entry]) => {
-      console.log('callback')
       if (!entry || !entry.isIntersecting) return;
-      console.log('lastMessagesRef', lastMessagesRef.current);
       if (lastMessagesRef.current) return;
 
-      console.log('first', firstRenderRef.current, firstMessageRef.current);
       if (!firstMessageRef.current && firstRenderRef.current) {
         firstRenderRef.current = false;
       } else {
@@ -74,6 +71,8 @@ const ChatContent = ({
 
   }, [rootRef, currentUserId, room, setMessages]);
 
+  console.log(bottomRef.current);
+  
   useEffect(() => {
     if (!messages[room.id] || !bottomRef.current) return;
     if (messages[room.id].length < 20) {
