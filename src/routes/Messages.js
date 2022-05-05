@@ -22,10 +22,10 @@ import ProfileImage from '../components/ProfileImage';
 import AddImageModal from '../components/AddImageModal';
 import useClickOutside from '../hooks/useClickOutside';
 import ChatContent from '../components/ChatContent';
-import { device } from '../style/device';
+import { device, color } from '../style/variable';
 
 const Container = styled.div`
-  background-color: white;
+  background-color: ${color.white};
   border-radius: 20px;
   position: relative;
   z-index: 1;

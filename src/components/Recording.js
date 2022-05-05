@@ -15,7 +15,7 @@ import CountDown from './elements/CountDown';
 import firebase from '../utils/firebase';
 import Loader from './Loader';
 import { useEffect, useState } from 'react';
-import { device } from '../style/device';
+import { device } from '../style/variable';
 
 const ButtonsWrapper = styled.div`
   display: flex;

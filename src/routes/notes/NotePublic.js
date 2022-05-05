@@ -16,7 +16,7 @@ import EditorArea from '../../components/elements/Editor';
 import Loader from '../../components/Loader';
 import NoteElement from '../../components/NoteCardEditable';
 import ProfileImage from '../../components/ProfileImage';
-import { device } from '../../style/device';
+import { device, color } from '../../style/variable';
 import firebase from '../../utils/firebase';
 
 const Background = styled.div`
@@ -30,9 +30,8 @@ const Background = styled.div`
 
 const UpperContainer = styled.div`
   display: flex;
-  align-items: center;
   border-radius: 24px;
-  background-color: #ee9c91;
+  background-color: ${color.mainYellow};
   padding: 15px 40px;
   cursor: pointer;
   &:hover {
@@ -46,6 +45,7 @@ const UpperContainer = styled.div`
   @media ${device.tablet} {
     flex-direction: row;
     margin-bottom: 25px;
+    align-items: center;
   }
 `;
 
@@ -76,7 +76,7 @@ const DetailsContainer = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 24px;
-  background: white;
+  background: ${color.white};
   margin-bottom: 60px;
   @media ${device.mobileM} {
     padding: 20px 20px 0;
@@ -89,7 +89,7 @@ const DetailsContainer = styled.div`
 const Line = styled.div`
   width: 100%;
   height: 5px;
-  background-color: #306172;
+  background-color: ${color.mainGreen};
 `;
 
 const FieldWrapper = styled.div`
@@ -100,10 +100,10 @@ const FieldWrapper = styled.div`
 `;
 
 const Title = styled.p`
-  font-size: 1.3rem;
+  font-size: 18px;
   font-weight: 500;
   margin-bottom: 10px;
-  color: #306172;
+  color: ${color.mainGreen};
   z-index: 1;
   position: relative;
 `;
@@ -117,7 +117,7 @@ const TitleBack = styled.div`
   position: absolute;
   top: 18px;
   left: 0;
-  background-color: #fff6c9;
+  background-color: rgba(243,173,95,0.5);
   z-index: 0;
   width: 100%;
 `;
@@ -134,7 +134,7 @@ const Dot = styled.div`
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: #306172;
+  background-color: ${color.mainGreen};
   margin-right: 10px;
 `;
 
@@ -161,7 +161,7 @@ const QuestionCard = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 15px;
-  background-color: #fff6c9;
+  background-color: rgba(243,173,95,0.5);
   position: relative;
 `;
 
@@ -201,8 +201,8 @@ const NotePublic = () => {
   return (
     <Background>
       <UpperContainer onClick={() => goToProfile(uid)}>
-        <Tag mr="10px" size="lg" colorScheme="red" borderRadius="full">
-          <TagLabel>作者</TagLabel>
+        <Tag mr="10px" size="lg" colorScheme="brand" borderRadius="full">
+          <TagLabel color="white">作者</TagLabel>
         </Tag>
         <Creator>
           <ProfileImage
@@ -227,9 +227,9 @@ const NotePublic = () => {
                   <Tab
                     key={i}
                     borderRadius={['18px', null, null, 'full']}
-                    p={['9px', null, null, '10px']}
+                    p={['9px', null, null, '10px 15px']}
                     m="10px"
-                    fontSize={['16px', null, null, '20px']}
+                    fontSize={['16px', null, null, '18px']}
                   >
                     {tab}
                   </Tab>

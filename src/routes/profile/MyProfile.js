@@ -6,15 +6,14 @@ import ProfileInfo from '../../components/ProfileInfo';
 
 import ProfileRecords from '../../components/ProfileRecords';
 import ProfileSetting from '../../components/ProfileSetting';
-import { device } from '../../style/device';
+import { device, color } from '../../style/variable';
 
 const Container = styled.div`
   height: 100%;
 `;
 
 const Upper = styled.div`
-  background-color: #f5cdc5;
-  border-bottom: 2px solid black;
+  background-color: ${color.mainYellow};
   @media ${device.mobileM} {
     height: 100px;
   }
@@ -25,9 +24,9 @@ const Upper = styled.div`
 
 const WebTitle = styled.div`
   font-weight: 700;
-  font-size: 60px;
+  font-size: 42px;
   line-height: 82px;
-  color: black;
+  color: ${color.mainGreen};
   padding-left: 10%;
   padding-top: 50px;
   max-width: 1440px;
@@ -53,7 +52,7 @@ const StyledTabList = styled(TabList)`
       justify-content: flex-start;
     }
     @media ${device.laptop} {
-      top: 213px;
+      top: 235px;
     }
   }
 `;
@@ -102,16 +101,18 @@ const MyProfile = () => {
         <Tabs size="lg" isLazy variant="soft-rounded" colorScheme="brand">
           <StyledTabList>
             <Tab
-              w={['50%', null, null, '20%']}
+              w={['50%', null, null, '12%']}
               p="5px"
-              fontSize={['1.125rem', null, null, null, '1.3rem']}
+              fontSize={['16px', null, null, null, '18px']}
+              height="35px"
             >
               Setting
             </Tab>
             <Tab
-              w={['50%', null, null, '20%']}
-              p={['5px', null, null, '0.75rem']}
-              fontSize={['1.125rem', null, null, null, '1.3rem']}
+              w={['50%', null, null, '12%']}
+              p="5px"
+              fontSize={['16px', null, null, null, '18px']}
+              height="35px"
             >
               Records
             </Tab>

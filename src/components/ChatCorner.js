@@ -5,7 +5,7 @@ import { IoChatbubbleEllipsesSharp } from 'react-icons/io5';
 import styled from 'styled-components';
 
 import Messages from '../routes/Messages';
-import { device } from '../style/device';
+import { device } from '../style/variable';
 
 const IconWrapper = styled.div`
   position: fixed;

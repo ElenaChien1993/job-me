@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Button, Input, Textarea } from '@chakra-ui/react';
 import AddField from '../../components/elements/AddField';
-import { device } from '../../style/device';
+import { device } from '../../style/variable';
 
 const InputWrap = styled.div`
   display: flex;

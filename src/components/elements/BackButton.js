@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button } from '@chakra-ui/react';
 import { ChevronLeftIcon } from '@chakra-ui/icons';
-import { device } from '../../style/device';
+import { device } from '../../style/variable';
 
 const StyledButton = styled(Button)`
   && {

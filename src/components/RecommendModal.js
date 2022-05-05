@@ -13,13 +13,14 @@ import {
 
 import Member from './Member';
 import SearchMembers from './SearchMembers';
+import {color} from '../style/variable';
 
 const RecommendModal = ({ isOpen, onClose, recommend, isLoading }) => {
   return (
     <>
       <Modal scrollBehavior="inside" size="xl" isOpen={isOpen} onClose={onClose} id="recommend">
         <ModalOverlay />
-        <ModalContent bgColor="#FFE6CA">
+        <ModalContent bgColor={color.lightPink}>
           {isLoading ? (
             <Flex justify="center">
               <Spinner
@@ -34,9 +35,9 @@ const RecommendModal = ({ isOpen, onClose, recommend, isLoading }) => {
             </Flex>
           ) : (
             <>
-              <ModalHeader bgColor="#306172" color="white" borderRadius="0.375rem 0.375rem 0 0">可以認識一下～</ModalHeader>
+              <ModalHeader bgColor={color.mainGreen} color="white" borderRadius="0.375rem 0.375rem 0 0">可以認識一下～</ModalHeader>
               <ModalCloseButton color="white"/>
-              <ModalBody>
+              <ModalBody pt="30px">
                 {recommend.length === 0 && (
                   <SearchMembers />
                 )}

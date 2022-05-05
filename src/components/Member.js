@@ -1,13 +1,13 @@
 import { Button } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { device } from '../style/device';
+import { device, color } from '../style/variable';
 import ProfileImage from './ProfileImage';
 
 const Container = styled.div`
   display: flex;
   border-radius: 24px;
-  background: white;
+  background: ${color.white};
   margin-bottom: 25px;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
   @media ${device.mobileM} {
@@ -25,7 +25,6 @@ const Container = styled.div`
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: 112px;
   justify-content: space-between;
   white-space: nowrap;
   overflow: hidden;
@@ -44,20 +43,20 @@ const MainContent = styled.div`
 
 const CompanyName = styled.p`
   font-weight: 700;
-  font-size: 25px;
-  color: #306172;
+  font-size: 18px;
+  color: ${color.mainYellow};
   text-overflow: ellipsis;
 `;
 
 const JobTitle = styled.p`
   font-weight: 700;
-  font-size: 25px;
-  color: black;
+  font-size: 24px;
+  color: ${color.mainGreen};
   text-overflow: ellipsis;
 `;
 
 const Status = styled.p`
-  font-weight: 700;
+  font-weight: 500;
   font-size: 18px;
   color: #999999;
 `;

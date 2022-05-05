@@ -14,7 +14,7 @@ const Container = styled.div`
   flex-direction: column;
   margin: 30px auto 0;
   width: 80%;
-  max-width: 1152px;
+  max-width: 1000px;
 `;
 
 const SearchBar = styled.div`
@@ -82,7 +82,7 @@ const Notes = () => {
       </SearchBar>
 
       <Link to="/notes/create" style={{ alignSelf: 'flex-end' }}>
-        <Button my="10px" colorScheme="brand">
+        <Button _hover={{backgroundColor: 'transparent'}} h="2rem" fontSize="14px" my="10px" colorScheme="brand">
           建立筆記
         </Button>
       </Link>

@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   Input,
   Editable,
@@ -8,21 +7,22 @@ import {
   Select,
   IconButton,
 } from '@chakra-ui/react';
+import { useLocation } from 'react-router-dom';
 import { EditIcon, CheckCircleIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
-import { device } from '../style/device';
+import { device, color } from '../style/variable';
 
 const Container = styled.div`
   display: flex;
   border-radius: 24px;
-  background: white;
+  background: ${color.white};
   padding: 20px 40px;
   margin-bottom: 25px;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
   &:hover {
-    transform: translate(5px, 5px);
+    transform: ${props => props.hasHover ? 'translate(5px, 5px)' : ''};
   }
   @media ${device.mobileM} {
     flex-direction: column;
@@ -38,15 +38,16 @@ const Container = styled.div`
 `;
 
 const HeadWrapper = styled.div`
-  min-width: 140px;
-  min-height: 140px;
-  border-radius: 70px;
-  background: #ffe6ca;
+  min-width: 100px;
+  min-height: 100px;
+  border-radius: 50px;
+  background: ${color.mainGreen};
+  color: ${color.white};
   margin-right: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 70px;
+  font-size: 42px;
   font-weight: 700;
   @media ${device.mobileM} {
     display: none;
@@ -64,35 +65,35 @@ const ContentWrapper = styled.div`
 
 const CompanyName = styled.p`
   font-weight: 700;
-  font-size: 25px;
-  color: #306172;
+  font-size: 24px;
+  color: ${color.mainYellow};
 `;
 
 const StyledCompanyPreview = styled(EditablePreview)`
   && {
     font-weight: 700;
-    font-size: 25px;
-    color: #306172;
+    font-size: 24px;
+    color: ${color.mainYellow};
   }
 `;
 
 const JobTitle = styled.p`
   font-weight: 700;
-  font-size: 25px;
-  color: black;
+  font-size: 18px;
+  color: ${color.mainGreen};
 `;
 
 const StyledJobPreview = styled(EditablePreview)`
   && {
     font-weight: 700;
-    font-size: 25px;
-    color: black;
+    font-size: 18px;
+    color: ${color.mainGreen};
   }
 `;
 
 const StyledAddressPreview = styled(EditablePreview)`
   && {
-    font-weight: 700;
+    font-weight: 500;
     font-size: 16px;
     color: #999999;
     width: 200px;
@@ -100,7 +101,7 @@ const StyledAddressPreview = styled(EditablePreview)`
 `;
 
 const Status = styled.p`
-  font-weight: 700;
+  font-weight: 500;
   font-size: 16px;
   color: #999999;
   margin-top: 5px;
@@ -108,7 +109,7 @@ const Status = styled.p`
 
 const StyledSelect = styled(Select)`
   && {
-    font-weight: 700;
+    font-weight: 500;
     font-size: 16px;
     color: #999999;
   }
@@ -144,11 +145,11 @@ const Tag = styled.div`
   justify-content: center;
   align-items: center;
   padding: 5px 10px;
-  background: #d5f4f7;
+  background: rgba(243, 173, 95, 0.5);
   border-radius: 6px;
-  color: #306172;
-  font-weight: 700;
-  font-size: 16px;
+  color: ${color.mainGreen};
+  font-weight: 500;
+  font-size: 14px;
 `;
 
 const StyledInput = styled(Input)`
@@ -161,7 +162,8 @@ const StyledInput = styled(Input)`
 const NoteElement = React.memo(
   ({ uid, noteId, note, setNote, editable, isPublic }) => {
     const [isEditing, setIsEditing] = useState(false);
-    console.log('NoteEl render');
+    const { pathname } = useLocation();
+    console.log(pathname);
 
     const onBlurSubmit = objectKey => {
       firebase.updateNoteBrief(uid, noteId, { [objectKey]: note[objectKey] });
@@ -188,15 +190,19 @@ const NoteElement = React.memo(
     return (
       <>
         {editable ? (
-          <Container>
+          <Container hasHover={pathname === '/notes' || pathname === '/practice'}>
             <HeadWrapper>{note.company_name.split('', 1)}</HeadWrapper>
             <ContentWrapper>
               <Editable
+                mb="5px"
                 value={note.company_name}
                 onSubmit={() => onBlurSubmit('company_name')}
               >
                 <StyledCompanyPreview />
                 <EditableInput
+                  fontSize="24px"
+                  color={color.mainYellow}
+                  fontWeight={700}
                   onChange={e =>
                     setNote(prev => {
                       return { ...prev, company_name: e.target.value };
@@ -205,11 +211,15 @@ const NoteElement = React.memo(
                 />
               </Editable>
               <Editable
+                mb="5px"
                 value={note.job_title}
                 onSubmit={() => onBlurSubmit('job_title')}
               >
                 <StyledJobPreview />
                 <EditableInput
+                  fontSize="18px"
+                  color={color.mainGreen}
+                  fontWeight={700}
                   onChange={e =>
                     setNote(prev => {
                       return { ...prev, job_title: e.target.value };
@@ -219,6 +229,7 @@ const NoteElement = React.memo(
               </Editable>
               <StatusWrapper>
                 <StyledSelect
+                  my="5px"
                   color="#999999"
                   variant="filled"
                   isFullWidth={false}
@@ -235,6 +246,7 @@ const NoteElement = React.memo(
                   <option value="等待中">等待中</option>
                 </StyledSelect>
                 <Editable
+                  mb="5px"
                   defaultValue={
                     note.address === '' ? '尚未填寫資料' : note.address
                   }
@@ -242,6 +254,9 @@ const NoteElement = React.memo(
                 >
                   <StyledAddressPreview />
                   <EditableInput
+                    fontSize="16px"
+                    color="#999"
+                    fontWeight={500}
                     onChange={e =>
                       setNote(prev => {
                         return { ...prev, address: e.target.value };
@@ -281,7 +296,7 @@ const NoteElement = React.memo(
             </TagsWrapper>
           </Container>
         ) : (
-          <Container>
+          <Container hasHover={pathname === '/notes' || pathname === '/practice'}>
             <HeadWrapper>{note.company_name.split('', 1)}</HeadWrapper>
             <ContentWrapper>
               <CompanyName>{note.company_name}</CompanyName>

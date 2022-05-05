@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
 import NoteElement from './NoteCardEditable';
-import { device } from '../style/device';
+import { device } from '../style/variable';
 
 const Container = styled.div`
   position: relative;

@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
 import { v4 as uuid } from 'uuid';
-import { device } from '../style/device';
+import { device } from '../style/variable';
 import firebase from '../utils/firebase';
 
 import ProfileImage from './ProfileImage';

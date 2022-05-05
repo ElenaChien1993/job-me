@@ -9,7 +9,7 @@ import DetailsStep1 from './DetailsStep1';
 import DetailsStep2 from './DetailsStep2';
 import DetailsStep3 from './DetailsStep3';
 import { useNavigate } from 'react-router-dom';
-import { device } from '../../style/device';
+import { device } from '../../style/variable';
 
 const Container = styled.div`
   max-width: 1152px;

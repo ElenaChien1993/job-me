@@ -1,12 +1,14 @@
-import React from 'react';
 import styled from 'styled-components';
 import Avatar from 'boring-avatars';
+
+import { color } from '../style/variable';
 
 const ImageWrapper = styled.div`
   min-width: ${(props) => props.size}px;
   min-height: ${(props) => props.size}px;
   border-radius: ${(props) => props.size / 2}px;
-  border: ${(props) => (props.hasBorder ? '5px solid #ee9c91' : 'none')};
+  border: ${(props) =>
+    props.hasBorder ? `5px solid ${color.mainYellow}` : 'none'};
   margin-right: ${(props) => props.marginRight}px;
   overflow: hidden;
 `;
@@ -17,36 +19,26 @@ const StyledImg = styled.img`
   object-fit: cover;
 `;
 
-const isEqual = (prevProps, nextProps) => {
-  if (prevProps.user !== nextProps.user) {
-    return false;
-  }
-  return true;
+const ProfileImage = ({ user, size, hasBorder, marginRight, preview }) => {
+  return (
+    <ImageWrapper size={size} hasBorder={hasBorder} marginRight={marginRight}>
+      {user.photo_url || preview ? (
+        <StyledImg
+          src={preview ? preview : user.photo_url}
+          alt="head-shot"
+          size={size}
+          referrerpolicy="no-referrer"
+        />
+      ) : (
+        <Avatar
+          size={size}
+          name={user.display_name}
+          variant="beam"
+          colors={['#C1DDC7', '#F5E8C6', '#BBCD77', '#DC8051', '#F4D279']}
+        />
+      )}
+    </ImageWrapper>
+  );
 };
-
-const ProfileImage = React.memo(
-  ({ user, size, hasBorder, marginRight, preview }) => {
-    return (
-      <ImageWrapper size={size} hasBorder={hasBorder} marginRight={marginRight}>
-        {user.photo_url || preview ? (
-          <StyledImg
-            src={preview ? preview : user.photo_url}
-            alt="head-shot"
-            size={size}
-            referrerpolicy="no-referrer"
-          />
-        ) : (
-          <Avatar
-            size={size}
-            name={user.display_name}
-            variant="beam"
-            colors={['#C1DDC7', '#F5E8C6', '#BBCD77', '#DC8051', '#F4D279']}
-          />
-        )}
-      </ImageWrapper>
-    );
-  },
-  isEqual
-);
 
 export default ProfileImage;

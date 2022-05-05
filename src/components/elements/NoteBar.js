@@ -1,12 +1,12 @@
 import styled from 'styled-components';
-import { device } from '../../style/device';
+import { device, color } from '../../style/variable';
 
 const NoteWrapper = styled.div`
   display: flex;
   height: 80px;
   align-items: center;
   border-radius: 24px;
-  background: white;
+  background: ${color.white};
   margin-bottom: 25px;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
   justify-content: center;

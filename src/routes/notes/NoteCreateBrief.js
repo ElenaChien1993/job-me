@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import {
   Input,
@@ -18,7 +18,7 @@ import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
 import SearchableInput from '../../components/SearchableInput';
-import { device } from '../../style/device';
+import { device } from '../../style/variable';
 import { initMap } from '../../components/GoogleSearch';
 
 const InputWrap = styled.div`
@@ -141,6 +141,7 @@ const NoteCreateBrief = props => {
   } = props;
   const { currentUserId, companies, setCompanies, jobTitles, setJobTitles } =
     useOutletContext();
+  const inputRef = useRef();
   const user = firebase.auth.currentUser;
   const navigate = useNavigate();
   const statusArray = [
@@ -162,8 +163,12 @@ const NoteCreateBrief = props => {
     firebase.getWholeCollection('job_titles').then(data => {
       setJobTitles(data);
     });
-    initMap(setValues);
+    // initMap(setValues, inputRef);
   }, []);
+
+  useEffect(() => {
+    initMap(setValues, inputRef);
+  })
 
   const handleCheckboxChange = () => {
     setValues(prev => {
@@ -244,7 +249,7 @@ const NoteCreateBrief = props => {
         <InputWrap>
           <InputLabel>公司地點</InputLabel>
           <StyledInput
-            id="autocomplete-input"
+            ref={inputRef}
             size="sm"
             value={values.address}
             onChange={handleChange('address')}

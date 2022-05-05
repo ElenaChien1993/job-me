@@ -19,11 +19,11 @@ import Avatar from 'boring-avatars';
 
 import firebase from '../utils/firebase';
 import logo from '../images/logo.png';
-import { device } from '../style/device';
+import { device, color } from '../style/variable';
 
 const Container = styled.div`
   height: auto;
-  background-color: #ffeade;
+  background-color: ${color.backgroundGray};
 `;
 
 const ContentContainer = styled.div`
@@ -36,7 +36,7 @@ const ContentContainer = styled.div`
 const StyledNav = styled.nav`
   width: 100vw;
   height: 70px;
-  background-color: #306172;
+  background-color: #0f4a5c;
   position: fixed;
   z-index: 5;
 `;
@@ -48,13 +48,13 @@ const Ul = styled.ul`
 `;
 
 const Logo = styled.img`
-  width: 180px;
+  width: 130px;
   margin: 10px 20px;
 `;
 
 const NavItem = styled.li`
-  font-size: 20px;
-  margin: 10px 20px;
+  font-size: 16px;
+  margin: 10px;
   @media ${device.mobileM} {
     display: none;
   }
@@ -64,9 +64,9 @@ const NavItem = styled.li`
 `;
 
 const ImageWrapper = styled.div`
-  width: 60px;
-  height: 60px;
-  border-radius: 30px;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
   background: #f5cdc5;
   margin-right: 13px;
   overflow: hidden;
@@ -81,8 +81,8 @@ const ImageWrapper = styled.div`
 `;
 
 const StyledImg = styled.img`
-  width: 60px;
-  height: 60px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
 `;
 
@@ -108,15 +108,15 @@ const LogoutButton = styled.div`
 `;
 
 const StyledNavLink = styled(NavLink)`
-  font-size: 24px;
+  font-size: 16px;
   margin: 10px 5px;
 `;
 
 const Span = styled.span`
-  color: ${props => (props.isActive ? '#e17f45' : 'white')};
+  color: ${props => (props.isActive ? '#f2ad5f' : 'rgba(255, 255, 255, 0.7)')};
   font-weight: ${props => (props.isActive ? '700' : '500')};
   &:hover {
-    color: #e17f45;
+    color: #f2ad5f;
     font-weight: 700;
   }
 `;
@@ -196,7 +196,7 @@ const Nav = ({ userInfo, currentUserId }) => {
                     />
                   ) : (
                     <Avatar
-                      size={60}
+                      size={40}
                       name={userInfo?.display_name}
                       variant="beam"
                       colors={[

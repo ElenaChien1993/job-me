@@ -10,14 +10,14 @@ import RadioGroup from '../../components/elements/RadioGroup';
 import Loader from '../../components/Loader';
 import NoteBar from '../../components/elements/NoteBar';
 import BackButton from '../../components/elements/BackButton';
-import { device } from '../../style/device';
+import { device, color } from '../../style/variable';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 20px auto 0;
-  max-width: 1152px;
+  max-width: 1000px;
   @media ${device.mobileM} {
     width: 90%;
   }
@@ -55,7 +55,7 @@ const SettingWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   border-radius: 15px;
-  background: white;
+  background: ${color.white};
   @media ${device.mobileM} {
     padding: 20px 20px;
   }

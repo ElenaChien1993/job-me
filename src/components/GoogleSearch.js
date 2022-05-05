@@ -1,5 +1,5 @@
-export const initMap = async setValues => {
-  const input = document.getElementById('autocomplete-input');
+export const initMap = async (setValues, inputRef) => {
+  // const input = document.getElementById('autocomplete-input');
 
   const options = {
     fields: ['formatted_address'],
@@ -8,7 +8,7 @@ export const initMap = async setValues => {
   };
 
   const autocomplete = new window.google.maps.places.Autocomplete(
-    input,
+    inputRef.current,
     options
   );
 

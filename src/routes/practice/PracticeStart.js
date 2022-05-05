@@ -14,7 +14,7 @@ import NoteBar from '../../components/elements/NoteBar';
 import BeforeRecord from '../../components/BeforeRecord';
 import Recording from '../../components/Recording';
 import finishJson from '../../images/finish.json'
-import { device } from '../../style/device';
+import { device } from '../../style/variable';
 
 const Container = styled.div`
   display: flex;

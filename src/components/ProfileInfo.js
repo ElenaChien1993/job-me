@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
 import {
   IconButton,
   Menu,
@@ -12,7 +11,7 @@ import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
 import ProfileImage from './ProfileImage';
-import { device } from '../style/device';
+import { device } from '../style/variable';
 
 const ImageContainer = styled.div`
   position: relative;
@@ -31,12 +30,12 @@ const NameWrapper = styled.div`
   color: #000000;
   text-align: center;
   @media ${device.mobileM} {
-    font-size: 28px;
+    font-size: 24px;
     line-height: 22px;
     margin-top: 15px;
   }
   @media ${device.tablet} {
-    font-size: 48px;
+    font-size: 42px;
     line-height: 65px;
     margin-top: 20px;
   }
@@ -50,7 +49,7 @@ const JobTitle = styled.div`
     font-size: 18px;
   }
   @media ${device.tablet} {
-    font-size: 30px;
+    font-size: 24px;
   }
 `;
 
@@ -62,7 +61,7 @@ const About = styled.div`
     margin-top: 5px;
   }
   @media ${device.tablet} {
-    font-size: 22px;
+    font-size: 18px;
     margin-top: 10px;
   }
 `;
@@ -85,11 +84,11 @@ const Counts = styled.div`
 
 const Number = styled.div`
   @media ${device.mobileM} {
-    font-size: 25px;
+    font-size: 24px;
     margin-right: 10px;
   }
   @media ${device.tablet} {
-    font-size: 50px;
+    font-size: 42px;
     margin-right: 0;
   }
 `;

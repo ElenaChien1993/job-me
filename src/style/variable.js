@@ -13,3 +13,13 @@ export const device = {
   laptop: `(min-width: ${size.laptop})`,
   laptopL: `(min-width: ${size.laptopL})`,
 };
+
+export const color = {
+  mainGreen: '#0f4a5c',
+  mainYellow: '#f3ad5f',
+  gray: '#6c757d',
+  white: '#fefefe',
+  backgroundGray: '#f2f5f9',
+  darkGreen: '#263237',
+  lightPink: '#ffeade',
+};

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import ChatCorner from '../../components/ChatCorner';
 import Loader from '../../components/Loader';
 import ProfileImage from '../../components/ProfileImage';
-import { device } from '../../style/device';
+import { device } from '../../style/variable';
 
 import firebase from '../../utils/firebase';
 

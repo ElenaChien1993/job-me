@@ -13,7 +13,7 @@ import styled from 'styled-components';
 import firebase from '../utils/firebase';
 import Loader from '../components/Loader';
 import ChatCorner from './ChatCorner';
-import { device } from '../style/device';
+import { device, color } from '../style/variable';
 import ProfileInfo from './ProfileInfo';
 
 const Container = styled.div`
@@ -81,10 +81,10 @@ const InputWrap = styled.div`
     font-weight: 500;
   }
   @media ${device.mobileM} {
-    padding: 10px;
+    padding: 10px 0;
   }
   @media ${device.tablet} {
-    padding: 16px;
+    padding: 16px 0;
   }
 `;
 
@@ -123,9 +123,10 @@ const ProfileSetting = () => {
       <RightWrapper>
         <SelectionWrapper>
           <SectionTitle>BASIC INFO</SectionTitle>
-          <ButtonGroup colorScheme="teal" spacing="4">
+          <ButtonGroup colorScheme="brand" spacing="4">
             <Button
               variant="outline"
+              color={color.mainGreen}
               onClick={() =>
                 setValues({
                   display_name: '',

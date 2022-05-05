@@ -9,7 +9,7 @@ import Note from '../../components/NoteCard';
 const Background = styled.div`
   margin: 30px auto 5%;
   width: 80%;
-  max-width: 1152px;
+  max-width: 1000px;
 `;
 
 const SearchBar = styled.div`

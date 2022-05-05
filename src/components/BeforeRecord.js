@@ -5,7 +5,7 @@ import { MdTimer } from 'react-icons/md';
 import styled from 'styled-components';
 
 import SwitchElement from './elements/Switch';
-import { device } from '../style/device';
+import { device, color } from '../style/variable';
 
 const PlayerWrapper = styled.div`
   margin-bottom: 20px;
@@ -24,7 +24,7 @@ const TimerSettingWrapper = styled.div`
   align-items: center;
   border-radius: 20px;
   padding: 20px;
-  background-color: white;
+  background-color: ${color.white};
 `;
 
 const Text = styled.div`

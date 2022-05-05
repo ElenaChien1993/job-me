@@ -26,7 +26,7 @@ import styled from 'styled-components';
 
 import image from '../images/login.png';
 import firebase from '../utils/firebase';
-import { device } from '../style/device';
+import { device } from '../style/variable';
 
 const WebTitle = styled.div`./
   color: #306172;

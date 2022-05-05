@@ -33,11 +33,11 @@ import EditFiles from '../../components/elements/EditFiles';
 import EditorArea from '../../components/elements/Editor';
 import RecommendModal from '../../components/RecommendModal';
 import EditableInputField from '../../components/EditableInputField';
-import { device } from '../../style/device';
+import { device, color } from '../../style/variable';
 
 const Background = styled.div`
   margin: 30px auto 0;
-  max-width: 1152px;
+  max-width: 1000px;
   @media ${device.mobileM} {
     width: 90%;
   }
@@ -50,7 +50,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 24px;
-  background: white;
+  background: ${color.white};
   margin-bottom: 60px;
   position: relative;
   @media ${device.mobileM} {
@@ -105,7 +105,7 @@ const TitleSection = styled.div`
 `;
 
 const Title = styled.p`
-  font-size: 1.3rem;
+  font-size: 18px;
   font-weight: 500;
   margin-bottom: 10px;
   color: #306172;
@@ -118,7 +118,7 @@ const TitleBack = styled.div`
   position: absolute;
   top: 18px;
   left: 0;
-  background-color: #fff6c9;
+  background-color: rgba(243,173,95,0.5);
   z-index: 0;
   width: 100%;
 `;
@@ -140,7 +140,7 @@ const Dot = styled.div`
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: #306172;
+  background-color: ${color.mainGreen};
 `;
 
 const ListItem = styled.div`
@@ -154,7 +154,7 @@ const QuestionCard = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 15px;
-  background-color: #fff6c9;
+  background-color: rgba(243,173,95,0.5);
   position: relative;
 `;
 
@@ -185,7 +185,7 @@ const CheckBox = styled.input`
 const Line = styled.div`
   width: 100%;
   height: 5px;
-  background-color: #306172;
+  background-color: ${color.mainGreen};
 `;
 
 const StyledLink = styled.a`
@@ -430,7 +430,7 @@ const NoteDetails = () => {
                 color="black"
               >
                 <IconButton
-                  color="#704406"
+                  color={color.mainGreen}
                   aria-label="Open Preview"
                   icon={<MdPreview />}
                   mr="10px"
@@ -456,9 +456,9 @@ const NoteDetails = () => {
                   <Tab
                     key={i}
                     borderRadius={['18px', null, null, 'full']}
-                    p={['9px', null, null, '10px']}
+                    p={['9px', null, null, '10px 15px']}
                     m="10px"
-                    fontSize={['16px', null, null, '20px']}
+                    fontSize={['16px', null, null, '18px']}
                   >
                     {tab}
                   </Tab>

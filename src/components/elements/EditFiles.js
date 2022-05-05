@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Input } from '@chakra-ui/react';
-import { device } from '../../style/device';
+import { device } from '../../style/variable';
 
 const StyledInput = styled(Input)`
   && {

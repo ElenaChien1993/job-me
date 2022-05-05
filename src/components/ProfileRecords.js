@@ -18,8 +18,10 @@ import styled from 'styled-components';
 
 import ChatCorner from './ChatCorner';
 import firebase from '../utils/firebase';
+import useRWD from '../hooks/useRWD';
 import { MdSaveAlt } from 'react-icons/md';
-import { device } from '../style/device';
+import { device } from '../style/variable';
+import ProfileMobileRecords from './ProfileMobileRecords';
 
 const Container = styled.div`
   width: 100%;
@@ -76,14 +78,17 @@ const RecordsList = styled.div`
   background: #ffffff;
   border-radius: 20px;
   overflow: scroll;
+  padding: 10px 0;
 `;
 
 const Record = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 20px;
+  margin: 10px 20px;
+  padding-bottom: 10px;
   cursor: pointer;
+  border-bottom: 1px solid #dbdbdb;
   color: ${props => (props.isSelected ? 'black' : '#999999')};
   font-weight: ${props => (props.isSelected ? '700' : '400')};
   &:hover {
@@ -95,20 +100,20 @@ const Record = styled.div`
     white-space: nowrap;
     overflow: hidden;
     @media ${device.mobileM} {
-      font-size: 20px;
+      font-size: 16px;
     }
     @media ${device.tablet} {
-      font-size: 24px;
+      font-size: 18px;
     }
   }
   & p {
     text-align: end;
     max-width: 20%;
     @media ${device.mobileM} {
-      font-size: 16px;
+      font-size: 14px;
     }
     @media ${device.tablet} {
-      font-size: 18px;
+      font-size: 16px;
     }
   }
 `;
@@ -154,6 +159,8 @@ const ProfileRecords = () => {
   const [activeVideo, setActiveVideo] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
   const { currentUserId } = useOutletContext();
+
+  const isMobile = useRWD();
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -204,6 +211,7 @@ const ProfileRecords = () => {
 
   return (
     <Container>
+      {isMobile ? <ProfileMobileRecords /> : (<>
       <LeftWrapper>
         <Tabs
           w={['100%', null, null, 'auto']}
@@ -327,6 +335,7 @@ const ProfileRecords = () => {
           </>
         )}
       </RightWrapper>
+      </>)}
       <ChatCorner />
     </Container>
   );
