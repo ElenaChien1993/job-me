@@ -23,7 +23,6 @@ import {
   AtSignIcon,
 } from '@chakra-ui/icons';
 import { MdPreview } from 'react-icons/md';
-import { v4 as uuid } from 'uuid';
 import styled from 'styled-components';
 
 import NoteElement from '../../components/NoteCardEditable';
@@ -140,7 +139,7 @@ const Dot = styled.div`
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: ${color.mainGreen};
+  background-color: ${color.primary};
 `;
 
 const ListItem = styled.div`
@@ -185,7 +184,7 @@ const CheckBox = styled.input`
 const Line = styled.div`
   width: 100%;
   height: 5px;
-  background-color: ${color.mainGreen};
+  background-color: ${color.primary};
 `;
 
 const StyledLink = styled.a`
@@ -430,7 +429,7 @@ const NoteDetails = () => {
                 color="black"
               >
                 <IconButton
-                  color={color.mainGreen}
+                  color={color.primary}
                   aria-label="Open Preview"
                   icon={<MdPreview />}
                   mr="10px"
@@ -525,7 +524,7 @@ const NoteDetails = () => {
                   <ListWrapper>
                     {details.responsibilities.map((item, i) => {
                       return (
-                        <ListItem key={uuid()}>
+                        <ListItem key={item}>
                           <Dot />
                           <EditableInputField
                             value={item}
@@ -558,7 +557,7 @@ const NoteDetails = () => {
                   <ListWrapper>
                     {details.requirements.map((item, i) => {
                       return (
-                        <CheckBoxWrapper key={uuid()}>
+                        <CheckBoxWrapper key={item.description}>
                           <CheckBox
                             type="checkbox"
                             checked={details.requirements[i].is_qualified}
@@ -603,7 +602,7 @@ const NoteDetails = () => {
                   <ListWrapper>
                     {details.bonus.map((item, i) => {
                       return (
-                        <CheckBoxWrapper key={uuid()}>
+                        <CheckBoxWrapper key={item.description}>
                           <CheckBox
                             type="checkbox"
                             checked={details.bonus[i].is_qualified}
@@ -676,7 +675,7 @@ const NoteDetails = () => {
                       </StyledListItem>
                       {details.attached_files.map((file, i) => {
                         return (
-                          <React.Fragment key={uuid()}>
+                          <React.Fragment key={file.file_link}>
                             <StyledListItem>
                               <Dot />
                               <StyledLink href={file.file_link} target="_blank">
@@ -713,7 +712,7 @@ const NoteDetails = () => {
                   <QuestionCardsWrapper>
                     {details.questions.map((q, i) => {
                       return (
-                        <QuestionCard key={uuid()}>
+                        <QuestionCard key={q.question}>
                           <QuestionTitle>
                             <EditableInputField
                               style={{ fontWeight: '700' }}

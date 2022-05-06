@@ -8,7 +8,7 @@ const ImageWrapper = styled.div`
   min-height: ${(props) => props.size}px;
   border-radius: ${(props) => props.size / 2}px;
   border: ${(props) =>
-    props.hasBorder ? `5px solid ${color.mainYellow}` : 'none'};
+    props.hasBorder ? `5px solid ${color.primary}` : 'none'};
   margin-right: ${(props) => props.marginRight}px;
   overflow: hidden;
 `;

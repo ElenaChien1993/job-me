@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { v4 as uuid } from 'uuid';
 
 import firebase from '../utils/firebase';
 import ChatReceived from './elements/ChatReceived';

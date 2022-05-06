@@ -5,7 +5,7 @@ import { IoChatbubbleEllipsesSharp } from 'react-icons/io5';
 import styled from 'styled-components';
 
 import Messages from '../routes/Messages';
-import { device } from '../style/variable';
+import { device, color } from '../style/variable';
 
 const IconWrapper = styled.div`
   position: fixed;
@@ -47,10 +47,10 @@ const ChatCorner = () => {
           h="50px"
           isRound
           color="white"
-          bg="#306172"
+          bg={color.primary}
           aria-label="Open Chat"
           fontSize="30px"
-          _hover={{ filter: 'brightness(150%)', color: 'black' }}
+          _hover={{ filter: 'brightness(150%)' }}
           onClick={() => setChatOpen(!chatOpen)}
           icon={chatOpen ? <ChevronDownIcon /> : <IoChatbubbleEllipsesSharp />}
         />

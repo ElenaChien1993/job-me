@@ -3,11 +3,11 @@ import { Link, useOutletContext } from 'react-router-dom';
 import { InputGroup, InputRightElement, Input, Button } from '@chakra-ui/react';
 import { Search2Icon } from '@chakra-ui/icons';
 import styled from 'styled-components';
-import { v4 as uuid } from 'uuid';
 
 import firebase from '../../utils/firebase';
 import Note from '../../components/NoteCard';
 import ChatCorner from '../../components/ChatCorner';
+import { color } from '../../style/variable';
 
 const Container = styled.div`
   display: flex;
@@ -82,7 +82,7 @@ const Notes = () => {
       </SearchBar>
 
       <Link to="/notes/create" style={{ alignSelf: 'flex-end' }}>
-        <Button _hover={{backgroundColor: 'transparent'}} h="2rem" fontSize="14px" my="10px" colorScheme="brand">
+        <Button _hover={{background: 'none', color: color.primary, border: `1px solid ${color.primary}`}} h="2rem" fontSize="14px" my="10px" colorScheme="brand">
           建立筆記
         </Button>
       </Link>
@@ -94,7 +94,7 @@ const Notes = () => {
               <Note
                 currentUserId={currentUserId}
                 note={note}
-                key={uuid()}
+                key={note.note_id}
                 databaseNotes={databaseNotes}
                 setRenderNotes={setRenderNotes}
                 setDatabaseNotes={setDatabaseNotes}

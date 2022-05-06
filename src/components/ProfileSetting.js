@@ -126,7 +126,7 @@ const ProfileSetting = () => {
           <ButtonGroup colorScheme="brand" spacing="4">
             <Button
               variant="outline"
-              color={color.mainGreen}
+              color={color.primary}
               onClick={() =>
                 setValues({
                   display_name: '',

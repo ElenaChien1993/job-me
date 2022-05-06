@@ -3,8 +3,7 @@ import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
 import React, { useState, useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
-import { v4 as uuid } from 'uuid';
-import { device } from '../style/variable';
+import { device, color } from '../style/variable';
 import firebase from '../utils/firebase';
 
 import ProfileImage from './ProfileImage';
@@ -26,10 +25,10 @@ const ChatWrapper = styled.div`
   display: flex;
   align-items: center;
   padding: 15px 16px;
-  background-color: ${(props) => (props.isSelected ? '#D5F4F7' : '')};
+  background-color: ${(props) => (props.isSelected ? color.third : '')};
   cursor: pointer;
   &:hover {
-    background-color: #d5f4f7;
+    background-color: ${color.third};
   }
   @media ${device.mobileM} {
     padding: 10px 10px;
@@ -42,6 +41,7 @@ const ChatWrapper = styled.div`
 `;
 
 const BriefContent = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   text-overflow: ellipsis;
@@ -84,61 +84,69 @@ const LatestMessage = styled.div`
 `;
 
 const DateText = styled.div`
-  text-align: right;
-  align-self: flex-start;
   font-size: 14px;
-  margin-left: auto;
-  display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
   @media ${device.mobileM} {
     display: none;
   }
   @media ${device.laptop} {
-    display: block;
+    display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
   }
+`;
+
+const Upper = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;
 
 const NewMessage = styled.div`
   position: absolute;
-  height: 12px;
-  width: 12px;
-  border-radius: 6px;
+  height: 26px;
+  width: 26px;
+  border-radius: 13px;
   background-color: red;
   right: 20px;
+  color: white;
+  text-align: center;
+  font-weight: 700;
   display: ${(props) => (props.isRead ? 'none' : 'block')};
 `;
 
 const TitleWrapper = styled.div`
-  padding: 25px 0 0 17px;
+  display: flex;
   flex-direction: column;
   @media ${device.mobileM} {
-    display: none;
+    display: ${(props) => (props.theme.isCorner ? 'none' : 'flex')};
+    padding: 15px 0 0 10px;
   }
   @media ${device.laptop} {
     display: flex;
+    padding: 25px 0 0 17px;
   }
 `;
 
 const Title = styled.div`
   font-weight: 600;
   font-size: 24px;
-  margin-bottom: 20px;
+  color: ${color.primary};
   @media ${device.mobileM} {
     font-size: 18px;
   }
   @media ${device.laptop} {
+    display: block;
     font-size: 24px;
+    margin-bottom: 20px;
   }
 `;
 
 const SearchBar = styled.div`
-  width: 90%;
   display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
   @media ${device.mobileM} {
-    align-self: center;
     margin: 15px 0;
+    width: 99%;
   }
   @media ${device.laptop} {
     margin: 0 0 30px;
+    width: 97%;
   }
 `;
 
@@ -237,6 +245,8 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
               children={<Search2Icon color="gray.300" />}
             />
             <Input
+              backgroundColor="white"
+              borderColor={color.primary}
               type="text"
               placeholder="Search people or message"
               onChange={handleSearch}
@@ -258,7 +268,10 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
               marginRight={0}
             />
             <BriefContent>
-              <Name>{room.members.display_name}</Name>
+              <Upper>
+                <Name>{room.members.display_name}</Name>
+                <DateText>{room.latest.timestamp}</DateText>
+              </Upper>
               <LatestMessage
                 isRead={
                   room.receiver_has_read || currentUserId === room.latest_sender
@@ -267,12 +280,13 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
                 {LATEST_MESSAGE_TYPE(room)[room.latest.message_type]}
               </LatestMessage>
             </BriefContent>
-            <DateText>{room.latest.timestamp}</DateText>
             <NewMessage
               isRead={
                 room.receiver_has_read || currentUserId === room.latest_sender
               }
-            />
+            >
+              1
+            </NewMessage>
           </ChatWrapper>
         ))}
         <div ref={observeTargetRef}></div>

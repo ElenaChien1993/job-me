@@ -36,7 +36,7 @@ const ContentContainer = styled.div`
 const StyledNav = styled.nav`
   width: 100vw;
   height: 70px;
-  background-color: #0f4a5c;
+  background-color: ${color.primary};
   position: fixed;
   z-index: 5;
 `;
@@ -67,7 +67,6 @@ const ImageWrapper = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 20px;
-  background: #f5cdc5;
   margin-right: 13px;
   overflow: hidden;
   margin-right: 20px;
@@ -97,13 +96,14 @@ const LoginButton = styled.div`
   }
 `;
 
-const LogoutButton = styled.div`
+const LogoutButton = styled.span`
+  margin-top: 10px;
   padding: 0 5px;
   cursor: pointer;
   color: #999;
   font-weight: 700;
   &:hover {
-    background: #e3e3e3;
+    color: ${color.primary};
   }
 `;
 
@@ -113,10 +113,10 @@ const StyledNavLink = styled(NavLink)`
 `;
 
 const Span = styled.span`
-  color: ${props => (props.isActive ? '#f2ad5f' : 'rgba(255, 255, 255, 0.7)')};
+  color: ${props => (props.isActive ? 'white' : 'rgba(255, 255, 255, 0.7)')};
   font-weight: ${props => (props.isActive ? '700' : '500')};
   &:hover {
-    color: #f2ad5f;
+    color: white;
     font-weight: 700;
   }
 `;
@@ -127,15 +127,15 @@ const MobileUl = styled.ul`
 `;
 
 const MobileNavItem = styled.li`
-  font-size: 20px;
+  font-size: 16px;
   margin: 10px 20px;
 `;
 
 const MobileSpan = styled.span`
-  color: ${props => (props.isActive ? '#e17f45' : '#999')};
+  color: ${props => (props.isActive ? color.primary : '#999')};
   font-weight: ${props => (props.isActive ? '700' : '500')};
   &:hover {
-    color: #e17f45;
+    color: ${color.primary};
     font-weight: 700;
   }
 `;

@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import styled from 'styled-components';
 import { MdSaveAlt } from 'react-icons/md';
+import PropTypes from 'prop-types';
 
 import firebase from '../../utils/firebase';
 import { color } from '../../style/variable';
@@ -126,8 +127,8 @@ const RecordAccordion = ({
                     <SectionTitle>{record.record_name}</SectionTitle>
                     <Button
                       variant="outline"
-                      borderColor={color.mainGreen}
-                      color={color.mainGreen}
+                      borderColor={color.primary}
+                      color={color.primary}
                       onClick={handleDelete}
                       h="26px"
                       fontSize="14px"
@@ -144,7 +145,7 @@ const RecordAccordion = ({
                         style={{ width: '100%', height: '40px' }}
                       />
                     ) : (
-                      <video src={record.link} controls />
+                      <video width="84%" src={record.link} controls />
                     )}
                     <IconButton
                       size="sm"

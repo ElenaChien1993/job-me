@@ -169,7 +169,7 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
         <TabletMode>
           <ProfileImage
             user={userInfo}
-            size={200}
+            size={150}
             hasBorder
             marginRight={0}
             preview={image.preview}

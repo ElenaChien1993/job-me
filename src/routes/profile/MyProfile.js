@@ -13,7 +13,7 @@ const Container = styled.div`
 `;
 
 const Upper = styled.div`
-  background-color: ${color.mainYellow};
+  background-color: ${color.third};
   @media ${device.mobileM} {
     height: 100px;
   }
@@ -26,7 +26,7 @@ const WebTitle = styled.div`
   font-weight: 700;
   font-size: 42px;
   line-height: 82px;
-  color: ${color.mainGreen};
+  color: ${color.primary};
   padding-left: 10%;
   padding-top: 50px;
   max-width: 1440px;
@@ -48,11 +48,8 @@ const StyledTabList = styled(TabList)`
       justify-content: space-around;
     }
     @media ${device.tablet} {
-      top: 218px;
-      justify-content: flex-start;
-    }
-    @media ${device.laptop} {
       top: 235px;
+      justify-content: flex-start;
     }
   }
 `;

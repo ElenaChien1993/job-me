@@ -35,7 +35,7 @@ const RecommendModal = ({ isOpen, onClose, recommend, isLoading }) => {
             </Flex>
           ) : (
             <>
-              <ModalHeader bgColor={color.mainGreen} color="white" borderRadius="0.375rem 0.375rem 0 0">可以認識一下～</ModalHeader>
+              <ModalHeader bgColor={color.primary} color="white" borderRadius="0.375rem 0.375rem 0 0">可以認識一下～</ModalHeader>
               <ModalCloseButton color="white"/>
               <ModalBody pt="30px">
                 {recommend.length === 0 && (

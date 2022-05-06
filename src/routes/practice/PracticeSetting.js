@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
 import { Button, Input, IconButton, useToast } from '@chakra-ui/react';
 import { ArrowForwardIcon, PlusSquareIcon } from '@chakra-ui/icons';
-import { v4 as uuid } from 'uuid';
 import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
@@ -270,7 +269,7 @@ const PracticeSetting = () => {
             <Questions>
               {details.questions.map((item, i) => {
                 return (
-                  <CheckBoxWrapper key={uuid()}>
+                  <CheckBoxWrapper key={item.question}>
                     {questionsBase === '指定' ? (
                       <CheckBox
                         type="checkbox"

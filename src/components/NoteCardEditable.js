@@ -41,7 +41,7 @@ const HeadWrapper = styled.div`
   min-width: 100px;
   min-height: 100px;
   border-radius: 50px;
-  background: ${color.mainGreen};
+  background: ${color.primary};
   color: ${color.white};
   margin-right: 30px;
   display: flex;
@@ -66,28 +66,28 @@ const ContentWrapper = styled.div`
 const CompanyName = styled.p`
   font-weight: 700;
   font-size: 24px;
-  color: ${color.mainYellow};
+  color: ${color.secondary};
 `;
 
 const StyledCompanyPreview = styled(EditablePreview)`
   && {
     font-weight: 700;
     font-size: 24px;
-    color: ${color.mainYellow};
+    color: ${color.secondary};
   }
 `;
 
 const JobTitle = styled.p`
   font-weight: 700;
   font-size: 18px;
-  color: ${color.mainGreen};
+  color: ${color.primary};
 `;
 
 const StyledJobPreview = styled(EditablePreview)`
   && {
     font-weight: 700;
     font-size: 18px;
-    color: ${color.mainGreen};
+    color: ${color.primary};
   }
 `;
 
@@ -145,9 +145,9 @@ const Tag = styled.div`
   justify-content: center;
   align-items: center;
   padding: 5px 10px;
-  background: rgba(243, 173, 95, 0.5);
+  background: ${color.third};
   border-radius: 6px;
-  color: ${color.mainGreen};
+  color: ${color.primary};
   font-weight: 500;
   font-size: 14px;
 `;
@@ -201,7 +201,7 @@ const NoteElement = React.memo(
                 <StyledCompanyPreview />
                 <EditableInput
                   fontSize="24px"
-                  color={color.mainYellow}
+                  color={color.secondary}
                   fontWeight={700}
                   onChange={e =>
                     setNote(prev => {
@@ -218,7 +218,7 @@ const NoteElement = React.memo(
                 <StyledJobPreview />
                 <EditableInput
                   fontSize="18px"
-                  color={color.mainGreen}
+                  color={color.primary}
                   fontWeight={700}
                   onChange={e =>
                     setNote(prev => {

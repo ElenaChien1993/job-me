@@ -44,14 +44,14 @@ const MainContent = styled.div`
 const CompanyName = styled.p`
   font-weight: 700;
   font-size: 18px;
-  color: ${color.mainYellow};
+  color: ${color.secondary};
   text-overflow: ellipsis;
 `;
 
 const JobTitle = styled.p`
   font-weight: 700;
   font-size: 24px;
-  color: ${color.mainGreen};
+  color: ${color.primary};
   text-overflow: ellipsis;
 `;
 

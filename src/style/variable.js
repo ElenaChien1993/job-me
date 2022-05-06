@@ -22,4 +22,7 @@ export const color = {
   backgroundGray: '#f2f5f9',
   darkGreen: '#263237',
   lightPink: '#ffeade',
+  primary: '#013b57',
+  secondary: '#a6492b',
+  third: '#f7e6cc',
 };

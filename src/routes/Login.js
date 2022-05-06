@@ -26,10 +26,10 @@ import styled from 'styled-components';
 
 import image from '../images/login.png';
 import firebase from '../utils/firebase';
-import { device } from '../style/variable';
+import { device, color } from '../style/variable';
 
-const WebTitle = styled.div`./
-  color: #306172;
+const WebTitle = styled.div`
+  color: ${color.primary};
   font-weight: bold;
   @media ${device.mobileM} {
     font-size: 34px;
@@ -87,7 +87,7 @@ const BottomText = styled.div`
 `;
 
 const StyledSpan = styled.span`
-  color: #ee9c91;
+  color: ${color.secondary};
   font-weight: bold;
   cursor: pointer;
 `;
@@ -211,7 +211,7 @@ const Login = () => {
 
   return (
     <Flex
-      bg="#ffeade"
+      bg={color.backgroundGray}
       justify="center"
       align="center"
       my="5%"
@@ -333,7 +333,8 @@ const Login = () => {
           mt="30px"
           py="5px"
           _hover={{ filter: 'auto', brightness: '90%' }}
-          bgColor="#F5CDC5"
+          bgColor={color.secondary}
+          color="white"
         >
           {isRegistered ? '登入' : '註冊'}
         </Button>

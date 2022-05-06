@@ -1,11 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useOutletContext } from 'react-router-dom';
-import { Search2Icon } from '@chakra-ui/icons';
 import { BiSend, BiImageAdd, BiGame } from 'react-icons/bi';
-import { BsFillEmojiHeartEyesFill } from 'react-icons/bs';
+import { BsEmojiHeartEyes } from 'react-icons/bs';
 import {
-  InputGroup,
-  InputLeftElement,
   Input,
   IconButton,
   useDisclosure,
@@ -45,54 +42,21 @@ const Container = styled.div`
 `;
 
 const LeftWrapper = styled.div`
-  position: absolute;
-  left: 0;
-  height: 100%;
-  width: 35%;
-  background-color: #fafafa;
-  border-radius: 20px 0 0 20px;
+  background-color: #ececec;
   flex-direction: column;
   @media ${device.mobileM} {
-    display: none;
+    border-radius: 20px 20px 0 0;
+    position: static;
+    width: 100%;
+    padding: 0 10px;
   }
   @media ${device.laptop} {
-    display: flex;
-  }
-`;
-
-const MobileRoomList = styled.div`
-  flex-direction: column;
-  background-color: #ffe6ca;
-  border-radius: 20px 20px 0 0;
-  padding: 0 10px;
-  @media ${device.mobileM} {
-    display: flex;
-  }
-  @media ${device.laptop} {
-    display: none;
-  }
-`;
-
-const TitleWrapper = styled.div`
-  padding: 25px 0 0 17px;
-  flex-direction: column;
-  @media ${device.mobileM} {
-    display: none;
-  }
-  @media ${device.laptop} {
-    display: flex;
-  }
-`;
-
-const Title = styled.div`
-  font-weight: 600;
-  font-size: 24px;
-  margin-bottom: 20px;
-  @media ${device.mobileM} {
-    font-size: 18px;
-  }
-  @media ${device.laptop} {
-    font-size: 24px;
+    border-radius: 20px 0 0 20px;
+    position: absolute;
+    left: 0;
+    height: 100%;
+    width: 35%;
+    padding: 0;
   }
 `;
 
@@ -106,18 +70,6 @@ const RightWrapper = styled.div`
   @media ${device.laptop} {
     width: 65%;
     margin-left: 35%;
-  }
-`;
-
-const SearchBar = styled.div`
-  width: 90%;
-  display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
-  @media ${device.mobileM} {
-    align-self: center;
-    margin: 15px 0;
-  }
-  @media ${device.laptop} {
-    margin: 0 0 30px;
   }
 `;
 
@@ -173,7 +125,7 @@ const StyledIconButton = styled(IconButton)`
     svg {
       width: 25px;
       height: 25px;
-      color: #21978b;
+      color: ${color.primary};
     }
   }
 `;
@@ -248,9 +200,9 @@ const Messages = () => {
         <LeftWrapper>
           <ChatList active={active} setActive={setActive} isCorner={isCorner} />
         </LeftWrapper>
-        <MobileRoomList>
+        {/* <MobileRoomList>
           <ChatList active={active} setActive={setActive} isCorner={isCorner} />
-        </MobileRoomList>
+        </MobileRoomList> */}
         <RightWrapper>
           {active ? (
             <>
@@ -307,7 +259,7 @@ const Messages = () => {
                   onClick={() => setShowEmojis(!showEmojis)}
                   variant="ghost"
                   aria-label="Open Emojis"
-                  icon={<BsFillEmojiHeartEyesFill />}
+                  icon={<BsEmojiHeartEyes />}
                 />
                 <StyledIconButton
                   onClick={() => send(text, 0)}

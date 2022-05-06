@@ -10,7 +10,6 @@ import {
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { v4 as uuid } from 'uuid';
 import EditorArea from '../../components/elements/Editor';
 
 import Loader from '../../components/Loader';
@@ -31,7 +30,7 @@ const Background = styled.div`
 const UpperContainer = styled.div`
   display: flex;
   border-radius: 24px;
-  background-color: ${color.mainYellow};
+  background-color: ${color.secondary};
   padding: 15px 40px;
   cursor: pointer;
   &:hover {
@@ -89,7 +88,7 @@ const DetailsContainer = styled.div`
 const Line = styled.div`
   width: 100%;
   height: 5px;
-  background-color: ${color.mainGreen};
+  background-color: ${color.primary};
 `;
 
 const FieldWrapper = styled.div`
@@ -103,7 +102,7 @@ const Title = styled.p`
   font-size: 18px;
   font-weight: 500;
   margin-bottom: 10px;
-  color: ${color.mainGreen};
+  color: ${color.primary};
   z-index: 1;
   position: relative;
 `;
@@ -134,7 +133,7 @@ const Dot = styled.div`
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: ${color.mainGreen};
+  background-color: ${color.primary};
   margin-right: 10px;
 `;
 
@@ -265,9 +264,9 @@ const NotePublic = () => {
                   <ListWrapper>
                     {details.responsibilities.length === 0
                       ? '未填寫'
-                      : details.responsibilities.map((item, i) => {
+                      : details.responsibilities.map((item) => {
                           return (
-                            <ListItem key={uuid()}>
+                            <ListItem key={item}>
                               <Dot />
                               <Content>{item}</Content>
                             </ListItem>
@@ -283,9 +282,9 @@ const NotePublic = () => {
                   <ListWrapper>
                     {details.requirements.length === 0
                       ? '未填寫'
-                      : details.requirements.map((item, i) => {
+                      : details.requirements.map((item) => {
                           return (
-                            <ListItem key={uuid()}>
+                            <ListItem key={item.description}>
                               <Dot />
                               <Content>{item.description}</Content>
                             </ListItem>
@@ -301,9 +300,9 @@ const NotePublic = () => {
                   <ListWrapper>
                     {details.bonus.length === 0
                       ? '未填寫'
-                      : details.bonus.map((item, i) => {
+                      : details.bonus.map((item) => {
                           return (
-                            <ListItem key={uuid()}>
+                            <ListItem key={item.description}>
                               <Dot />
                               <Content>{item.description}</Content>
                             </ListItem>
@@ -328,9 +327,9 @@ const NotePublic = () => {
                   <Title>面試題目猜題</Title>
                   {details.questions.length !== 0 && (
                     <QuestionCardsWrapper>
-                      {details.questions.map((q, i) => {
+                      {details.questions.map((q) => {
                         return (
-                          <QuestionCard key={uuid()}>
+                          <QuestionCard key={q.question}>
                             <QuestionTitle>{q.question}</QuestionTitle>
                           </QuestionCard>
                         );

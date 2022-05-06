@@ -24,6 +24,8 @@ const DateText = styled.div`
   font-size: 14px;
   color: #999999;
   margin-left: 10px;
+  align-self: flex-end;
+  margin-bottom: 5px;
 `;
 
 const Text = React.forwardRef((props, ref) => {

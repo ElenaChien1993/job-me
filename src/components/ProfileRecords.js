@@ -13,7 +13,6 @@ import {
 } from '@chakra-ui/react';
 import { FaMicrophone, FaFilm } from 'react-icons/fa';
 import { RiFileUnknowLine } from 'react-icons/ri';
-import { v4 as uuid } from 'uuid';
 import styled from 'styled-components';
 
 import ChatCorner from './ChatCorner';
@@ -237,7 +236,7 @@ const ProfileRecords = () => {
                   audioRecords.map(record => {
                     return (
                       <Record
-                        key={uuid()}
+                        key={record.record_id}
                         isSelected={
                           activeAudio &&
                           activeAudio.record_id === record.record_id
@@ -260,7 +259,7 @@ const ProfileRecords = () => {
                   videoRecords.map(record => {
                     return (
                       <Record
-                        key={uuid()}
+                        key={record.record_id}
                         isSelected={
                           activeVideo &&
                           activeVideo.record_id === record.record_id

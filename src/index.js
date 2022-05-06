@@ -22,6 +22,8 @@ import Login from './routes/Login';
 import NotFound from './routes/NotFound';
 import NotePublic from './routes/notes/NotePublic';
 
+import {color} from './style/variable'
+
 const breakpoints = {
   xs: '375px',
   sm: '425px',
@@ -40,8 +42,8 @@ const theme = extendTheme({
       200: '#51a386',
       300: '#6c757d',
       400: '#B7C7CE',
-      500: '#0f4a5c',
-      600: '#f3ad5f',
+      500: color.primary,
+      600: color.secondary,
       700: 'white',
       800: '#f3ad5f',
       900: '#f2f5f9',
