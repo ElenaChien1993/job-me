@@ -9,7 +9,7 @@ import DetailsStep1 from './DetailsStep1';
 import DetailsStep2 from './DetailsStep2';
 import DetailsStep3 from './DetailsStep3';
 import { useNavigate } from 'react-router-dom';
-import { device } from '../../style/variable';
+import { device, color} from '../../style/variable';
 
 const Container = styled.div`
   max-width: 1152px;
@@ -35,7 +35,7 @@ const Main = styled.div`
 const LeftWrapper = styled.div`
   position: absolute;
   left: 0;
-  background: #306172;
+  background: ${color.primary};
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -65,7 +65,7 @@ const RightWrapper = styled.div`
     padding: 0 22px 60px;
     width: 100%;
     height: 90%;
-    padding-top: 20%;
+    padding-top: 23%;
   }
   @media ${device.tablet} {
     padding-top: 40px;
@@ -79,7 +79,7 @@ const RightWrapper = styled.div`
 `;
 
 const StyledIcon = styled(Icon)`
-  color: ${props => (props.isComplete ? 'white' : '#214552')};
+  color: ${props => (props.isComplete ? 'white' : '#04608c')};
   @media ${device.mobileM} {
     width: 25px;
     height: 25px;
@@ -95,9 +95,10 @@ const StyledIcon = styled(Icon)`
 `;
 
 const StepText = styled.p`
-  color: ${props => (props.isComplete ? 'white' : '#214552')};
+  color: ${props => (props.isComplete ? 'white' : '#04608c')};
   font-size: 20px;
   font-weight: bold;
+  cursor: default;
   @media ${device.mobileM} {
     font-size: 16px;
     line-height: 22px;
@@ -113,7 +114,7 @@ const StraightLine = styled.div`
   height: 30px;
   margin: 3px 0;
   margin-left: 16px;
-  background-color: ${props => (props.isComplete ? 'white' : '#214552')};
+  background-color: ${props => (props.isComplete ? 'white' : '#04608c')};
   @media ${device.mobileM} {
     display: none;
   }
@@ -143,7 +144,7 @@ const NoteCreate = () => {
     resume_link: '',
     salary: {
       range: '',
-      type: '',
+      type: '年薪',
     },
     responsibilities: [],
     requirements: [{ is_qualified: false, description: '' }],

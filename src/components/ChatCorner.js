@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { IconButton } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
@@ -6,6 +7,7 @@ import styled from 'styled-components';
 
 import Messages from '../routes/Messages';
 import { device, color } from '../style/variable';
+import firebase from '../utils/firebase';
 
 const IconWrapper = styled.div`
   position: fixed;
@@ -31,8 +33,24 @@ const MessageWrapper = styled.div`
   }
 `;
 
+const NewMessage = styled.div`
+  position: absolute;
+  height: 26px;
+  width: 26px;
+  border-radius: 13px;
+  background-color: red;
+  right: -10px;
+  top: -10px;
+  color: white;
+  text-align: center;
+  font-weight: 700;
+  display: ${props => (props.isRead ? 'none' : 'block')};
+`;
+
 const ChatCorner = () => {
-  const { chatOpen, setChatOpen } = useOutletContext();
+  const { chatOpen, setChatOpen, unreadTotal } = useOutletContext();
+
+  console.log(unreadTotal);
 
   return (
     <>
@@ -54,6 +72,9 @@ const ChatCorner = () => {
           onClick={() => setChatOpen(!chatOpen)}
           icon={chatOpen ? <ChevronDownIcon /> : <IoChatbubbleEllipsesSharp />}
         />
+        <NewMessage isRead={unreadTotal === 0 || chatOpen}>
+          {unreadTotal}
+        </NewMessage>
       </IconWrapper>
     </>
   );

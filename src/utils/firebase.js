@@ -405,15 +405,22 @@ const firebase = {
         const roomSnap = await getDoc(doc(db, 'chatrooms', room.id));
         const lastSender = roomSnap.data().latest_sender;
         if (uid === lastSender) return;
-        this.updateRoom(room.id, { receiver_has_read: true });
+        this.updateRoom(room.id, { receiver_has_read: true, unread_qty: 0 });
       },
       (error) => {
         console.error(error);
       }
     );
   },
+  async checkUnreadQty(roomId) {
+    const docSnap = await getDoc(doc(db, 'chatrooms', roomId));
+    const unreadQty = docSnap.data().unread_qty || 0;
+    return unreadQty;
+  },
   async sendMessage(roomId, data) {
     try {
+      const unreadQty = await this.checkUnreadQty(roomId);
+      console.log(unreadQty);
       await updateDoc(doc(db, 'chatrooms', roomId), {
         latest: {
           timestamp: data.create_at,
@@ -422,8 +429,8 @@ const firebase = {
         },
         receiver_has_read: false,
         latest_sender: data.uid,
+        unread_qty: unreadQty + 1,
       });
-      console.log('update room');
       const newDocRef = doc(collection(db, 'chatrooms', roomId, 'messages'));
       await setDoc(newDocRef, { ...data, id: newDocRef.id });
     } catch (err) {

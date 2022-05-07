@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Button, Input, Textarea } from '@chakra-ui/react';
 import AddField from '../../components/elements/AddField';
-import { device } from '../../style/variable';
+import { device, color} from '../../style/variable';
 
 const InputWrap = styled.div`
   display: flex;
@@ -57,11 +57,11 @@ const RadioInput = styled.input`
 const TagButton = styled.label`
   width: 90px;
   height: 35px;
-  background: ${props => (props.checked ? '#306172' : '#E3E3E3')};
+  background: ${props => (props.checked ? color.primary : '#E3E3E3')};
   border-radius: 20px;
   color: ${props => (props.checked ? 'white' : '#707070')};
   font-size: 16px;
-  line-height: 22px;
+  line-height: 22px;ㄑ
   margin-right: 15px;
   cursor: pointer;
   border: 1px solid #667080;

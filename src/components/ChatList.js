@@ -25,7 +25,7 @@ const ChatWrapper = styled.div`
   display: flex;
   align-items: center;
   padding: 15px 16px;
-  background-color: ${(props) => (props.isSelected ? color.third : '')};
+  background-color: ${props => (props.isSelected ? color.third : '')};
   cursor: pointer;
   &:hover {
     background-color: ${color.third};
@@ -49,9 +49,11 @@ const BriefContent = styled.div`
   overflow: hidden;
   @media ${device.mobileM} {
     margin-left: 0;
+    width: auto;
   }
   @media ${device.laptop} {
     margin-left: 13px;
+    width: 100%;
   }
 `;
 
@@ -74,7 +76,11 @@ const Name = styled.div`
 const LatestMessage = styled.div`
   color: #4f5665;
   font-size: 16px;
-  font-weight: ${(props) => (props.isRead ? '400' : '700')};
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 90%;
+  font-weight: ${props => (props.isRead ? '400' : '700')};
   @media ${device.mobileM} {
     display: none;
   }
@@ -89,7 +95,7 @@ const DateText = styled.div`
     display: none;
   }
   @media ${device.laptop} {
-    display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
+    display: ${props => (props.theme.isCorner ? 'none' : 'block')};
   }
 `;
 
@@ -104,18 +110,24 @@ const NewMessage = styled.div`
   width: 26px;
   border-radius: 13px;
   background-color: red;
-  right: 20px;
+  top: 38px;
   color: white;
   text-align: center;
   font-weight: 700;
-  display: ${(props) => (props.isRead ? 'none' : 'block')};
+  display: ${props => (props.isRead ? 'none' : 'block')};
+  @media ${device.mobileM} {
+    right: 5px;
+  }
+  @media ${device.laptop} {
+    right: 17px;
+  }
 `;
 
 const TitleWrapper = styled.div`
   display: flex;
   flex-direction: column;
   @media ${device.mobileM} {
-    display: ${(props) => (props.theme.isCorner ? 'none' : 'flex')};
+    display: ${props => (props.theme.isCorner ? 'none' : 'flex')};
     padding: 15px 0 0 10px;
   }
   @media ${device.laptop} {
@@ -139,7 +151,7 @@ const Title = styled.div`
 `;
 
 const SearchBar = styled.div`
-  display: ${(props) => (props.theme.isCorner ? 'none' : 'block')};
+  display: ${props => (props.theme.isCorner ? 'none' : 'block')};
   @media ${device.mobileM} {
     margin: 15px 0;
     width: 99%;
@@ -150,29 +162,19 @@ const SearchBar = styled.div`
   }
 `;
 
-const LATEST_MESSAGE_TYPE = (props) => ({
+const LATEST_MESSAGE_TYPE = props => ({
   0: props.latest.message,
   1: '傳送了一張照片',
   default: '',
 });
 
 const ChatList = React.memo(({ active, setActive, isCorner }) => {
-  const [databaseRooms, setDatabaseRooms] = useState([]);
   const [renderRooms, setRenderRooms] = useState([]);
-  const { currentUserId } = useOutletContext();
+  const { currentUserId, databaseRooms } = useOutletContext();
   const rootRef = useRef();
   const observeTargetRef = useRef();
   const firstRenderRef = useRef(true);
   const roomsQtyRef = useRef(0);
-
-  useEffect(() => {
-    const unsubscribe = firebase.listenRoomsChange(
-      currentUserId,
-      setDatabaseRooms
-    );
-
-    return () => unsubscribe();
-  }, [currentUserId]);
 
   useEffect(() => {
     setRenderRooms(databaseRooms.slice(0, 5));
@@ -182,13 +184,13 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
     roomsQtyRef.current = renderRooms.length;
   }, [renderRooms]);
 
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     const term = e.target.value;
     if (!term) {
       setRenderRooms(databaseRooms.slice(0, 5));
       return;
     }
-    const filtered = databaseRooms.filter((room) => {
+    const filtered = databaseRooms.filter(room => {
       const regex = new RegExp(term, 'gi');
       return room.members.display_name.match(regex);
     });
@@ -206,12 +208,7 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
       const startIndex = roomsQtyRef.current;
       if (startIndex === databaseRooms.length) return;
 
-      console.log(
-        'observer fire',
-        startIndex,
-        databaseRooms.slice(startIndex, startIndex + 5)
-      );
-      setRenderRooms((prev) => [
+      setRenderRooms(prev => [
         ...prev,
         ...databaseRooms.slice(startIndex, startIndex + 5),
       ]);
@@ -255,7 +252,7 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
         </SearchBar>
       </TitleWrapper>
       <Container ref={rootRef}>
-        {renderRooms.map((room) => (
+        {renderRooms.map(room => (
           <ChatWrapper
             isSelected={active?.id === room.id}
             key={room.id}
@@ -285,7 +282,7 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
                 room.receiver_has_read || currentUserId === room.latest_sender
               }
             >
-              1
+              {room.unread_qty}
             </NewMessage>
           </ChatWrapper>
         ))}

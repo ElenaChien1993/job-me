@@ -266,9 +266,7 @@ const Nav = ({ userInfo, currentUserId }) => {
                         </StyledNavLink>
                       </MobileNavItem>
                       <MobileNavItem>
-                        <StyledNavLink
-                          to={`/profile/${currentUserId}`}
-                        >
+                        <StyledNavLink to={`/profile/${currentUserId}`}>
                           {({ isActive }) => (
                             <MobileSpan isActive={isActive}>Profile</MobileSpan>
                           )}
@@ -296,6 +294,8 @@ const Layout = () => {
   const [active, setActive] = useState(null);
   const [companies, setCompanies] = useState(null);
   const [jobTitles, setJobTitles] = useState(null);
+  const [databaseRooms, setDatabaseRooms] = useState([]);
+  const [unreadTotal, setUnreadTotal] = useState(0);
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -306,6 +306,27 @@ const Layout = () => {
 
     return () => unsubscribe();
   }, [currentUserId]);
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    const unsubscribe = firebase.listenRoomsChange(
+      currentUserId,
+      setDatabaseRooms
+    );
+
+    return () => unsubscribe();
+  }, [currentUserId]);
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    const unreadQty = databaseRooms.reduce((acc, cur) => {
+      if (cur.latest_sender === currentUserId) {
+        return acc + 0;
+      }
+      return acc + (cur.unread_qty || 0);
+    }, 0);
+    setUnreadTotal(unreadQty);
+  }, [databaseRooms, setUnreadTotal, currentUserId]);
 
   const props = {
     currentUserId,
@@ -318,6 +339,10 @@ const Layout = () => {
     setCompanies,
     jobTitles,
     setJobTitles,
+    unreadTotal,
+    setUnreadTotal,
+    databaseRooms,
+    setDatabaseRooms,
   };
 
   return (

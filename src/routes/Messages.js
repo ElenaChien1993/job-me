@@ -2,13 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import { BiSend, BiImageAdd, BiGame } from 'react-icons/bi';
 import { BsEmojiHeartEyes } from 'react-icons/bs';
-import {
-  Input,
-  IconButton,
-  useDisclosure,
-  Flex,
-  Icon,
-} from '@chakra-ui/react';
+import { Input, IconButton, useDisclosure, Flex, Icon } from '@chakra-ui/react';
 import styled, { ThemeProvider } from 'styled-components';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
@@ -28,16 +22,16 @@ const Container = styled.div`
   z-index: 1;
   max-width: 1152px;
   @media ${device.mobileM} {
-    margin: ${(props) => (props.theme.isCorner ? '' : '0 auto 80px')};
-    top: ${(props) => (props.theme.isCorner ? '' : '40px')};
-    width: ${(props) => (props.theme.isCorner ? '300px' : '90%')};
-    height: ${(props) => (props.theme.isCorner ? '454px' : 'auto')};
+    margin: ${props => (props.theme.isCorner ? '' : '0 auto 80px')};
+    top: ${props => (props.theme.isCorner ? '' : '40px')};
+    width: ${props => (props.theme.isCorner ? '300px' : '90%')};
+    height: ${props => (props.theme.isCorner ? '454px' : 'auto')};
   }
   @media ${device.laptop} {
-    margin: ${(props) => (props.theme.isCorner ? '' : '0 auto')};
-    top: ${(props) => (props.theme.isCorner ? '' : '70px')};
-    width: ${(props) => (props.theme.isCorner ? '40vw' : '80%')};
-    height: ${(props) => (props.theme.isCorner ? '400px' : '650px')};
+    margin: ${props => (props.theme.isCorner ? '' : '0 auto')};
+    top: ${props => (props.theme.isCorner ? '' : '70px')};
+    width: ${props => (props.theme.isCorner ? '40vw' : '80%')};
+    height: ${props => (props.theme.isCorner ? '400px' : '650px')};
   }
 `;
 
@@ -95,10 +89,10 @@ const Name = styled.div`
 const Content = styled.div`
   overflow: scroll;
   @media ${device.mobileM} {
-    height: ${(props) => (props.theme.isCorner ? '285px' : '410px')};
+    height: ${props => (props.theme.isCorner ? '285px' : '410px')};
   }
   @media ${device.laptop} {
-    height: ${(props) => (props.theme.isCorner ? '272px' : '522px')};
+    height: ${props => (props.theme.isCorner ? '272px' : '522px')};
   }
 `;
 
@@ -165,7 +159,7 @@ const Messages = () => {
 
   useEffect(() => {
     if (!active || currentUserId === active.latest_sender) return;
-    firebase.updateRoom(active.id, { receiver_has_read: true });
+    firebase.updateRoom(active.id, { receiver_has_read: true, unread_qty: 0 });
   }, [active, currentUserId]);
 
   const send = async (value, type) => {
@@ -186,9 +180,9 @@ const Messages = () => {
     }
   };
 
-  const addEmoji = (e) => {
+  const addEmoji = e => {
     let emoji = e.native;
-    setText((prev) => prev + emoji);
+    setText(prev => prev + emoji);
     setShowEmojis(false);
   };
 
@@ -198,11 +192,12 @@ const Messages = () => {
     <ThemeProvider theme={{ isCorner }}>
       <Container>
         <LeftWrapper>
-          <ChatList active={active} setActive={setActive} isCorner={isCorner} />
+          <ChatList
+            active={active}
+            setActive={setActive}
+            isCorner={isCorner}
+          />
         </LeftWrapper>
-        {/* <MobileRoomList>
-          <ChatList active={active} setActive={setActive} isCorner={isCorner} />
-        </MobileRoomList> */}
         <RightWrapper>
           {active ? (
             <>
@@ -237,8 +232,8 @@ const Messages = () => {
                   type="text"
                   placeholder="Type your message"
                   value={text}
-                  onChange={(event) => setText(event.target.value)}
-                  onKeyDown={(e) => handleEnter(e, text, 0)}
+                  onChange={event => setText(event.target.value)}
+                  onKeyDown={e => handleEnter(e, text, 0)}
                 />
                 {showEmojis && (
                   <EmojisPicker ref={emojisRef}>

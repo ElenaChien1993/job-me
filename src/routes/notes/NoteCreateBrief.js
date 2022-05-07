@@ -18,14 +18,15 @@ import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
 import SearchableInput from '../../components/SearchableInput';
-import { device } from '../../style/variable';
+import { device, color} from '../../style/variable';
 import { initMap } from '../../components/GoogleSearch';
 
 const InputWrap = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 32px;
+  position: relative;
 `;
 
 const InputLabel = styled.label`
@@ -39,6 +40,7 @@ const InputLabel = styled.label`
 const StyledInput = styled(Input)`
   && {
     border-radius: 10px;
+    height: 40px;
   }
 `;
 
@@ -58,7 +60,7 @@ const RadioInput = styled.input`
 const TagButton = styled.label`
   width: 90px;
   height: 35px;
-  background: ${props => (props.checked ? '#306172' : '#E3E3E3')};
+  background: ${props => (props.checked ? color.primary : '#E3E3E3')};
   border-radius: 20px;
   color: ${props => (props.checked ? 'white' : '#707070')};
   line-height: 22px;
@@ -88,7 +90,7 @@ const CheckBoxWrapper = styled.div`
 const CheckBox = styled.input`
   height: 25px;
   width: 25px;
-  background: #306172;
+  background: ${color.primary};
   color: white;
   margin-right: 15px;
   cursor: pointer;
@@ -112,7 +114,7 @@ const InfoPopup = () => {
       <PopoverTrigger>
         <IconButton
           aria-label="more info"
-          colorScheme="brand"
+          color={color.secondary}
           variant="ghost"
           icon={<QuestionIcon />}
         />
@@ -216,7 +218,6 @@ const NoteCreateBrief = props => {
     });
   };
 
-  // console.log(companies, jobTitles);
   console.log(values.address);
 
   return (

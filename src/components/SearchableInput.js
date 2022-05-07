@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Input } from '@chakra-ui/react';
 import styled from 'styled-components';
+
+import { device, color } from '../style/variable';
 
 const StyledInput = styled(Input)`
   && {
@@ -10,10 +12,14 @@ const StyledInput = styled(Input)`
 
 const StyledList = styled.div`
   width: 100%;
-  background-color: #ffeadd;
+  background-color: whitesmoke;
   border-radius: 5px;
   margin-top: 5px;
   padding: 5px 0;
+  position: absolute;
+  z-index: 3;
+  top: 70px;
+  box-shadow: 4px 5px 7px #888888;
 `;
 
 const StyledListItem = styled.div`
@@ -21,14 +27,21 @@ const StyledListItem = styled.div`
   width: 100%;
   padding-left: 17px;
   &:hover {
-    background-color: #FFF6C9;
+    background-color: ${color.third};
   }
+`;
+
+const NotFound = styled.div`
+  position: absolute;
+  margin-top: 5px;
+  padding-left: 10px;
+  color: #999999;
 `;
 
 const RenderList = ({ data, value, setValue, toggle, setToggle }) => {
   if (value && data) {
     const filteredList = data.filter(item => {
-      const regex = new RegExp(value, "gi");
+      const regex = new RegExp(value, 'gi');
       return item.name.match(regex);
     });
     if (filteredList.length) {
@@ -55,7 +68,7 @@ const RenderList = ({ data, value, setValue, toggle, setToggle }) => {
 
     return (
       <div>
-        <li style={{marginTop: '10px'}}>紀錄查無此公司，將為您直接新增</li>
+        <NotFound>查無此紀錄，將為您直接新增</NotFound>
       </div>
     );
   }

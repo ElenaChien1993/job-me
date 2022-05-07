@@ -44,7 +44,7 @@ const StyledTabList = styled(TabList)`
     position: absolute;
     width: 90%;
     @media ${device.mobileM} {
-      top: 400px;
+      top: 410px;
       justify-content: space-around;
     }
     @media ${device.tablet} {
