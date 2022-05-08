@@ -1,9 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
-import {
-  useOutletContext,
-  useNavigate,
-} from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import { Button } from '@chakra-ui/react';
 import { CgProfile } from 'react-icons/cg';
 import Lottie from 'react-lottie-player';
@@ -13,8 +10,8 @@ import BackButton from '../../components/elements/BackButton';
 import NoteBar from '../../components/elements/NoteBar';
 import BeforeRecord from '../../components/BeforeRecord';
 import Recording from '../../components/Recording';
-import finishJson from '../../images/finish.json'
-import { device } from '../../style/variable';
+import finishJson from '../../images/finish.json';
+import { device, color } from '../../style/variable';
 
 const Container = styled.div`
   display: flex;
@@ -44,20 +41,20 @@ const StyledNoteBar = styled(NoteBar)`
 
 const Question = styled.div`
   font-weight: 700;
-  color: #306172;
+  color: ${color.primary};
   margin-bottom: 30px;
   text-align: center;
   @media ${device.mobileM} {
-    font-size: 2.5rem;
+    font-size: 30px;
   }
   @media ${device.tablet} {
-    font-size: 3.5rem;
+    font-size: 42px;
   }
 `;
 
 const Title = styled.div`
   font-weight: 700;
-  color: #306172;
+  color: ${color.primary};
   margin-bottom: 20px;
   @media ${device.mobileM} {
     font-size: 24px;
@@ -72,7 +69,7 @@ const StyledButton = styled(Button)`
     height: 40px;
     width: 200px;
     color: white;
-    background: #306172;
+    background: ${color.primary};
     &:hover {
       filter: brightness(110%);
       color: black;

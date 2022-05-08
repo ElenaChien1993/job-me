@@ -22,7 +22,7 @@ const Text = styled.div`
   text-align: center;
 `;
 
-const ProfileMobileRecords = () => {
+const ProfileMobileRecords = ({onOpen}) => {
   const [audioRecords, setAudioRecords] = useState([]);
   const [videoRecords, setVideoRecords] = useState([]);
   const [activeRecord, setActiveRecord] = useState(null);
@@ -75,9 +75,9 @@ const ProfileMobileRecords = () => {
                 <RecordAccordion
                   records={audioRecords}
                   tabIndex={tabIndex}
-                  currentUserId={currentUserId}
                   activeRecord={activeRecord}
                   setActiveRecord={setActiveRecord}
+                  onOpen={onOpen}
                 />
               ) : (
                 <Text>尚無錄音練習紀錄</Text>
@@ -88,9 +88,9 @@ const ProfileMobileRecords = () => {
                 <RecordAccordion
                   records={videoRecords}
                   tabIndex={tabIndex}
-                  currentUserId={currentUserId}
                   activeRecord={activeRecord}
                   setActiveRecord={setActiveRecord}
+                  onOpen={onOpen}
                 />
               ) : (
                 <Text>尚無錄影練習紀錄</Text>

@@ -20,11 +20,19 @@ const PlayerWrapper = styled.div`
 const TimerSettingWrapper = styled.div`
   display: flex;
   margin-bottom: 20px;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   border-radius: 20px;
   padding: 20px;
   background-color: ${color.white};
+  @media ${device.mobileM} {
+    width: 340px;
+    height: 180px;
+  }
+  @media ${device.tablet} {
+    width: 450px;
+    height: 140px;
+  }
 `;
 
 const Text = styled.div`

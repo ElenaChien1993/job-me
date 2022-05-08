@@ -279,13 +279,11 @@ const firebase = {
   },
   async deleteFile(path) {
     const fileRef = ref(storage, path);
-    deleteObject(fileRef)
-      .then(() => {
-        alert('已刪除檔案');
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    try {
+      deleteObject(fileRef);
+    } catch (error) {
+      console.log(error);
+    }
   },
   async getDownloadURL(path) {
     return getDownloadURL(ref(storage, path))

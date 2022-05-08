@@ -12,7 +12,6 @@ import styled from 'styled-components';
 import { MdSaveAlt } from 'react-icons/md';
 import PropTypes from 'prop-types';
 
-import firebase from '../../utils/firebase';
 import { color } from '../../style/variable';
 
 const RecordsList = styled.div`
@@ -30,8 +29,8 @@ const Record = styled.div`
   justify-content: space-between;
   padding: 0 10px;
   width: 90%;
-  color: ${(props) => (props.isSelected ? 'black' : '#999999')};
-  font-weight: ${(props) => (props.isSelected ? '700' : '400')};
+  color: ${props => (props.isSelected ? 'black' : '#999999')};
+  font-weight: ${props => (props.isSelected ? '700' : '400')};
   &:hover {
     font-weight: 700;
     color: black;
@@ -69,10 +68,11 @@ const Content = styled.div`
 const RecordAccordion = ({
   records,
   tabIndex,
-  currentUserId,
   activeRecord,
   setActiveRecord,
+  onOpen,
 }) => {
+
   const handleDownload = async (url, name) => {
     const record = await fetch(url);
     const recordBlob = await record.blob();
@@ -88,22 +88,10 @@ const RecordAccordion = ({
     URL.revokeObjectURL(recordURL);
   };
 
-  const handleDelete = () => {
-    let path;
-    if (tabIndex === 0) {
-      path = `audios/${currentUserId}/${activeRecord.record_job}/${activeRecord.record_name}-${activeRecord.record_id}`;
-    } else {
-      path = `videos/${currentUserId}/${activeRecord.record_job}/${activeRecord.record_name}-${activeRecord.record_id}`;
-    }
-    firebase.deleteFile(path).then(() => {
-      firebase.deleteRecord(currentUserId, activeRecord.record_id);
-    });
-  };
-
   return (
     <Accordion allowToggle>
       <RecordsList>
-        {records.map((record) => {
+        {records.map(record => {
           return (
             <AccordionItem key={record.record_id}>
               <AccordionButton px={0} borderBottom="1px solid #dbdbdb">
@@ -129,7 +117,7 @@ const RecordAccordion = ({
                       variant="outline"
                       borderColor={color.primary}
                       color={color.primary}
-                      onClick={handleDelete}
+                      onClick={onOpen}
                       h="26px"
                       fontSize="14px"
                     >

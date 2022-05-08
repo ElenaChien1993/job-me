@@ -5,6 +5,8 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  useToast,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
@@ -12,6 +14,8 @@ import styled from 'styled-components';
 import firebase from '../utils/firebase';
 import ProfileImage from './ProfileImage';
 import { device } from '../style/variable';
+import AlertModal from './AlertModal';
+import Loader from './Loader';
 
 const ImageContainer = styled.div`
   position: relative;
@@ -113,7 +117,10 @@ const MobileMode = styled.div`
 
 const ProfileInfo = ({ userInfo, currentUserId }) => {
   const [image, setImage] = useState({ preview: '', raw: '' });
+  const [isLoading, setIsLoading] = useState(false);
   const hiddenInputRef = useRef();
+  const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
+  const toast = useToast();
 
   const handleChooseFile = e => {
     hiddenInputRef.current.click();
@@ -128,13 +135,22 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
     }
   };
 
-  const handleUpload = async e => {
+  const handleUpload = async () => {
+    setIsLoading(true);
     const path = `profile/${currentUserId}`;
     const url = await firebase.uploadFile(path, image.raw).then(() => {
       return firebase.getDownloadURL(path);
     });
     firebase.updateUserInfo(currentUserId, { photo_url: url }).then(() => {
-      alert('照片更新成功！');
+      setIsLoading(false);
+      toast({
+        title: '成功',
+        description: '照片已更新',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
     });
     setImage({
       preview: '',
@@ -160,11 +176,28 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
     const path = `profile/${currentUserId}`;
     firebase.deleteFile(path).then(() => {
       firebase.updateUserInfo(currentUserId, { photo_url: null });
+      toast({
+        title: '成功',
+        description: '照片已刪除',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
     });
   };
 
   return (
     <>
+      {isLoading && <Loader isLoading={isLoading} hasShadow />}
+      <AlertModal
+        isOpen={isOpen}
+        onClose={onClose}
+        header="刪除照片"
+        content="照片一經刪除便無法回復，確認要刪除嗎？"
+        actionText="刪除"
+        action={handleDelete}
+      />
       <ImageContainer>
         <TabletMode>
           <ProfileImage
@@ -215,7 +248,7 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
               onChange={handleFileChange}
               style={{ display: 'none' }}
             />
-            <MenuItem onClick={handleDelete}>刪除照片</MenuItem>
+            <MenuItem onClick={onOpen}>刪除照片</MenuItem>
           </MenuList>
         </Menu>
       </ImageContainer>

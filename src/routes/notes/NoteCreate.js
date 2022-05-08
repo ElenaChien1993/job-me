@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Flex, Button, Icon } from '@chakra-ui/react';
+import { Flex, Button, Icon, useDisclosure } from '@chakra-ui/react';
 import { BiCircle } from 'react-icons/bi';
 import { BsCheckCircleFill } from 'react-icons/bs';
 import styled from 'styled-components';
@@ -9,7 +9,8 @@ import DetailsStep1 from './DetailsStep1';
 import DetailsStep2 from './DetailsStep2';
 import DetailsStep3 from './DetailsStep3';
 import { useNavigate } from 'react-router-dom';
-import { device, color} from '../../style/variable';
+import { device, color } from '../../style/variable';
+import AlertModal from '../../components/AlertModal';
 
 const Container = styled.div`
   max-width: 1152px;
@@ -154,6 +155,7 @@ const NoteCreate = () => {
     more_notes: [],
     other: '',
   });
+  const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
   const navigate = useNavigate();
 
   const {
@@ -211,10 +213,18 @@ const NoteCreate = () => {
 
   return (
     <Container>
+      <AlertModal
+        isOpen={isOpen}
+        onClose={onClose}
+        header="取消創建"
+        content="目前設定與記錄將消失，確定要離開創建頁面嗎？"
+        actionText="確定"
+        action={handleCancel}
+      />
       <Button
         display={['block', null, null, 'none']}
         variant="outline"
-        onClick={handleCancel}
+        onClick={onOpen}
         w="20%"
         colorScheme="brand"
         mb="40px"
@@ -256,14 +266,14 @@ const NoteCreate = () => {
             textAlign="center"
             color="white"
           >
-            基本資料頁為創建筆記的必填項目，
+            公司名稱和應徵職稱為創建筆記的必填項目，
             <br />
             其餘資訊可日後再編輯新增唷
           </Flex>
           <Button
             display={['none', null, null, 'inline-flex']}
             variant="outline"
-            onClick={handleCancel}
+            onClick={onOpen}
             w="50%"
             style={{ color: 'white' }}
           >

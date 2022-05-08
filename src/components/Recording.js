@@ -15,7 +15,7 @@ import CountDown from './elements/CountDown';
 import firebase from '../utils/firebase';
 import Loader from './Loader';
 import { useEffect, useState } from 'react';
-import { device } from '../style/variable';
+import { device, color } from '../style/variable';
 
 const ButtonsWrapper = styled.div`
   display: flex;
@@ -144,8 +144,6 @@ const Recording = ({
     setProgress('before');
   };
 
-  console.log(status, error);
-
   return (
     <>
       {isLoading && <Loader isLoading={isLoading} hasShadow />}
@@ -185,10 +183,14 @@ const Recording = ({
               <IconButton
                 isRound
                 color="white"
-                bg="#306172"
+                bg={color.primary}
                 aria-label="Restart Recording"
                 fontSize="20px"
-                _hover={{ filter: 'brightness(150%)', color: 'black' }}
+                _hover={{
+                  background: 'none',
+                  color: 'black',
+                  border: `2px solid ${color.primary}`,
+                }}
                 onClick={clearBlobUrl}
                 icon={<VscDebugRestart />}
               />
@@ -197,10 +199,14 @@ const Recording = ({
               <IconButton
                 isRound
                 color="white"
-                bg="#306172"
+                bg={color.primary}
                 aria-label="Resume Recording"
                 fontSize="20px"
-                _hover={{ filter: 'brightness(150%)', color: 'black' }}
+                _hover={{
+                  background: 'none',
+                  color: 'black',
+                  border: `2px solid ${color.primary}`,
+                }}
                 onClick={resumeRecording}
                 icon={<VscDebugStart />}
               />
@@ -209,10 +215,14 @@ const Recording = ({
               <IconButton
                 isRound
                 color="white"
-                bg="#306172"
+                bg={color.primary}
                 aria-label="Pause Recording"
                 fontSize="20px"
-                _hover={{ filter: 'brightness(150%)', color: 'black' }}
+                _hover={{
+                  background: 'none',
+                  color: 'black',
+                  border: `2px solid ${color.primary}`,
+                }}
                 onClick={pauseRecording}
                 icon={<VscDebugPause />}
               />
@@ -227,10 +237,14 @@ const Recording = ({
                 <IconButton
                   isRound
                   color="white"
-                  bg="#306172"
+                  bg={color.primary}
                   aria-label="End Recording"
                   fontSize="20px"
-                  _hover={{ filter: 'brightness(150%)', color: 'black' }}
+                  _hover={{
+                    background: 'none',
+                    color: 'black',
+                    border: `2px solid ${color.primary}`,
+                  }}
                   onClick={stopRecording}
                   icon={<VscStopCircle />}
                 />
@@ -242,10 +256,14 @@ const Recording = ({
                   <IconButton
                     isRound
                     color="white"
-                    bg="#306172"
+                    bg={color.primary}
                     aria-label="Save Recording"
                     fontSize="20px"
-                    _hover={{ filter: 'brightness(150%)', color: 'black' }}
+                    _hover={{
+                      background: 'none',
+                      color: 'black',
+                      border: `2px solid ${color.primary}`,
+                    }}
                     onClick={() => handleSave(recordType === '錄音' ? 0 : 1)}
                     icon={<MdSaveAlt />}
                   />

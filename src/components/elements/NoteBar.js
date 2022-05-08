@@ -15,12 +15,12 @@ const NoteWrapper = styled.div`
 
 const CompanyName = styled.span`
   font-weight: 700;
-  color: #306172;
+  color: ${color.primary};
   @media ${device.mobileM} {
-    font-size: 22px;
+    font-size: 20px;
   }
   @media ${device.tablet} {
-    font-size: 25px;
+    font-size: 24px;
   }
 `;
 
@@ -30,10 +30,10 @@ const JobTitle = styled.p`
   font-weight: 700;
   color: black;
   @media ${device.mobileM} {
-    font-size: 28px;
+    font-size: 20px;
   }
   @media ${device.tablet} {
-    font-size: 32px;
+    font-size: 24px;
   }
 `;
 

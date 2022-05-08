@@ -1,19 +1,20 @@
-import { Button } from '@chakra-ui/react';
+import { Button, useDisclosure } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import AlertModal from '../../components/AlertModal';
 
 import ChatCorner from '../../components/ChatCorner';
 import Loader from '../../components/Loader';
 import ProfileImage from '../../components/ProfileImage';
-import { device } from '../../style/variable';
+import { device, color } from '../../style/variable';
 
 import firebase from '../../utils/firebase';
 
 const Container = styled.div``;
 
 const Upper = styled.div`
-  background-color: #f5cdc5;
+  background-color: ${color.third};
   @media ${device.mobileM} {
     height: 130px;
   }
@@ -106,6 +107,7 @@ const Number = styled.div`
 const MemberProfile = React.memo(() => {
   const [info, setInfo] = useState(null);
   const { currentUserId, setChatOpen, setActive } = useOutletContext();
+  const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
   const navigate = useNavigate();
   let params = useParams();
   const uid = params.uid;
@@ -119,8 +121,7 @@ const MemberProfile = React.memo(() => {
 
   const createChat = async () => {
     if (!currentUserId) {
-      alert('請先登入才能傳送訊息給其他會員');
-      navigate('/login', { state: { from: { pathname: `/profile/${uid}` } } });
+      onOpen();
       return;
     }
     const data = {
@@ -144,7 +145,19 @@ const MemberProfile = React.memo(() => {
 
   return (
     <Container>
-      <Upper></Upper>
+      <AlertModal
+        isOpen={isOpen}
+        onClose={onClose}
+        header="請先登入"
+        content="登入後才能傳送訊息給其他會員唷"
+        actionText="前往登入"
+        action={() => {
+          navigate('/login', {
+            state: { from: { pathname: `/profile/${uid}` } },
+          });
+        }}
+      />
+      <Upper />
       <InfoContainer>
         <ProfileImage user={info} size={200} hasBorder marginRight={0} />
         <NameWrapper>{info.display_name}</NameWrapper>
@@ -158,7 +171,7 @@ const MemberProfile = React.memo(() => {
           mb="50px"
           w="100px"
           variant="solid"
-          colorScheme="teal"
+          colorScheme="brand"
           onClick={createChat}
         >
           傳送訊息

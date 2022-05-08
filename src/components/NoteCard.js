@@ -1,11 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
-import { IconButton } from '@chakra-ui/react';
+import { IconButton, useDisclosure } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
 import NoteElement from './NoteCardEditable';
 import { device } from '../style/variable';
+import AlertModal from './AlertModal';
 
 const Container = styled.div`
   position: relative;
@@ -31,6 +32,7 @@ const Note = ({
   setRenderNotes,
   setDatabaseNotes,
 }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
   const { pathname } = useLocation();
 
   const handleDeleteNote = () => {
@@ -54,10 +56,18 @@ const Note = ({
       >
         <StyledNote note={note} editable={false} />
       </Link>
+      <AlertModal
+        isOpen={isOpen}
+        onClose={onClose}
+        header="刪除筆記"
+        content="筆記一經刪除便無法復原，確定刪除嗎？"
+        actionText="刪除"
+        action={handleDeleteNote}
+      />
       {pathname === '/notes' && (
         <DeleteButton
           variant="ghost"
-          onClick={handleDeleteNote}
+          onClick={onOpen}
           aria-label="Delete note"
           icon={<DeleteIcon />}
         />

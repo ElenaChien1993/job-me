@@ -44,9 +44,14 @@ const TitleWrapper = styled.div`
 `;
 
 const Title = styled.div`
-  font-size: 30px;
   font-weight: 700;
-  color: #306172;
+  color: ${color.secondary};
+  @media ${device.mobileM} {
+    font-size: 30px;
+  }
+  @media ${device.tablet} {
+    font-size: 42px;
+  }
 `;
 
 const SettingWrapper = styled.div`
@@ -82,7 +87,7 @@ const StyledInput = styled(Input)`
 const OptionTitle = styled.div`
   font-size: 24px;
   font-weight: 700;
-  color: #306172;
+  color: ${color.primary};
   @media ${device.mobileM} {
     min-width: 120px;
   }
@@ -109,7 +114,7 @@ const Dot = styled.div`
   min-width: 10px;
   min-height: 10px;
   border-radius: 5px;
-  background-color: #306172;
+  background-color: ${color.primary};;
 `;
 
 const Questions = styled.div`

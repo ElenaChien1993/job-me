@@ -118,7 +118,10 @@ const ProfileSetting = () => {
   return (
     <Container>
       <LeftWrapper>
-        <ProfileInfo userInfo={userInfo} currentUserId={currentUserId} />
+        <ProfileInfo
+          userInfo={userInfo}
+          currentUserId={currentUserId}
+        />
       </LeftWrapper>
       <RightWrapper>
         <SelectionWrapper>

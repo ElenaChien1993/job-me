@@ -128,15 +128,18 @@ const TagsWrapper = styled.div`
   @media ${device.mobileM} {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(100px, 105px));
     gap: 10px;
     margin-left: 0;
     margin-top: 10px;
+    justify-content: flex-start;
   }
   @media ${device.laptop} {
     margin-top: 0;
     margin-left: auto;
     max-width: 55%;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 120px));
+    justify-content: flex-end;
   }
 `;
 
@@ -150,6 +153,7 @@ const Tag = styled.div`
   color: ${color.primary};
   font-weight: 500;
   font-size: 14px;
+  max-width: 120px;
 `;
 
 const StyledInput = styled(Input)`

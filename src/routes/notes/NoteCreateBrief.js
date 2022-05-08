@@ -18,7 +18,7 @@ import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
 import SearchableInput from '../../components/SearchableInput';
-import { device, color} from '../../style/variable';
+import { device, color } from '../../style/variable';
 import { initMap } from '../../components/GoogleSearch';
 
 const InputWrap = styled.div`
@@ -35,6 +35,12 @@ const InputLabel = styled.label`
   font-size: 18px;
   display: flex;
   flex-direction: column;
+`;
+
+const RequiredInput = styled.label`
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 18px;
 `;
 
 const StyledInput = styled(Input)`
@@ -170,7 +176,7 @@ const NoteCreateBrief = props => {
 
   useEffect(() => {
     initMap(setValues, inputRef);
-  })
+  });
 
   const handleCheckboxChange = () => {
     setValues(prev => {
@@ -218,13 +224,13 @@ const NoteCreateBrief = props => {
     });
   };
 
-  console.log(values.address);
-
   return (
     <>
       <>
         <InputWrap>
-          <InputLabel>公司名稱</InputLabel>
+          <RequiredInput>
+            公司名稱 <span style={{ color: 'red' }}>*</span>
+          </RequiredInput>
           <SearchableInput
             value={values.company_name}
             setValue={value => {
@@ -236,7 +242,9 @@ const NoteCreateBrief = props => {
           />
         </InputWrap>
         <InputWrap>
-          <InputLabel>應徵職務</InputLabel>
+          <RequiredInput>
+            應徵職務 <span style={{ color: 'red' }}>*</span>
+          </RequiredInput>
           <SearchableInput
             value={values.job_title}
             setValue={value => {

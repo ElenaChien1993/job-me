@@ -31,7 +31,6 @@ const UpperContainer = styled.div`
   display: flex;
   border-radius: 24px;
   background-color: ${color.secondary};
-  padding: 15px 40px;
   cursor: pointer;
   &:hover {
     filter: brightness(110%);
@@ -40,11 +39,13 @@ const UpperContainer = styled.div`
     flex-direction: column;
     align-items: flex-start;
     margin-bottom: 10px;
+    padding: 15px 30px;
   }
   @media ${device.tablet} {
     flex-direction: row;
     margin-bottom: 25px;
     align-items: center;
+    padding: 15px 40px;
   }
 `;
 
@@ -52,6 +53,7 @@ const Creator = styled.div`
   display: flex;
   @media ${device.mobileM} {
     margin-top: 10px;
+    align-items: center;
   }
   @media ${device.tablet} {
     margin-top: 0;
@@ -61,14 +63,23 @@ const Creator = styled.div`
 const Name = styled.p`
   font-weight: 700;
   font-size: 25px;
-  color: black;
+  color: white;
   display: flex;
-  align-items: center;
+  color: white;
+  @media ${device.mobileM} {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  @media ${device.tablet} {
+    flex-direction: row;
+    align-items: center;
+  }
 `;
 
 const JobTitle = styled.span`
   font-weight: 500;
   font-size: 18px;
+  color: white;
 `;
 
 const DetailsContainer = styled.div`
@@ -114,9 +125,9 @@ const TitleSection = styled.div`
 const TitleBack = styled.div`
   height: 13px;
   position: absolute;
-  top: 18px;
+  top: 16px;
   left: 0;
-  background-color: rgba(243,173,95,0.5);
+  background-color: ${color.third};
   z-index: 0;
   width: 100%;
 `;
@@ -160,7 +171,7 @@ const QuestionCard = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 15px;
-  background-color: rgba(243,173,95,0.5);
+  background-color: ${color.third};
   position: relative;
 `;
 

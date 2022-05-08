@@ -1,11 +1,11 @@
-import { Search2Icon } from '@chakra-ui/icons';
-import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
 import React, { useState, useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import styled, { ThemeProvider } from 'styled-components';
-import { device, color } from '../style/variable';
-import firebase from '../utils/firebase';
 
+import { Search2Icon } from '@chakra-ui/icons';
+import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
+import styled, { ThemeProvider } from 'styled-components';
+
+import { device, color } from '../style/variable';
 import ProfileImage from './ProfileImage';
 
 const Container = styled.div`

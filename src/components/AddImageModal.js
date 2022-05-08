@@ -14,9 +14,18 @@ import { v4 as uuid } from 'uuid';
 
 import styled from 'styled-components';
 import firebase from '../utils/firebase';
+import { color } from '../style/variable';
 
 const StyledImage = styled(Image)`
   cursor: pointer;
+`;
+
+const ImageWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px dashed #999;
+  padding: 30px;
 `;
 
 const AddImageModal = ({ isOpen, onClose, room, send }) => {
@@ -56,7 +65,13 @@ const AddImageModal = ({ isOpen, onClose, room, send }) => {
       <Modal
         size="xl"
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={() => {
+          onClose();
+          setImage({
+            preview: '',
+            raw: '',
+          });
+        }}
         id="addImage"
         isCentered
       >
@@ -65,28 +80,32 @@ const AddImageModal = ({ isOpen, onClose, room, send }) => {
           <ModalHeader>選擇要傳送的圖片</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <StyledImage
-              objectFit='contain'
-              boxSize="200px"
-              alt="upload"
-              src={image.preview}
-              fallbackSrc={require('../images/add-document.svg').default}
-              onClick={handleChooseFile}
-            />
-            <input
-              type="file"
-              ref={hiddenInputRef}
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-            />
+            <ImageWrapper>
+              <StyledImage
+                objectFit="contain"
+                m={image.preview === '' ? '75px' : ''}
+                boxSize={image.preview === '' ? '50px' : '200px'}
+                alt="upload"
+                src={image.preview}
+                fallbackSrc={require('../images/add-document.svg').default}
+                onClick={handleChooseFile}
+              />
+              <input
+                type="file"
+                ref={hiddenInputRef}
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+            </ImageWrapper>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="teal" mr={5} onClick={handleUpload}>
+            <Button colorScheme="brand" mr={5} onClick={handleUpload}>
               確認傳送
             </Button>
             <Button
               variant="outline"
-              colorScheme="blue"
+              borderColor={color.primary}
+              color={color.primary}
               mr={3}
               onClick={onClose}
             >

@@ -163,6 +163,7 @@ const Messages = () => {
   }, [active, currentUserId]);
 
   const send = async (value, type) => {
+    if (value === '' && type === 0) return;
     const MessageData = {
       uid: currentUserId,
       text: value,
