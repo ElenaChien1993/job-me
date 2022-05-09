@@ -17,6 +17,7 @@ const Container = styled.div`
   }
   @media ${device.laptop} {
     flex-direction: column;
+    height: 78%;
   }
 `;
 

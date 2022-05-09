@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 
 import styled from 'styled-components';
 import { Button, Input, useToast } from '@chakra-ui/react';
@@ -52,7 +52,7 @@ const DetailsStep3 = ({
   noteDataBrief,
   noteDetails,
 }) => {
-  const user = firebase.auth.currentUser;
+  const { currentUserId, companies, jobTitles } = useOutletContext();
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -71,7 +71,7 @@ const DetailsStep3 = ({
     });
   };
 
-  const createNote = () => {
+  const createNote = async () => {
     if (values.company_name === '' || values.job_title === '') {
       toast({
         title: '哎呀',
@@ -83,13 +83,25 @@ const DetailsStep3 = ({
       });
       return;
     }
-    firebase
-      .setNoteBrief(user.uid, { ...noteDataBrief, creator: user.uid })
-      .then(id => {
-        firebase.setNoteDetails(id, noteDetails).then(() => {
-          navigate(`/notes/details/${id}`);
-        });
-      });
+    const noteId = await firebase.setNoteBrief(currentUserId, {
+      ...noteDataBrief,
+      creator: currentUserId,
+    });
+    const notes = await firebase.getNotes(currentUserId);
+    firebase.updateUserInfo(currentUserId, { notes_qty: notes.length });
+
+    await firebase.setNoteDetails(noteId, noteDetails);
+
+    if (
+      companies.map(company => company.name).indexOf(values.company_name) === -1
+    ) {
+      await firebase.createDoc('companies', { name: values.company_name });
+    }
+    if (jobTitles.map(job => job.name).indexOf(values.job_title) === -1) {
+      await firebase.createDoc('job_titles', { name: values.job_title });
+    }
+
+    navigate(`/notes/details/${noteId}`);
   };
 
   return (

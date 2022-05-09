@@ -65,7 +65,7 @@ const firebase = {
       .then(() => {
         console.log('updated');
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
   },
@@ -89,8 +89,8 @@ const firebase = {
     }
   },
   listenUserProfileChange(uid, callback) {
-    return onSnapshot(doc(db, 'users', uid), (doc) => {
-      callback((prev) => {
+    return onSnapshot(doc(db, 'users', uid), doc => {
+      callback(prev => {
         return { ...prev, ...doc.data() };
       });
     });
@@ -100,17 +100,17 @@ const firebase = {
       collection(db, 'users', uid, 'records'),
       orderBy('date', 'desc')
     );
-    return onSnapshot(q, async (docs) => {
+    return onSnapshot(q, async docs => {
       let data = [];
-      docs.forEach((doc) => {
+      docs.forEach(doc => {
         data.push(doc.data());
       });
-      const transformed = data.map((record) => {
+      const transformed = data.map(record => {
         const timeString = useFormatedTime(record.date);
         return { ...record, date: timeString };
       });
-      const audios = transformed.filter((record) => record.type === 0);
-      const videos = transformed.filter((record) => record.type === 1);
+      const audios = transformed.filter(record => record.type === 0);
+      const videos = transformed.filter(record => record.type === 1);
       setAudioRecords(audios);
       setVideoRecords(videos);
     });
@@ -130,7 +130,7 @@ const firebase = {
   async getWholeCollection(category) {
     const docsSnap = await getDocs(collection(db, category));
     const data = [];
-    docsSnap.forEach((doc) => {
+    docsSnap.forEach(doc => {
       data.push(doc.data());
     });
     return data;
@@ -169,7 +169,7 @@ const firebase = {
   async getNotes(uid) {
     const docSnaps = await getDocs(collection(db, `users/${uid}/notes`));
     const notesArray = [];
-    docSnaps.forEach((doc) => {
+    docSnaps.forEach(doc => {
       notesArray.push(doc.data());
     });
     return notesArray;
@@ -226,7 +226,7 @@ const firebase = {
     try {
       await setDoc(doc(db, 'users', uid), {
         display_name: value,
-        photo_url: url,
+        photo_url: url || '',
       });
     } catch (err) {
       console.log(err);
@@ -240,11 +240,11 @@ const firebase = {
       collectionGroup(db, 'notes'),
       where('company_name', '==', company),
       where('is_share', '==', true),
-      limit(7)
+      limit(15)
     );
     const querySnapshot = await getDocs(membersByCompany);
     let dataByCompany = [];
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(doc => {
       dataByCompany.push(doc.data());
     });
     const uniqueByCompany = helper.findUnique(dataByCompany);
@@ -253,22 +253,25 @@ const firebase = {
       collectionGroup(db, 'notes'),
       where('job_title', '==', job),
       where('is_share', '==', true),
-      limit(7)
+      limit(15)
     );
     const Snapshots = await getDocs(membersByJob);
     let dataByJob = [];
-    Snapshots.forEach((doc) => {
+    Snapshots.forEach(doc => {
       dataByJob.push(doc.data());
     });
     const uniqueByJob = helper.findUnique(dataByJob);
+
+    // console.log(uniqueByCompany, uniqueByJob);
     const data = helper.compare(uniqueByCompany, uniqueByJob);
     const users = await Promise.all(
-      data.map(async (note) => {
+      data.map(async note => {
         const userData = await this.getUserInfo(note.creator);
         return { ...note, creator_info: userData };
       })
     );
-    const filteredData = users.filter((item) => item.creator !== uid);
+    const filteredData = users.filter(item => item.creator !== uid);
+    console.log(filteredData);
     return filteredData;
   },
   async uploadFile(path, file) {
@@ -287,10 +290,10 @@ const firebase = {
   },
   async getDownloadURL(path) {
     return getDownloadURL(ref(storage, path))
-      .then((url) => {
+      .then(url => {
         return url;
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
       });
   },
@@ -310,7 +313,7 @@ const firebase = {
     );
     const querySnapshot = await getDocs(myRooms);
     let data = [];
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(doc => {
       if (doc.data().members.includes(ids[1])) {
         data.push(doc.data());
       }
@@ -323,15 +326,15 @@ const firebase = {
       where('members', 'array-contains', uid),
       orderBy('latest.timestamp', 'desc')
     );
-    return onSnapshot(q, async (snapshot) => {
+    return onSnapshot(q, async snapshot => {
       let data = [];
-      snapshot.forEach((snap) => {
+      snapshot.forEach(snap => {
         data.push(snap.data());
       });
       const rooms = await Promise.all(
-        data.map(async (room) => {
+        data.map(async room => {
           const timeRelative = useRelativeTime(room);
-          const friendId = room.members.filter((id) => id !== uid);
+          const friendId = room.members.filter(id => id !== uid);
           const userData = await this.getUserInfo(friendId[0]);
           return {
             ...room,
@@ -345,9 +348,9 @@ const firebase = {
   },
   async getUserInfo(uid) {
     const docSnap = await getDoc(doc(db, 'users', uid));
-    const display_name = docSnap.data().display_name;
+    const name = docSnap.data().display_name;
     const photo = docSnap.data().photo_url ? docSnap.data().photo_url : '';
-    return { display_name, photo_url: photo };
+    return { display_name: name, photo_url: photo };
   },
   async getMoreMessages(roomId, message) {
     if (!message) return;
@@ -361,7 +364,7 @@ const firebase = {
       )
     );
     let data = [];
-    docSnaps.forEach((doc) => {
+    docSnaps.forEach(doc => {
       data.push(doc.data());
     });
     data.sort((a, b) => !b.create_at - a.create_at);
@@ -375,16 +378,16 @@ const firebase = {
     );
     return onSnapshot(
       q,
-      async (snapshot) => {
+      async snapshot => {
         console.log('msg listener 1');
         let data = [];
-        snapshot.docChanges().forEach((change) => {
+        snapshot.docChanges().forEach(change => {
           if (change.type === 'added') {
             data.push(change.doc.data());
           }
         });
         data.sort((a, b) => !b.create_at - a.create_at);
-        callback((prev) => {
+        callback(prev => {
           if (!prev[room.id]) {
             return {
               ...prev,
@@ -394,9 +397,13 @@ const firebase = {
             // 我這邊是先比較後來監聽拿到的 messages 是不是已經存在之前的 state 中
             const stateIds = prev[room.id].map(item => item.id);
             const dataIds = data.map(item => item.id);
-            const filteredIds = dataIds.filter(id => stateIds.indexOf(id) === -1);
+            const filteredIds = dataIds.filter(
+              id => stateIds.indexOf(id) === -1
+            );
             if (filteredIds.length === 0) return prev;
-            const filteredData = data.filter(message => filteredIds.indexOf(message.id) !== -1);
+            const filteredData = data.filter(
+              message => filteredIds.indexOf(message.id) !== -1
+            );
             return { ...prev, [room.id]: [...prev[room.id], ...filteredData] };
           }
         });
@@ -405,7 +412,7 @@ const firebase = {
         if (uid === lastSender) return;
         this.updateRoom(room.id, { receiver_has_read: true, unread_qty: 0 });
       },
-      (error) => {
+      error => {
         console.error(error);
       }
     );
@@ -418,7 +425,7 @@ const firebase = {
   async sendMessage(roomId, data) {
     try {
       const unreadQty = await this.checkUnreadQty(roomId);
-      console.log(unreadQty);
+      console.log('unreadQty', unreadQty);
       await updateDoc(doc(db, 'chatrooms', roomId), {
         latest: {
           timestamp: data.create_at,

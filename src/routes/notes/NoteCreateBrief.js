@@ -150,7 +150,6 @@ const NoteCreateBrief = props => {
   const { currentUserId, companies, setCompanies, jobTitles, setJobTitles } =
     useOutletContext();
   const inputRef = useRef();
-  const user = firebase.auth.currentUser;
   const navigate = useNavigate();
   const statusArray = [
     '未申請',
@@ -199,10 +198,10 @@ const NoteCreateBrief = props => {
     const noteId = await firebase.setNoteBrief(currentUserId, {
       ...noteDataBrief,
       creator: currentUserId,
-      creator_name: user.displayName || '未提供名字',
     });
     const notes = await firebase.getNotes(currentUserId);
     firebase.updateUserInfo(currentUserId, { notes_qty: notes.length });
+
     await firebase.setNoteDetails(noteId, noteDetails);
 
     if (

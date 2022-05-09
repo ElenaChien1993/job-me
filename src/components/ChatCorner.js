@@ -50,7 +50,7 @@ const NewMessage = styled.div`
 const ChatCorner = () => {
   const { chatOpen, setChatOpen, unreadTotal } = useOutletContext();
 
-  console.log(unreadTotal);
+  console.log('unreadTotal', unreadTotal);
 
   return (
     <>

@@ -16,7 +16,16 @@ const EditableControls = () => {
     useEditableControls();
 
   return isEditing ? (
-    <ButtonGroup justifyContent="end" size="sm" w="full" spacing={2} mt={2}>
+    <ButtonGroup
+      justifyContent="end"
+      size="sm"
+      // position="absolute"
+      right={0}
+      top="-4px"
+      zIndex={3}
+      spacing={2}
+      mt={2}
+    >
       <IconButton icon={<CheckIcon />} {...getSubmitButtonProps()} />
       <IconButton
         icon={<CloseIcon boxSize={3} />}
@@ -38,6 +47,7 @@ const EditableInputField = ({
       w="90%"
       defaultValue={value === '' ? '尚未填寫資料' : value}
       isPreviewFocusable
+      // position="relative"
       selectAllOnFocus={false}
       onSubmit={value => {
         onSubmitCallback(value, i, callbackArgs.objectKey, callbackArgs.subKey);
@@ -53,12 +63,8 @@ const EditableInputField = ({
           }}
         />
       </Tooltip>
-      <Input
-        py={2}
-        px={4}
-        as={EditableInput}
-      />
-      <EditableControls />
+      <Input py={2} pl={0} mx={4} as={EditableInput} />
+      {/* <EditableControls /> */}
     </Editable>
   );
 };

@@ -152,7 +152,6 @@ const NoteCreate = () => {
     bonus: [{ is_qualified: false, description: '' }],
     questions: [],
     attached_files: [{ file_name: '', file_link: '' }],
-    more_notes: [],
     other: '',
   });
   const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
@@ -178,7 +177,6 @@ const NoteCreate = () => {
     bonus,
     questions,
     attached_files,
-    more_notes,
     other,
     ...noteDataBrief
   } = values;

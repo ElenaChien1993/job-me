@@ -57,15 +57,15 @@ const Audio = ({ status, mediaBlobUrl }) => {
 };
 
 const Video = ({ status, mediaBlobUrl, previewStream }) => {
-
   return (
     <Container>
       <Badge fontSize="1.2em" variant="outline" colorScheme="orange" mb="20px">
         {STATUS[status]}
       </Badge>
-      {status === 'stopped' ? (
+      {status === 'stopped' && (
         <video src={mediaBlobUrl} controls autoPlay loop />
-      ) : (
+      )}
+      {(status === 'recording' || status === 'paused') && (
         <VideoPreview stream={previewStream} />
       )}
     </Container>

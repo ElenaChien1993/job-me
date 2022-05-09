@@ -55,10 +55,10 @@ const ReadMode = styled.div`
 
 const EditorArea = ({ noteId, details, objectKey, isPublic }) => {
   const [editorState, setEditorState] = useState(() =>
-    details.more_notes[objectKey] === '' || !details.more_notes[objectKey]
+    details[objectKey] === '' || !details[objectKey]
       ? EditorState.createEmpty()
       : EditorState.createWithContent(
-          convertFromRaw(JSON.parse(details.more_notes[objectKey]))
+          convertFromRaw(JSON.parse(details[objectKey]))
         )
   );
 
@@ -95,11 +95,8 @@ const EditorArea = ({ noteId, details, objectKey, isPublic }) => {
 
   const onBlur = () => {
     const contentState = editorState.getCurrentContent();
-    console.log(convertToRaw(contentState));
     firebase.updateNoteDetails(noteId, {
-      more_notes: {
-        [objectKey]: JSON.stringify(convertToRaw(contentState)),
-      },
+      [objectKey]: JSON.stringify(convertToRaw(contentState)),
     });
   };
 

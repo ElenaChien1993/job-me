@@ -138,7 +138,6 @@ const Login = () => {
       firebase.signUp(user.uid, values.name);
       toast({
         title: '註冊成功！',
-        description: '已為您自動導向首頁',
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -162,7 +161,6 @@ const Login = () => {
       await firebase.signIn(values.email, values.password);
       toast({
         title: '歡迎回來！',
-        description: '已自動為您導向首頁',
         status: 'success',
         duration: 3000,
         isClosable: true,

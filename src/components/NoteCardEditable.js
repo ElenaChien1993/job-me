@@ -18,23 +18,23 @@ const Container = styled.div`
   display: flex;
   border-radius: 24px;
   background: ${color.white};
-  padding: 20px 40px;
   margin-bottom: 25px;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
   &:hover {
-    transform: ${props => props.hasHover ? 'translate(5px, 5px)' : ''};
+    transform: ${props => (props.hasHover ? 'translate(5px, 5px)' : '')};
   }
   @media ${device.mobileM} {
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
+    padding: 20px 40px 40px;
   }
   @media ${device.laptop} {
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
+    padding: 20px 40px;
   }
-  
 `;
 
 const HeadWrapper = styled.div`
@@ -125,6 +125,7 @@ const StatusWrapper = styled.div`
 `;
 
 const TagsWrapper = styled.div`
+  position: relative;
   @media ${device.mobileM} {
     width: 100%;
     display: grid;
@@ -156,18 +157,29 @@ const Tag = styled.div`
   max-width: 120px;
 `;
 
+const TagReminder = styled.div`
+  position: absolute;
+  @media ${device.mobileM} {
+    left: 0;
+    bottom: -30px;
+  }
+  @media ${device.laptop} {
+    left: auto;
+    right: 0;
+    bottom: -30px;
+  }
+`;
+
 const StyledInput = styled(Input)`
   && {
     border-radius: 10px;
   }
 `;
 
-
 const NoteElement = React.memo(
   ({ uid, noteId, note, setNote, editable, isPublic }) => {
     const [isEditing, setIsEditing] = useState(false);
     const { pathname } = useLocation();
-    console.log(pathname);
 
     const onBlurSubmit = objectKey => {
       firebase.updateNoteBrief(uid, noteId, { [objectKey]: note[objectKey] });
@@ -194,7 +206,9 @@ const NoteElement = React.memo(
     return (
       <>
         {editable ? (
-          <Container hasHover={pathname === '/notes' || pathname === '/practice'}>
+          <Container
+            hasHover={pathname === '/notes' || pathname === '/practice'}
+          >
             <HeadWrapper>{note.company_name.split('', 1)}</HeadWrapper>
             <ContentWrapper>
               <Editable
@@ -284,23 +298,27 @@ const NoteElement = React.memo(
                 </>
               ) : (
                 <>
-                  <StyledInput
-                    size="sm"
-                    defaultValue={note.tags.join(',')}
-                    placeholder="請以「,」隔開每個標籤"
-                    onChange={handleTagsChange}
-                  />
-                  <IconButton
-                    size="sm"
-                    onClick={handleTagsSubmit}
-                    icon={<CheckCircleIcon />}
-                  />
+                  <>
+                    <StyledInput
+                      size="sm"
+                      defaultValue={note.tags.join(',')}
+                      onChange={handleTagsChange}
+                    />
+                    <IconButton
+                      size="sm"
+                      onClick={handleTagsSubmit}
+                      icon={<CheckCircleIcon />}
+                    />
+                  </>
+                  <TagReminder>請以「,」隔開每個標籤</TagReminder>
                 </>
               )}
             </TagsWrapper>
           </Container>
         ) : (
-          <Container hasHover={pathname === '/notes' || pathname === '/practice'}>
+          <Container
+            hasHover={pathname === '/notes' || pathname === '/practice'}
+          >
             <HeadWrapper>{note.company_name.split('', 1)}</HeadWrapper>
             <ContentWrapper>
               <CompanyName>{note.company_name}</CompanyName>

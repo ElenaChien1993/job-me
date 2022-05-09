@@ -117,7 +117,7 @@ const TitleBack = styled.div`
   position: absolute;
   top: 18px;
   left: 0;
-  background-color: rgba(243,173,95,0.5);
+  background-color: rgba(243, 173, 95, 0.5);
   z-index: 0;
   width: 100%;
 `;
@@ -153,7 +153,7 @@ const QuestionCard = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 15px;
-  background-color: rgba(243,173,95,0.5);
+  background-color: rgba(243, 173, 95, 0.5);
   position: relative;
 `;
 
@@ -177,7 +177,6 @@ const CheckBoxWrapper = styled.div`
 const CheckBox = styled.input`
   height: 16px;
   width: 16px;
-  margin-right: 10px;
   cursor: pointer;
 `;
 
@@ -445,10 +444,7 @@ const NoteDetails = () => {
               {brief.is_share ? '公開中' : '隱藏中'}
             </Button>
           </PublicButtons>
-          <Tabs
-            variant="soft-rounded"
-            colorScheme="brand"
-          >
+          <Tabs variant="soft-rounded" colorScheme="brand">
             <TabList>
               {tabs.map((tab, i) => {
                 return (
