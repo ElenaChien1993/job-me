@@ -3,6 +3,7 @@ import { Image, CircularProgress } from '@chakra-ui/react';
 import styled from 'styled-components';
 
 import ProfileImage from '../ProfileImage';
+import useFormatedTime from '../../hooks/useFormatedTime';
 
 const Wrapper = styled.div`
   display: flex;
@@ -23,30 +24,35 @@ const DateText = styled.div`
   font-size: 14px;
   color: #999999;
   margin-left: 10px;
+  align-self: flex-end;
+  margin-bottom: 5px;
 `;
 
-const Text = ({ text }) => {
-  return <Content>{text}</Content>;
-};
+const Text = React.forwardRef((props, ref) => {
+  return <Content ref={ref}>{props.text}</Content>;
+});
 
-const ImageMessage = ({ url }) => {
+const ImageMessage = React.forwardRef((props, ref) => {
   return (
-    <Image
-      objectFit='contain'
-      alt="message"
-      src={url}
-      boxSize="100px"
-      fallback={<CircularProgress isIndeterminate color='green.300' />}
-    />
+    <div ref={ref}>
+      <Image
+        objectFit="contain"
+        alt="message"
+        src={props.url}
+        boxSize="100px"
+        fallback={<CircularProgress isIndeterminate color="green.300" />}
+      />
+    </div>
   );
-};
+});
 
-const MESSAGE_TYPE = props => ({
-  0: <Text text={props.message.text} />,
-  1: <ImageMessage url={props.message.text} />,
+const MESSAGE_TYPE = (props) => ({
+  0: <Text text={props.message.text} ref={props.bottomRef} />,
+  1: <ImageMessage url={props.message.text} ref={props.bottomRef} />,
 });
 
 const ChatReceived = React.forwardRef((props, ref) => {
+  const timeString = useFormatedTime(props.message.create_at);
   return (
     <Wrapper ref={ref}>
       {!props.isCorner && (
@@ -58,7 +64,7 @@ const ChatReceived = React.forwardRef((props, ref) => {
         />
       )}
       {MESSAGE_TYPE(props)[props.message.type]}
-      <DateText>{props.message.create_at}</DateText>
+      <DateText>{timeString}</DateText>
     </Wrapper>
   );
 });

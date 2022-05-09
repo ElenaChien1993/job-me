@@ -2,9 +2,12 @@ import React from 'react';
 import { Image, CircularProgress } from '@chakra-ui/react';
 import styled from 'styled-components';
 
+import useFormatedTime from '../../hooks/useFormatedTime';
+import { color } from '../../style/variable';
+
 const Wrapper = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   padding-left: 20px;
   margin-top: 10px;
   justify-content: flex-end;
@@ -16,7 +19,7 @@ const Content = styled.div`
   border-radius: 15px;
   padding: 10px 20px;
   max-width: 60%;
-  background-color: #306172;
+  background-color: ${color.primary};
   color: white;
   line-height: 1.4;
 `;
@@ -25,33 +28,37 @@ const DateText = styled.div`
   font-size: 14px;
   color: #999999;
   margin-right: 10px;
+  margin-bottom: 5px;
 `;
 
-const Text = ({ text }) => {
-  return <Content>{text}</Content>;
-};
+const Text = React.forwardRef((props, ref) => {
+  return <Content ref={ref}>{props.text}</Content>;
+});
 
-const ImageMessage = ({ url }) => {
+const ImageMessage = React.forwardRef((props, ref) => {
   return (
-    <Image
-      objectFit='contain'
-      alt="message"
-      src={url}
-      boxSize="100px"
-      fallback={<CircularProgress isIndeterminate color='green.300' />}
-    />
+    <div ref={ref}>
+      <Image
+        objectFit="contain"
+        alt="message"
+        src={props.url}
+        boxSize="100px"
+        fallback={<CircularProgress isIndeterminate color="green.300" />}
+      />
+    </div>
   );
-};
+});
 
-const MESSAGE_TYPE = props => ({
-  0: <Text text={props.message.text} />,
-  1: <ImageMessage url={props.message.text} />,
+const MESSAGE_TYPE = (props) => ({
+  0: <Text text={props.message.text} ref={props.bottomRef} />,
+  1: <ImageMessage url={props.message.text} ref={props.bottomRef} />,
 });
 
 const ChatSent = React.forwardRef((props, ref) => {
+  const timeString = useFormatedTime(props.message.create_at);
   return (
     <Wrapper ref={ref}>
-      <DateText>{props.message.create_at}</DateText>
+      <DateText>{timeString}</DateText>
       {MESSAGE_TYPE(props)[props.message.type]}
     </Wrapper>
   );

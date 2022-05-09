@@ -1,10 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
-import { IconButton } from '@chakra-ui/react';
+import { IconButton, useDisclosure } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import firebase from '../utils/firebase';
 import NoteElement from './NoteCardEditable';
+import { device } from '../style/variable';
+import AlertModal from './AlertModal';
 
 const Container = styled.div`
   position: relative;
@@ -13,8 +15,8 @@ const Container = styled.div`
 const DeleteButton = styled(IconButton)`
   && {
     position: absolute;
-    top: 75px;
-    right: 50px;
+    top: 12px;
+    right: 20px;
     cursor: pointer;
   }
 `;
@@ -23,13 +25,20 @@ const StyledNote = styled(NoteElement)`
   cursor: pointer;
 `;
 
-const Note = ({ note, currentUserId, databaseNotes, setRenderNotes, setDatabaseNotes }) => {
+const Note = ({
+  note,
+  currentUserId,
+  databaseNotes,
+  setRenderNotes,
+  setDatabaseNotes,
+}) => {
+  const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
   const { pathname } = useLocation();
 
   const handleDeleteNote = () => {
     firebase.deleteNote(currentUserId, note.note_id).then(() => {
       const update = databaseNotes.filter(
-        (item) => item.note_id !== note.note_id
+        item => item.note_id !== note.note_id
       );
       setDatabaseNotes(update);
       setRenderNotes(update);
@@ -47,9 +56,18 @@ const Note = ({ note, currentUserId, databaseNotes, setRenderNotes, setDatabaseN
       >
         <StyledNote note={note} editable={false} />
       </Link>
+      <AlertModal
+        isOpen={isOpen}
+        onClose={onClose}
+        header="刪除筆記"
+        content="筆記一經刪除便無法復原，確定刪除嗎？"
+        actionText="刪除"
+        action={handleDeleteNote}
+      />
       {pathname === '/notes' && (
         <DeleteButton
-          onClick={handleDeleteNote}
+          variant="ghost"
+          onClick={onOpen}
           aria-label="Delete note"
           icon={<DeleteIcon />}
         />

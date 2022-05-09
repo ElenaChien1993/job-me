@@ -13,14 +13,10 @@ const PracticeParent = () => {
 
   useEffect(() => {
     // if (!user) return;
-    firebase.getNotes(user.uid).then((snaps) => {
-      const notesArray = [];
-      snaps.forEach((doc) => {
-        notesArray.push(doc.data());
-      });
-      setDatabaseNotes(notesArray);
+    firebase.getNotes(user.uid).then(data => {
+      setDatabaseNotes(data);
     });
-  }, []);
+  }, [user.uid]);
 
   const props = {
     databaseNotes,
@@ -31,6 +27,7 @@ const PracticeParent = () => {
     setRecordType,
     brief,
     setBrief,
+    user,
   };
 
   return <Outlet context={props} />;

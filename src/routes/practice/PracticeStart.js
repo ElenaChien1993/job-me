@@ -1,26 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState } from 'react';
-import {
-  Link,
-  useOutletContext,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
-import { Icon, Button } from '@chakra-ui/react';
-import { BiWinkSmile } from 'react-icons/bi';
+import { useEffect, useState } from 'react';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { Button } from '@chakra-ui/react';
 import { CgProfile } from 'react-icons/cg';
+import Lottie from 'react-lottie-player';
 import styled from 'styled-components';
 
 import BackButton from '../../components/elements/BackButton';
 import NoteBar from '../../components/elements/NoteBar';
 import BeforeRecord from '../../components/BeforeRecord';
 import Recording from '../../components/Recording';
+import finishJson from '../../images/finish.json';
+import { device, color } from '../../style/variable';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 30px 10% 0;
+  margin: 20px auto 5%;
+  width: 90%;
+  max-width: 1296px;
 `;
 
 const TitleWrapper = styled.div`
@@ -28,24 +27,41 @@ const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  @media ${device.mobileM} {
+    flex-direction: column;
+  }
+  @media ${device.tablet} {
+    flex-direction: row;
+  }
 `;
 
 const StyledNoteBar = styled(NoteBar)`
-  width: 40%;
+  padding: 0 30px;
 `;
 
 const Question = styled.div`
-  font-size: 30px;
   font-weight: 700;
-  color: #306172;
+  color: ${color.primary};
   margin-bottom: 30px;
+  text-align: center;
+  @media ${device.mobileM} {
+    font-size: 30px;
+  }
+  @media ${device.tablet} {
+    font-size: 42px;
+  }
 `;
 
 const Title = styled.div`
-  font-size: 30px;
   font-weight: 700;
-  color: #306172;
+  color: ${color.primary};
   margin-bottom: 20px;
+  @media ${device.mobileM} {
+    font-size: 24px;
+  }
+  @media ${device.tablet} {
+    font-size: 30px;
+  }
 `;
 
 const StyledButton = styled(Button)`
@@ -53,7 +69,7 @@ const StyledButton = styled(Button)`
     height: 40px;
     width: 200px;
     color: white;
-    background: #306172;
+    background: ${color.primary};
     &:hover {
       filter: brightness(110%);
       color: black;
@@ -66,6 +82,17 @@ const PracticeStart = () => {
   const [timer, setTimer] = useState(180);
   const [progress, setProgress] = useState('before');
   const props = useOutletContext();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (props.practiceQuestions === [] || !props.brief) {
+      navigate('/practice');
+    }
+  }, []);
+
+  const goToProfile = () => {
+    navigate(`/profile/${props.user.uid}`);
+  };
 
   return (
     <Container>
@@ -74,7 +101,7 @@ const PracticeStart = () => {
         <StyledNoteBar brief={props.brief} />
       </TitleWrapper>
       {progress !== 'finished' && (
-        <Question>{props.practiceQuestions[current].question}</Question>
+        <Question>{props.practiceQuestions[current]?.question}</Question>
       )}
       {progress === 'before' && (
         <BeforeRecord
@@ -97,10 +124,20 @@ const PracticeStart = () => {
       )}
       {progress === 'finished' && (
         <>
-          <Icon boxSize={200} as={BiWinkSmile} />
+          <Lottie
+            loop
+            animationData={finishJson}
+            play
+            style={{ width: 400, height: 370 }}
+          />
           <Title>此次練習已結束！你好棒！</Title>
           <Title>再多練習其他公司的面試吧～</Title>
-          <StyledButton variant="solid" size="xl" rightIcon={<CgProfile />}>
+          <StyledButton
+            onClick={goToProfile}
+            variant="solid"
+            size="xl"
+            rightIcon={<CgProfile />}
+          >
             前往查看練習檔案
           </StyledButton>
         </>

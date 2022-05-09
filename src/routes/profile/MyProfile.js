@@ -1,57 +1,125 @@
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import { useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
+import Loader from '../../components/Loader';
+import ProfileInfo from '../../components/ProfileInfo';
 
 import ProfileRecords from '../../components/ProfileRecords';
 import ProfileSetting from '../../components/ProfileSetting';
+import { device, color } from '../../style/variable';
 
 const Container = styled.div`
-  background-color: #ffeade;
   height: 100%;
 `;
 
 const Upper = styled.div`
-  background-color: #f5cdc5;
-  height: 200px;
+  background-color: ${color.third};
+  @media ${device.mobileM} {
+    height: 100px;
+  }
+  @media ${device.tablet} {
+    height: 200px;
+  }
 `;
 
 const WebTitle = styled.div`
   font-weight: 700;
-  font-size: 60px;
+  font-size: 42px;
   line-height: 82px;
-  color: black;
-  padding-left: 100px;
+  color: ${color.primary};
+  padding-left: 10%;
   padding-top: 50px;
+  max-width: 1440px;
+  margin: 0 auto;
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.tablet} {
+    display: block;
+  }
 `;
 
 const StyledTabList = styled(TabList)`
-  position: absolute;
-  top: 218px;
-  padding-left: 100px;
-  width: 100%;
-`
+  && {
+    position: absolute;
+    width: 90%;
+    @media ${device.mobileM} {
+      top: 410px;
+      justify-content: space-around;
+    }
+    @media ${device.tablet} {
+      top: 235px;
+      justify-content: flex-start;
+    }
+  }
+`;
 
 const Bottom = styled.div`
   height: 100%;
+  margin: 0 auto;
+  max-width: 1152px;
+  @media ${device.mobileM} {
+    width: 90%;
+  }
+  @media ${device.laptop} {
+    width: 80%;
+  }
+`;
+
+const InfoWrapper = styled.div`
+  @media ${device.mobileM} {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
+  @media ${device.tablet} {
+    display: none;
+  }
 `;
 
 const MyProfile = () => {
+  const { userInfo, currentUserId } = useOutletContext();
+
+  if (!userInfo) return <Loader />;
+
   return (
     <Container>
       <Upper>
         <WebTitle>Profile</WebTitle>
       </Upper>
       <Bottom>
-        <Tabs size="lg" height="100%" isLazy>
+        <InfoWrapper>
+          <ProfileInfo userInfo={userInfo} currentUserId={currentUserId} />
+        </InfoWrapper>
+        <Tabs size="lg" isLazy variant="soft-rounded" colorScheme="brand">
           <StyledTabList>
-            <Tab>Setting</Tab>
-            <Tab>Records</Tab>
+            <Tab
+              w={['50%', null, null, '12%']}
+              p="5px"
+              fontSize={['16px', null, null, null, '18px']}
+              height="35px"
+            >
+              Setting
+            </Tab>
+            <Tab
+              w={['50%', null, null, '12%']}
+              p="5px"
+              fontSize={['16px', null, null, null, '18px']}
+              height="35px"
+            >
+              Records
+            </Tab>
           </StyledTabList>
 
-          <TabPanels height="100%">
-            <TabPanel height="100%">
+          <TabPanels>
+            <TabPanel>
               <ProfileSetting />
             </TabPanel>
-            <TabPanel height="100%">
+            <TabPanel px={0}>
               <ProfileRecords />
             </TabPanel>
           </TabPanels>

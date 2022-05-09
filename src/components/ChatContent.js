@@ -1,62 +1,57 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { v4 as uuid } from 'uuid';
 
 import firebase from '../utils/firebase';
 import ChatReceived from './elements/ChatReceived';
 import ChatSent from './elements/ChatSent';
 
-const ChatContent = React.memo(({ room, rootRef, bottomRef, isCorner }) => {
-  const [messages, setMessages] = useState({});
-  // const unsubscribeRef = useRef();
-  const observeTargetRef = useRef();
+const ChatContent = ({
+  room,
+  rootRef,
+  isCorner,
+  bottomRef,
+  messages,
+  setMessages,
+}) => {
   const firstMessageRef = useRef();
+  const observeTargetRef = useRef();
   const firstRenderRef = useRef(true);
   const lastMessagesRef = useRef(false);
-  const containerRef = useRef();
+  const isLoadMoreRef = useRef(false);
+
   const { currentUserId } = useOutletContext();
 
-  // useEffect(() => {
-  //   if (bottomRef.current) {
-  //     bottomRef.current.scrollIntoView();
-  //   }
-  // }, [bottomRef]);
+  useEffect(() => {
+    const unsubscribe = firebase.listenMessagesChange(
+      room,
+      setMessages,
+      currentUserId
+    );
+
+    return () => unsubscribe();
+  }, [currentUserId, room, setMessages]);
 
   useEffect(() => {
-    if (!messages[room.id]) return;
-    firstMessageRef.current = messages[room.id][0];
-  }, [messages, room.id]);
-
-  useEffect(() => {
-    // bottomRef.current.scrollIntoView(false, { behavior: 'auto' });
-    if (messages[room.id]) return;
-    firstRenderRef.current = true;
-    lastMessagesRef.current = false;
-  }, [room]);
-
-  useEffect(() => {
-    let unsubscribe;
-    const callback = ([entry]) => {
+    const callback = async ([entry]) => {
       if (!entry || !entry.isIntersecting) return;
       if (lastMessagesRef.current) return;
 
-      if (firstRenderRef.current) {
-        firebase.listenMessagesChange(room, setMessages, currentUserId).then((res) => {
-          unsubscribe = res;
-          // bottomRef.current.scrollIntoView();
-          firstRenderRef.current = false;
-        });
+      if (!firstMessageRef.current && firstRenderRef.current) {
+        firstRenderRef.current = false;
       } else {
-        firebase
-          .getMoreMessages(room.id, firstMessageRef.current)
-          .then((messages) => {
-            setMessages((prev) => {
-              return { ...prev, [room.id]: [...messages, ...prev[room.id]] };
-            });
-            if (messages.length < 20) {
-              lastMessagesRef.current = true;
-            }
+        isLoadMoreRef.current = true;
+        const newMessages = await firebase.getMoreMessages(
+          room.id,
+          firstMessageRef.current
+        );
+        if (newMessages.length !== 0) {
+          setMessages((prev) => {
+            return { ...prev, [room.id]: [...newMessages, ...prev[room.id]] };
           });
+          if (newMessages.length < 20) {
+            lastMessagesRef.current = true;
+          }
+        }
       }
     };
 
@@ -66,39 +61,55 @@ const ChatContent = React.memo(({ room, rootRef, bottomRef, isCorner }) => {
       threshold: 1,
     };
 
+    const target = observeTargetRef.current;
     const observer = new IntersectionObserver(callback, options);
-    if (observeTargetRef.current) {
-      observer.observe(observeTargetRef.current);
+    if (target) {
+      console.log('observe');
+      observer.observe(target);
     }
 
-    return () => {
-      // unsubscribe();
-      observer.unobserve(observeTargetRef.current);
-    };
-  }, [observeTargetRef, firstRenderRef, bottomRef, room, rootRef, currentUserId]);
+  }, [rootRef, currentUserId, room, setMessages]);
+
+  console.log(bottomRef.current);
+  
+  useEffect(() => {
+    if (!messages[room.id] || !bottomRef.current) return;
+    if (messages[room.id].length < 20) {
+      lastMessagesRef.current = true;
+    }
+    firstMessageRef.current = messages[room.id][0];
+    if (isLoadMoreRef.current) {
+      isLoadMoreRef.current = false;
+      return;
+    }
+    bottomRef.current.scrollIntoView({ behavior: 'auto' });
+  }, [messages, room.id, bottomRef]);
 
   return (
-    <div ref={containerRef}>
+    <>
       <div ref={observeTargetRef}></div>
-      {messages[room.id] &&
-        messages[room.id].map((message, index) => {
-          if (index === messages[room.id].length - 1) {
-            return message.uid !== currentUserId ? (
-              <ChatReceived isCorner={isCorner} member={room.members} ref={bottomRef} key={uuid()} message={message} />
+      <div style={{ paddingBottom: '10px' }}>
+        {messages[room.id] &&
+          messages[room.id].map((message) =>
+            message.uid !== currentUserId ? (
+              <ChatReceived
+                isCorner={isCorner}
+                member={room.members}
+                key={message.id}
+                message={message}
+                bottomRef={bottomRef}
+              />
             ) : (
-              <ChatSent ref={bottomRef} key={uuid()} message={message} />
-            );
-          } else {
-            return message.uid !== currentUserId ? (
-              <ChatReceived isCorner={isCorner} member={room.members} key={uuid()} message={message} />
-            ) : (
-              <ChatSent key={uuid()} message={message} />
-            );
-          }
-        })}
-      {/* <div ref={bottomRef}></div> */}
-    </div>
+              <ChatSent
+                key={message.id}
+                message={message}
+                bottomRef={bottomRef}
+              />
+            )
+          )}
+      </div>
+    </>
   );
-});
+};
 
 export default ChatContent;

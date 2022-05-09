@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
   Tabs,
@@ -9,69 +9,114 @@ import {
   Button,
   Divider,
   IconButton,
+  Icon,
+  useToast,
+  useDisclosure,
 } from '@chakra-ui/react';
 import { FaMicrophone, FaFilm } from 'react-icons/fa';
-import { v4 as uuid } from 'uuid';
+import { RiFileUnknowLine } from 'react-icons/ri';
 import styled from 'styled-components';
 
 import ChatCorner from './ChatCorner';
 import firebase from '../utils/firebase';
+import useRWD from '../hooks/useRWD';
 import { MdSaveAlt } from 'react-icons/md';
+import { color, device } from '../style/variable';
+import ProfileMobileRecords from './ProfileMobileRecords';
+import AlertModal from './AlertModal';
 
 const Container = styled.div`
-  margin: 20px 10%;
+  width: 100%;
+  margin: 20px 0;
   padding: 30px 0;
   display: flex;
-  height: 100%;
+  justify-content: center;
+  @media ${device.mobileM} {
+    margin-top: 240px;
+    flex-direction: column;
+    align-items: center;
+  }
+  @media ${device.tablet} {
+    margin-top: 0;
+    flex-direction: row;
+    align-items: flex-start;
+  }
 `;
 
 const LeftWrapper = styled.div`
-  height: 100%;
   display: flex;
   flex-direction: column;
-  border-right: 5px solid #c4c4c4;
   align-items: center;
-  padding-right: 20px;
-  width: 42%;
+  @media ${device.mobileM} {
+    border-right: none;
+    padding-right: 0;
+    width: 100%;
+  }
+  @media ${device.tablet} {
+    border-right: 5px solid #c4c4c4;
+    padding-right: 20px;
+    width: auto;
+  }
 `;
 
 const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding-left: 50px;
-  width: 55%;
-  height: 100%;
+  @media ${device.mobileM} {
+    width: 100%;
+    padding-left: 0;
+    margin-top: 20px;
+  }
+  @media ${device.tablet} {
+    width: 60%;
+    padding-left: 50px;
+    margin-top: 0;
+  }
 `;
 
 const RecordsList = styled.div`
   width: 100%;
   height: 500px;
-  padding-top: 20px;
   background: #ffffff;
   border-radius: 20px;
+  overflow: scroll;
+  padding: 10px 0;
 `;
 
 const Record = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 20px;
+  margin: 10px 20px;
+  padding-bottom: 10px;
   cursor: pointer;
-  color: ${(props) => (props.isSelected ? 'black' : '#999999')};
-  font-weight: ${(props) => (props.isSelected ? '700' : '400')};
+  border-bottom: 1px solid #dbdbdb;
+  color: ${props => (props.isSelected ? 'black' : '#999999')};
+  font-weight: ${props => (props.isSelected ? '700' : '400')};
   &:hover {
     font-weight: 700;
     color: black;
   }
   & h2 {
-    font-size: 24px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    @media ${device.mobileM} {
+      font-size: 16px;
+    }
+    @media ${device.tablet} {
+      font-size: 18px;
+    }
   }
   & p {
-    font-size: 18px;
     text-align: end;
+    max-width: 20%;
+    @media ${device.mobileM} {
+      font-size: 14px;
+    }
+    @media ${device.tablet} {
+      font-size: 16px;
+    }
   }
 `;
 
@@ -95,13 +140,31 @@ const Reminder = styled.div`
   margin-top: 30px;
 `;
 
+const Text = styled.div`
+  margin: 0 20px;
+  font-size: 20px;
+  text-align: center;
+`;
+
+const NoFileWrapper = styled.div`
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
 const ProfileRecords = () => {
-  const [audioRecords, setAudioRecords] = useState(null);
-  const [videoRecords, setVideoRecords] = useState(null);
+  const [audioRecords, setAudioRecords] = useState([]);
+  const [videoRecords, setVideoRecords] = useState([]);
   const [activeAudio, setActiveAudio] = useState(null);
   const [activeVideo, setActiveVideo] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
   const { currentUserId } = useOutletContext();
+  const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
+
+  const isMobile = useRWD();
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -135,118 +198,176 @@ const ProfileRecords = () => {
     URL.revokeObjectURL(recordURL);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     let path;
     if (tabIndex === 0) {
       path = `audios/${currentUserId}/${activeAudio.record_job}/${activeAudio.record_name}-${activeAudio.record_id}`;
     } else {
       path = `videos/${currentUserId}/${activeVideo.record_job}/${activeVideo.record_name}-${activeVideo.record_id}`;
     }
-    firebase.deleteFile(path).then(() => {
-      firebase.deleteRecord(currentUserId, tabIndex === 0 ? activeAudio.record_id : activeVideo.record_id);
+    await firebase.deleteFile(path);
+    await firebase.deleteRecord(
+      currentUserId,
+      tabIndex === 0 ? activeAudio.record_id : activeVideo.record_id
+    );
+    toast({
+      title: '成功',
+      description: '檔案已刪除',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+      position: 'top-right',
     });
   };
 
   return (
     <Container>
-      <LeftWrapper>
-        <Tabs
-          w="100%"
-          isFitted
-          orientation="vertical"
-          variant="solid-rounded"
-          colorScheme="teal"
-          size="lg"
-          onChange={(index) => setTabIndex(index)}
-        >
-          <TabList mb="3em">
-            <Tab>
-              <FaMicrophone />
-            </Tab>
-            <Tab>
-              <FaFilm />
-            </Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <RecordsList>
-                {audioRecords &&
-                  audioRecords.map((record) => {
-                    return (
-                      <Record
-                        key={uuid()}
-                        isSelected={
-                          activeAudio &&
-                          activeAudio.record_id === record.record_id
-                        }
-                        onClick={() => setActiveAudio(record)}
-                      >
-                        <h2>{record.record_job}</h2>
-                        <p>{record.date}</p>
-                      </Record>
-                    );
-                  })}
-              </RecordsList>
-            </TabPanel>
-            <TabPanel>
-              <RecordsList>
-                {videoRecords &&
-                  videoRecords.map((record) => {
-                    return (
-                      <Record
-                        key={uuid()}
-                        isSelected={
-                          activeVideo &&
-                          activeVideo.record_id === record.record_id
-                        }
-                        onClick={() => setActiveVideo(record)}
-                      >
-                        <h2>{record.record_job}</h2>
-                        <p>{record.date}</p>
-                      </Record>
-                    );
-                  })}
-              </RecordsList>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </LeftWrapper>
-      <RightWrapper>
-        <SelectionWrapper>
-          <SectionTitle>
-            {tabIndex === 0
-              ? activeAudio?.record_name
-              : activeVideo?.record_name}
-          </SectionTitle>
-          <Button variant="outline" colorScheme="teal" onClick={handleDelete}>
-            刪除
-          </Button>
-        </SelectionWrapper>
-        <Divider />
-        {tabIndex === 0 ? (
-          <audio src={activeAudio?.link} controls />
-        ) : (
-          <video src={activeVideo?.link} controls />
-        )}
-        <IconButton
-          isRound
-          color="white"
-          bg="#306172"
-          aria-label="Save Recording"
-          fontSize="20px"
-          _hover={{ filter: 'brightness(150%)', color: 'black' }}
-          onClick={() =>
-            handleDownload(
-              tabIndex === 0 ? activeAudio?.link : activeVideo?.link,
-              tabIndex === 0
-                ? activeAudio?.record_name
-                : activeVideo?.record_name
-            )
-          }
-          icon={<MdSaveAlt />}
-        />
-        <Reminder>檔案刪除後就無法再讀取，請記得先下載</Reminder>
-      </RightWrapper>
+      <AlertModal
+        isOpen={isOpen}
+        onClose={onClose}
+        header="刪除紀錄"
+        content="紀錄一經刪除便無法回復，確認要刪除嗎？"
+        actionText="刪除"
+        action={handleDelete}
+      />
+      {isMobile ? (
+        <ProfileMobileRecords onOpen={onOpen} />
+      ) : (
+        <>
+          <LeftWrapper>
+            <Tabs
+              w={['100%', null, null, 'auto']}
+              isFitted
+              orientation="vertical"
+              variant="soft-rounded"
+              colorScheme="brand"
+              size="lg"
+              onChange={index => setTabIndex(index)}
+            >
+              <TabList>
+                <Tab px={['5px', null, null, '1rem']}>
+                  <FaMicrophone />
+                </Tab>
+                <Tab px={['5px', null, null, '1rem']}>
+                  <FaFilm />
+                </Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel
+                  pr={[0, null, null, '1rem']}
+                  pt={[0, null, null, '1rem']}
+                >
+                  <RecordsList>
+                    {audioRecords.length !== 0 ? (
+                      audioRecords.map(record => {
+                        return (
+                          <Record
+                            key={record.record_id}
+                            isSelected={
+                              activeAudio &&
+                              activeAudio.record_id === record.record_id
+                            }
+                            onClick={() => setActiveAudio(record)}
+                          >
+                            <h2>{record.record_job}</h2>
+                            <p>{record.date}</p>
+                          </Record>
+                        );
+                      })
+                    ) : (
+                      <Text>尚無錄音練習紀錄</Text>
+                    )}
+                  </RecordsList>
+                </TabPanel>
+                <TabPanel>
+                  <RecordsList>
+                    {videoRecords.length !== 0 ? (
+                      videoRecords.map(record => {
+                        return (
+                          <Record
+                            key={record.record_id}
+                            isSelected={
+                              activeVideo &&
+                              activeVideo.record_id === record.record_id
+                            }
+                            onClick={() => setActiveVideo(record)}
+                          >
+                            <h2>{record.record_job}</h2>
+                            <p>{record.date}</p>
+                          </Record>
+                        );
+                      })
+                    ) : (
+                      <Text>尚無錄影練習紀錄</Text>
+                    )}
+                  </RecordsList>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </LeftWrapper>
+          <RightWrapper>
+            {(tabIndex === 0 && !activeAudio) ||
+            (tabIndex === 1 && !activeVideo) ? (
+              <NoFileWrapper>
+                <Icon
+                  w="200px"
+                  h="200px"
+                  color="#A0AEC0"
+                  as={RiFileUnknowLine}
+                />
+                <Text>無紀錄可顯示，請先至練習頁面練習</Text>
+              </NoFileWrapper>
+            ) : (
+              <>
+                <SelectionWrapper>
+                  <SectionTitle>
+                    {tabIndex === 0
+                      ? activeAudio?.record_name
+                      : activeVideo?.record_name}
+                  </SectionTitle>
+                  <Button
+                    variant="outline"
+                    borderColor={color.primary}
+                    color={color.primary}
+                    onClick={onOpen}
+                  >
+                    刪除
+                  </Button>
+                </SelectionWrapper>
+                <Divider mb="20px" />
+                {tabIndex === 0 ? (
+                  <audio
+                    src={activeAudio?.link}
+                    controls
+                    style={{ width: '100%' }}
+                  />
+                ) : (
+                  <video src={activeVideo?.link} controls />
+                )}
+                <IconButton
+                  isRound
+                  color="white"
+                  bg={color.primary}
+                  aria-label="Save Recording"
+                  fontSize="20px"
+                  _hover={{ filter: 'brightness(150%)' }}
+                  onClick={() =>
+                    handleDownload(
+                      tabIndex === 0 ? activeAudio?.link : activeVideo?.link,
+                      tabIndex === 0
+                        ? activeAudio?.record_name
+                        : activeVideo?.record_name
+                    )
+                  }
+                  icon={<MdSaveAlt />}
+                  mt="20px"
+                />
+                <Reminder>檔案刪除後就無法再讀取，請記得先下載</Reminder>
+              </>
+            )}
+          </RightWrapper>
+        </>
+      )}
       <ChatCorner />
     </Container>
   );
