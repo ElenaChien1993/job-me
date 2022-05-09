@@ -4,12 +4,22 @@ import Lottie from 'react-lottie-player';
 import styled from 'styled-components';
 
 import recordingJson from '../../images/recording.json';
+import { device } from '../../style/variable';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+`;
+
+const StyledVideo = styled.video`
+  @media ${device.mobileM} {
+    width: 90%;
+  }
+  @media ${device.tablet} {
+    width: 60%;
+  }
 `;
 
 const STATUS = {
@@ -32,7 +42,7 @@ const VideoPreview = ({ stream }) => {
     return null;
   }
 
-  return <video ref={videoRef} width="90%" autoPlay controls />;
+  return <StyledVideo ref={videoRef} autoPlay controls />;
 };
 
 const Audio = ({ status, mediaBlobUrl }) => {
@@ -63,7 +73,7 @@ const Video = ({ status, mediaBlobUrl, previewStream }) => {
         {STATUS[status]}
       </Badge>
       {status === 'stopped' && (
-        <video src={mediaBlobUrl} controls autoPlay loop />
+        <StyledVideo src={mediaBlobUrl} controls autoPlay loop />
       )}
       {(status === 'recording' || status === 'paused') && (
         <VideoPreview stream={previewStream} />
