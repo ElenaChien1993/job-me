@@ -17,7 +17,7 @@ const Container = styled.div`
   }
   @media ${device.laptop} {
     flex-direction: column;
-    height: 78%;
+    height: 76%;
   }
 `;
 
@@ -246,7 +246,7 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
               backgroundColor="white"
               borderColor={color.primary}
               type="text"
-              placeholder="Search people or message"
+              placeholder="Search people"
               onChange={handleSearch}
             />
           </InputGroup>

@@ -119,7 +119,6 @@ const SearchMembers = () => {
       });
       return;
     }
-    console.log(term)
     const result = await firebase.getRecommendedUsers(
       term,
       term,

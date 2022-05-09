@@ -25,4 +25,5 @@ export const color = {
   primary: '#013b57',
   secondary: '#a6492b',
   third: '#f7e6cc',
+  demoBackground: '#fff4db',
 };
