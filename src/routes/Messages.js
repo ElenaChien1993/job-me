@@ -28,8 +28,8 @@ const Container = styled.div`
     height: ${props => (props.theme.isCorner ? '454px' : 'auto')};
   }
   @media ${device.laptop} {
-    margin: ${props => (props.theme.isCorner ? '' : '0 auto')};
-    top: ${props => (props.theme.isCorner ? '' : '70px')};
+    margin: ${props => (props.theme.isCorner ? '' : '0 auto 70px')};
+    top: ${props => (props.theme.isCorner ? '' : '40px')};
     width: ${props => (props.theme.isCorner ? '40vw' : '80%')};
     height: ${props => (props.theme.isCorner ? '400px' : '650px')};
   }

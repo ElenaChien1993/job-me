@@ -262,7 +262,7 @@ const firebase = {
     });
     const uniqueByJob = helper.findUnique(dataByJob);
 
-    // console.log(uniqueByCompany, uniqueByJob);
+    console.log(uniqueByCompany, uniqueByJob);
     const data = helper.compare(uniqueByCompany, uniqueByJob);
     const users = await Promise.all(
       data.map(async note => {
@@ -348,8 +348,8 @@ const firebase = {
   },
   async getUserInfo(uid) {
     const docSnap = await getDoc(doc(db, 'users', uid));
-    const name = docSnap.data().display_name;
-    const photo = docSnap.data().photo_url ? docSnap.data().photo_url : '';
+    const name = docSnap.data()?.display_name || '未提供';
+    const photo = docSnap.data()?.photo_url || '';
     return { display_name: name, photo_url: photo };
   },
   async getMoreMessages(roomId, message) {

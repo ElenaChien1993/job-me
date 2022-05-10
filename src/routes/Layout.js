@@ -89,10 +89,11 @@ const LoginButton = styled.div`
   margin-left: auto;
   padding: 10px 30px;
   cursor: pointer;
-  color: white;
-  font-weight: 700;
+  color: #999;
+  font-weight: 500;
   &:hover {
-    background: #e3e3e3;
+    color: white;
+    font-weight: 700;
   }
 `;
 
