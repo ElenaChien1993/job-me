@@ -209,7 +209,7 @@ const Login = () => {
 
   return (
     <Flex
-      bg={color.demoBackground}
+      bg={color.backgroundGray}
       justify="center"
       align="center"
       my="5%"

@@ -41,13 +41,12 @@ const WebTitle = styled.div`
 
 const StyledTabList = styled(TabList)`
   && {
-    position: absolute;
     width: 90%;
     @media ${device.mobileM} {
-      top: 410px;
-      justify-content: space-around;
+      margin: 0 auto;
     }
     @media ${device.tablet} {
+      position: absolute;
       top: 235px;
       justify-content: flex-start;
     }
@@ -71,10 +70,7 @@ const InfoWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: absolute;
-    top: 100px;
-    left: 50%;
-    transform: translate(-50%, 0);
+    transform: translate(0, -23%);
   }
   @media ${device.tablet} {
     display: none;

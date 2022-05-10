@@ -16,6 +16,7 @@ import {
 import { HamburgerIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 import Avatar from 'boring-avatars';
+import PropTypes from 'prop-types';
 
 import firebase from '../utils/firebase';
 import logo from '../images/logo.png';
@@ -288,6 +289,11 @@ const Nav = ({ userInfo, currentUserId }) => {
   );
 };
 
+Nav.propTypes = {
+  userInfo: PropTypes.object,
+  currentUserId: PropTypes.string,
+};
+
 const Layout = () => {
   const currentUserId = firebase.auth.currentUser?.uid;
   const [userInfo, setUserInfo] = useState(null);
@@ -351,7 +357,6 @@ const Layout = () => {
       <Nav
         userInfo={userInfo}
         currentUserId={currentUserId}
-        setUserInfo={setUserInfo}
       />
       <ContentContainer>
         <Outlet context={props} />

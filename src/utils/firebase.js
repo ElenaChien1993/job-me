@@ -240,6 +240,7 @@ const firebase = {
       collectionGroup(db, 'notes'),
       where('company_name', '==', company),
       where('is_share', '==', true),
+      where('creator', '!=', uid),
       limit(15)
     );
     const querySnapshot = await getDocs(membersByCompany);
@@ -253,6 +254,7 @@ const firebase = {
       collectionGroup(db, 'notes'),
       where('job_title', '==', job),
       where('is_share', '==', true),
+      where('creator', '!=', uid),
       limit(15)
     );
     const Snapshots = await getDocs(membersByJob);
@@ -270,9 +272,9 @@ const firebase = {
         return { ...note, creator_info: userData };
       })
     );
-    const filteredData = users.filter(item => item.creator !== uid);
-    console.log(filteredData);
-    return filteredData;
+    // const filteredData = users.filter(item => item.creator !== uid);
+    console.log(users);
+    return users;
   },
   async uploadFile(path, file) {
     const fileRef = ref(storage, path);

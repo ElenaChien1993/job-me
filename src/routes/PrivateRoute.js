@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation, useOutletContext } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
-const PrivateRoute = ({ children, isLogIn }) => {
+const PrivateRoute = ({ isLogIn }) => {
   let location = useLocation();
   const props = useOutletContext();
   
@@ -9,6 +10,10 @@ const PrivateRoute = ({ children, isLogIn }) => {
   ) : (
     <Navigate to="/login" state={{ from: location }} />
   );
+};
+
+PrivateRoute.propTypes = {
+  isLogIn: PropTypes.bool,
 };
 
 export default PrivateRoute;

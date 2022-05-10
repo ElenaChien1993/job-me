@@ -27,17 +27,17 @@ import AlertModal from './AlertModal';
 
 const Container = styled.div`
   width: 100%;
-  margin: 20px 0;
-  padding: 30px 0;
   display: flex;
   justify-content: center;
   @media ${device.mobileM} {
-    margin-top: 240px;
+    padding: 20px 0 0;
+    margin-bottom: 40px;
     flex-direction: column;
     align-items: center;
   }
   @media ${device.tablet} {
-    margin-top: 0;
+    margin: 0 0 20px;
+    padding: 30px 0;
     flex-direction: row;
     align-items: flex-start;
   }
