@@ -23,7 +23,7 @@ import { device, color } from '../style/variable';
 
 const Container = styled.div`
   height: auto;
-  background-color: ${color.demoBackground};
+  background-color: ${color.backgroundGray};
 `;
 
 const ContentContainer = styled.div`
