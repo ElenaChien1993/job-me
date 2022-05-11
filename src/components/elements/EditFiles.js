@@ -1,6 +1,26 @@
 import styled from 'styled-components';
-import { Input } from '@chakra-ui/react';
+import {
+  CloseButton,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  IconButton,
+  Input,
+} from '@chakra-ui/react';
+import { SmallCloseIcon } from '@chakra-ui/icons';
+
 import { device } from '../../style/variable';
+
+const Reminder = styled.p`
+  margin-bottom: 5px;
+  color: #999;
+  @media ${device.mobileM} {
+    font-size: 14px;
+  }
+  @media ${device.tablet} {
+    font-size: 16px;
+  }
+`;
 
 const StyledInput = styled(Input)`
   && {
@@ -12,7 +32,7 @@ const StyledInput = styled(Input)`
 const FilesWrap = styled.div`
   display: flex;
   width: 100%;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   justify-content: space-between;
   & input {
     @media ${device.tablet} {
@@ -34,7 +54,7 @@ const FilesWrap = styled.div`
     flex-direction: column;
   }
   @media ${device.tablet} {
-    align-items: center;
+    align-items: flex-start;
     flex-direction: row;
   }
 `;
@@ -43,10 +63,6 @@ const FileName = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  & label {
-    width: 50px;
-    margin-bottom: 0;
-  }
   @media ${device.mobileM} {
     width: 100%;
     margin-bottom: 5px;
@@ -54,6 +70,7 @@ const FileName = styled.div`
   @media ${device.tablet} {
     width: 40%;
     margin-right: 10px;
+    margin-bottom: 0;
   }
 `;
 
@@ -61,15 +78,26 @@ const FileLink = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  & label {
-    width: 50px;
-    margin-bottom: 0;
-  }
   @media ${device.mobileM} {
     width: 100%;
   }
   @media ${device.tablet} {
     width: 60%;
+  }
+`;
+
+const DeleteButton = styled(CloseButton)`
+  && {
+    @media ${device.mobileM} {
+      margin-right: 0;
+      position: absolute;
+      right: 0;
+      z-index: 1;
+    }
+    @media ${device.tablet} {
+      margin-right: 5px;
+      position: static;
+    }
   }
 `;
 
@@ -98,56 +126,97 @@ const EditFiles = ({ details, setDetails }) => {
     });
   };
 
+  const handleDelete = i => {
+    const newData = details.attached_files.filter((_, index) => index !== i);
+    setDetails(prev => {
+      return { ...prev, attached_files: newData };
+    });
+  };
+
+  const regex =
+    /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gm;
+
   return (
     <>
+      <Reminder>若連結欄位留空，則不會顯示該資訊在筆記中</Reminder>
       <FilesWrap key="job_link">
-        <label>職缺連結</label>
-        <StyledInput
-          type="text"
-          defaultValue={details.job_link}
-          onChange={e =>
-            setDetails(prev => {
-              return { ...prev, job_link: e.target.value };
-            })
-          }
-        />
+        <FormControl
+          isInvalid={!details.job_link.match(regex) && details.job_link !== ''}
+        >
+          <FormLabel htmlFor="job_link">職缺連結</FormLabel>
+          <StyledInput
+            id="job_link"
+            type="text"
+            defaultValue={details.job_link}
+            onChange={e => {
+              setDetails(prev => {
+                return { ...prev, job_link: e.target.value };
+              });
+            }}
+          />
+          <FormErrorMessage>請填寫正確的 URL 格式</FormErrorMessage>
+        </FormControl>
       </FilesWrap>
       <FilesWrap key="resume_link">
-        <label>我的履歷連結</label>
-        <StyledInput
-          type="text"
-          defaultValue={details.resume_link}
-          onChange={e =>
-            setDetails(prev => {
-              return { ...prev, resume_link: e.target.value };
-            })
+        <FormControl
+          isInvalid={
+            !details.resume_link.match(regex) && details.resume_link !== ''
           }
-        />
+        >
+          <FormLabel htmlFor="resume_link">我的履歷連結</FormLabel>
+          <StyledInput
+            id="resume_link"
+            type="text"
+            defaultValue={details.resume_link}
+            onChange={e =>
+              setDetails(prev => {
+                return { ...prev, resume_link: e.target.value };
+              })
+            }
+          />
+          <FormErrorMessage>請填寫正確的 URL 格式</FormErrorMessage>
+        </FormControl>
       </FilesWrap>
       {details.attached_files.map((file, i) => {
         return (
           <FilesWrap key={i}>
+            <DeleteButton size="sm" onClick={() => handleDelete(i)} />
             <FileName>
-              <label>檔名</label>
-              <StyledInput
-                type="text"
-                placeholder="請輸入檔案名稱"
-                value={file.file_name}
-                onChange={e =>
-                  handleMapArrayInputChange(e, i, 'attached_files', 'file_name')
-                }
-              />
+              <FormControl>
+                <FormLabel mb="5px">檔名</FormLabel>
+                <StyledInput
+                  type="text"
+                  placeholder="請輸入檔案名稱"
+                  value={file.file_name}
+                  onChange={e =>
+                    handleMapArrayInputChange(
+                      e,
+                      i,
+                      'attached_files',
+                      'file_name'
+                    )
+                  }
+                />
+              </FormControl>
             </FileName>
             <FileLink>
-              <label>連結</label>
-              <StyledInput
-                type="text"
-                placeholder="請輸入檔案連結"
-                value={file.file_link}
-                onChange={e =>
-                  handleMapArrayInputChange(e, i, 'attached_files', 'file_link')
-                }
-              />
+              <FormControl isInvalid={!file.file_link.match(regex)}>
+                <FormLabel mb="5px">連結</FormLabel>
+                <StyledInput
+                  type="text"
+                  placeholder="請輸入檔案連結"
+                  value={file.file_link}
+                  onChange={e =>
+                    handleMapArrayInputChange(
+                      e,
+                      i,
+                      'attached_files',
+                      'file_link'
+                    )
+                  }
+                />
+                <FormErrorMessage>請填寫正確的 URL 格式</FormErrorMessage>
+              </FormControl>
             </FileLink>
           </FilesWrap>
         );

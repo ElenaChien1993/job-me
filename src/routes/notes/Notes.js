@@ -29,6 +29,7 @@ const StyledInput = styled(Input)`
   border-radius: 10px;
   padding-left: 10px;
   font-size: 18px;
+  background-color: white;
 `;
 
 const NotesWrapper = styled.div`
@@ -75,6 +76,7 @@ const Notes = () => {
             onChange={handleSearch}
           />
           <InputRightElement
+            zIndex={0}
             pointerEvents="none"
             children={<Search2Icon color="brand.300" />}
           />

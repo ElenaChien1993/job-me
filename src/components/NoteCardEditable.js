@@ -256,7 +256,7 @@ const NoteElement = React.memo(
                   value={note.status}
                   onBlur={() => onBlurSubmit('status')}
                 >
-                  <option value="未申請">未申請</option>
+                  <option style={{marginTop: '5px'}} value="未申請">未申請</option>
                   <option value="已申請">已申請</option>
                   <option value="未錄取">未錄取</option>
                   <option value="已錄取">已錄取</option>

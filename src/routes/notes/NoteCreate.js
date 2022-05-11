@@ -226,6 +226,7 @@ const NoteCreate = () => {
         w="20%"
         colorScheme="brand"
         mb="40px"
+        ml="auto"
       >
         取消
       </Button>

@@ -3,6 +3,7 @@ import { useLocation, useOutletContext } from 'react-router-dom';
 import { BiSend, BiImageAdd, BiGame } from 'react-icons/bi';
 import { BsEmojiHeartEyes } from 'react-icons/bs';
 import { Input, IconButton, useDisclosure, Flex, Icon } from '@chakra-ui/react';
+import { SmallCloseIcon } from '@chakra-ui/icons';
 import styled, { ThemeProvider } from 'styled-components';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
@@ -19,19 +20,20 @@ const Container = styled.div`
   background-color: ${color.white};
   border-radius: 20px;
   position: relative;
-  z-index: 1;
+  z-index: 3;
   max-width: 1152px;
+  box-shadow: 4px 4px 4px rgb(0 0 0 / 25%);
   @media ${device.mobileM} {
-    margin: ${props => (props.theme.isCorner ? '' : '0 auto 80px')};
+    margin: ${props => (props.theme.isCorner ? '' : '0 auto 40px')};
     top: ${props => (props.theme.isCorner ? '' : '40px')};
     width: ${props => (props.theme.isCorner ? '300px' : '90%')};
-    height: ${props => (props.theme.isCorner ? '454px' : 'auto')};
+    height: ${props => (props.theme.isCorner ? '454px' : '500px')};
   }
   @media ${device.laptop} {
     margin: ${props => (props.theme.isCorner ? '' : '0 auto 70px')};
     top: ${props => (props.theme.isCorner ? '' : '40px')};
     width: ${props => (props.theme.isCorner ? '40vw' : '80%')};
-    height: ${props => (props.theme.isCorner ? '400px' : '650px')};
+    height: ${props => (props.theme.isCorner ? '400px' : '80vh')};
   }
 `;
 
@@ -57,12 +59,16 @@ const LeftWrapper = styled.div`
 const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   @media ${device.mobileM} {
     width: 100%;
     margin-left: 0;
+    height: 388px;
   }
   @media ${device.laptop} {
     width: 65%;
+    height: 100%;
     margin-left: 35%;
   }
 `;
@@ -72,6 +78,7 @@ const TopWrapper = styled.div`
   align-items: center;
   padding-left: 20px;
   height: 64px;
+  border-radius: 0 20px 0 0;
   @media ${device.mobileM} {
     display: none;
   }
@@ -131,6 +138,18 @@ const EmojisPicker = styled.span`
   z-index: 1;
 `;
 
+const PickerWrapper = styled.div`
+  position: relative;
+`;
+
+const CloseButton = styled(IconButton)`
+  && {
+    position: absolute;
+    right: -15px;
+    top: -16px;
+  }
+`;
+
 const EmptyText = styled.div`
   color: #a0aec0;
   font-size: 30px;
@@ -144,7 +163,8 @@ const Messages = () => {
   const rootRef = useRef();
   const bottomRef = useRef();
   const emojisRef = useRef();
-  const { currentUserId, active, setActive } = useOutletContext();
+  const isSendingRef = useRef(false);
+  const { currentUserId, active, setActive, databaseRooms } = useOutletContext();
   const { pathname } = useLocation();
 
   const { onOpen, isOpen, onClose } = useDisclosure({ id: 'addImage' });
@@ -175,9 +195,12 @@ const Messages = () => {
     bottomRef.current.scrollIntoView({ behavior: 'auto' });
   };
 
-  const handleEnter = (e, value, type) => {
+  const handleEnter = async (e, value, type) => {
     if (e.keyCode === 13) {
-      send(value, type);
+      if (isSendingRef.current) return;
+      isSendingRef.current = true;
+      await send(value, type);
+      isSendingRef.current = false;
     }
   };
 
@@ -193,11 +216,7 @@ const Messages = () => {
     <ThemeProvider theme={{ isCorner }}>
       <Container>
         <LeftWrapper>
-          <ChatList
-            active={active}
-            setActive={setActive}
-            isCorner={isCorner}
-          />
+          <ChatList active={active} setActive={setActive} isCorner={isCorner} />
         </LeftWrapper>
         <RightWrapper>
           {active ? (
@@ -238,10 +257,20 @@ const Messages = () => {
                 />
                 {showEmojis && (
                   <EmojisPicker ref={emojisRef}>
-                    <Picker
-                      onSelect={addEmoji}
-                      emojiTooltip={true}
-                      title="JobMe"
+                    <PickerWrapper>
+                      <Picker
+                        onSelect={addEmoji}
+                        emojiTooltip={true}
+                        title="JobMe"
+                      />
+                    </PickerWrapper>
+                    <CloseButton
+                      isRound
+                      size="sm"
+                      colorScheme="brand"
+                      aria-label="delete item"
+                      icon={<SmallCloseIcon />}
+                      onClick={() => setShowEmojis(false)}
                     />
                   </EmojisPicker>
                 )}
@@ -270,11 +299,9 @@ const Messages = () => {
               flexDir="column"
               align="center"
               justify="center"
-              mt={['50px', null, null, null, '100px']}
-              mb={['30px', null, null, null, 0]}
             >
               <Icon w="200px" h="200px" color="#A0AEC0" as={BiGame} />
-              <EmptyText>請選取聊天室</EmptyText>
+              <EmptyText>{databaseRooms.length === 0 ? '尚無聊天室記錄' : '請選取聊天室'}</EmptyText>
             </Flex>
           )}
         </RightWrapper>

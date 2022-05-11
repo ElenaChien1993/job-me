@@ -360,7 +360,7 @@ const firebase = {
     const docSnaps = await getDocs(
       query(
         collection(db, `chatrooms/${roomId}/messages`),
-        where('create_at', '<', message.create_at),
+        where('create_at', '<', Timestamp.fromMillis(message.create_at)),
         orderBy('create_at', 'desc'),
         limit(20)
       )
@@ -369,8 +369,11 @@ const firebase = {
     docSnaps.forEach(doc => {
       data.push(doc.data());
     });
-    data.sort((a, b) => !b.create_at - a.create_at);
-    return data;
+    const millisData = data.map(item => {
+      return { ...item, create_at: item.create_at.toMillis() };
+    });
+    millisData.sort((a, b) => a.create_at - b.create_at);
+    return millisData;
   },
   listenMessagesChange(room, callback, uid) {
     const q = query(
@@ -381,29 +384,32 @@ const firebase = {
     return onSnapshot(
       q,
       async snapshot => {
-        console.log('msg listener 1');
         let data = [];
         snapshot.docChanges().forEach(change => {
           if (change.type === 'added') {
             data.push(change.doc.data());
           }
         });
-        data.sort((a, b) => !b.create_at - a.create_at);
+        const millisData = data.map(item => {
+          return { ...item, create_at: item.create_at.toMillis() };
+        });
+        millisData.sort((a, b) => a.create_at - b.create_at);
+        console.log(millisData);
         callback(prev => {
           if (!prev[room.id]) {
             return {
               ...prev,
-              [room.id]: data,
+              [room.id]: millisData,
             };
           } else {
             // 我這邊是先比較後來監聽拿到的 messages 是不是已經存在之前的 state 中
             const stateIds = prev[room.id].map(item => item.id);
-            const dataIds = data.map(item => item.id);
+            const dataIds = millisData.map(item => item.id);
             const filteredIds = dataIds.filter(
               id => stateIds.indexOf(id) === -1
             );
             if (filteredIds.length === 0) return prev;
-            const filteredData = data.filter(
+            const filteredData = millisData.filter(
               message => filteredIds.indexOf(message.id) !== -1
             );
             return { ...prev, [room.id]: [...prev[room.id], ...filteredData] };
