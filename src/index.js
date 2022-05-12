@@ -23,6 +23,8 @@ import NotFound from './routes/NotFound';
 import NotePublic from './routes/notes/NotePublic';
 
 import { color } from './style/variable';
+import Explore from './routes/Explore';
+import Landing from './routes/Landing';
 
 const breakpoints = {
   xs: '375px',
@@ -115,6 +117,10 @@ const App = () => {
                   <Route path=":noteId" element={<NotePublic />} />
                 </Route>
               </Route>
+
+              <Route path="explore" element={<Explore />} />
+
+              <Route path="product" element={<Landing />} />
 
               <Route path="*" element={<NotFound />} />
             </Route>
