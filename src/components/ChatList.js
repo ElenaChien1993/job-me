@@ -25,22 +25,28 @@ const ChatWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  background-color: ${props => (props.isSelected ? color.third : '')};
+  background-color: ${props => (props.isSelected ? 'white' : '')};
+  box-shadow: ${props => (props.isSelected ? '0 4px 16px rgb(91 96 103 / 8%)' : '')};
   cursor: pointer;
+  border-radius: 10px;
   &:hover {
-    background-color: ${color.third};
+    background-color: white;
+    box-shadow: 0 4px 16px rgb(91 96 103 / 8%);
+    transition: all .2s ease-in;
   }
   @media ${device.mobileM} {
     width: 90px;
     min-width: 90px;
-    padding: 10px 10px;
+    padding: 5px 3px;
+    margin: 5px 3px;
     flex-direction: column;
     justify-content: center;
   }
   @media ${device.laptopL} {
     width: auto;
     min-width: auto;
-    padding: ${props => (props.theme.isCorner ? '10px 15px' : '15px 25px')};
+    padding: ${props => (props.theme.isCorner ? '8px 5px' : '10px 10px')};
+    margin: ${props => (props.theme.isCorner ? '2px 5px' : '5px 10px')};
     flex-direction: row;
   }
 `;
@@ -174,21 +180,6 @@ const SearchBar = styled.div`
   }
 `;
 
-const Line = styled.div`
-  height: 1px;
-  background-color: #e8e7e7;
-  position: absolute;
-  bottom: 0;
-  width: 88%;
-  @media ${device.mobileM} {
-    display: none;
-  }
-  @media ${device.laptopL} {
-    display: block;
-    left: ${props => (props.theme.isCorner ? '15px' : '25px')};
-  }
-`;
-
 const LATEST_MESSAGE_TYPE = props => ({
   0: props.latest.message,
   1: '傳送了一張照片',
@@ -311,7 +302,6 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
             >
               {room.unread_qty}
             </NewMessage>
-            <Line />
           </ChatWrapper>
         ))}
         <div ref={observeTargetRef}></div>
