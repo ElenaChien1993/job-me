@@ -91,7 +91,7 @@ const PracticeStart = () => {
   }, []);
 
   const goToProfile = () => {
-    navigate(`/profile/${props.user.uid}`);
+    navigate(`/profile/${props.user.uid}?tab=records`);
   };
 
   return (
@@ -105,6 +105,7 @@ const PracticeStart = () => {
       )}
       {progress === 'before' && (
         <BeforeRecord
+          setRecordType={props.setRecordType}
           recordType={props.recordType}
           timer={timer}
           setTimer={setTimer}

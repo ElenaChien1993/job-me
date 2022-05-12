@@ -162,7 +162,7 @@ const Nav = ({ userInfo, currentUserId }) => {
   };
 
   const goToProfile = () => {
-    navigate(`/profile/${currentUserId}`);
+    navigate(`/profile/${currentUserId}?tab=setting`);
   };
 
   return (
@@ -268,7 +268,7 @@ const Nav = ({ userInfo, currentUserId }) => {
                         </StyledNavLink>
                       </MobileNavItem>
                       <MobileNavItem>
-                        <StyledNavLink to={`/profile/${currentUserId}`}>
+                        <StyledNavLink to={`/profile/${currentUserId}?tab=setting`}>
                           {({ isActive }) => (
                             <MobileSpan isActive={isActive}>Profile</MobileSpan>
                           )}

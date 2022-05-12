@@ -7,7 +7,7 @@ import {
   VscDebugStart,
   VscStopCircle,
 } from 'react-icons/vsc';
-import { MdSaveAlt, MdNavigateNext, MdTimer } from 'react-icons/md';
+import { MdOutlineSave, MdNavigateNext, MdTimer } from 'react-icons/md';
 import styled from 'styled-components';
 
 import { Audio, Video } from './elements/MediaRecorder';
@@ -81,7 +81,7 @@ const Recording = ({
         position: 'top-right',
       });
     }
-  }, [error]);
+  }, [error, toast]);
 
   const getDownloadURL = async (type, id) => {
     const fileBlob = await fetch(mediaBlobUrl).then(r => r.blob());
@@ -265,7 +265,7 @@ const Recording = ({
                       border: `2px solid ${color.primary}`,
                     }}
                     onClick={() => handleSave(recordType === '錄音' ? 0 : 1)}
-                    icon={<MdSaveAlt />}
+                    icon={<MdOutlineSave />}
                   />
                 </Tooltip>
                 <Button
@@ -273,7 +273,7 @@ const Recording = ({
                   onClick={goNext}
                   rightIcon={<MdNavigateNext />}
                 >
-                  前往下一題
+                  {current === practiceQuestions.length - 1 ? '結束練習' : '前往下一題'}
                 </Button>
               </>
             )}

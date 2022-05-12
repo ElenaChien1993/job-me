@@ -105,7 +105,10 @@ const firebase = {
       docs.forEach(doc => {
         data.push(doc.data());
       });
-      const transformed = data.map(record => {
+      const millisData = data.map(item => {
+        return { ...item, date: item.date.toMillis() };
+      });
+      const transformed = millisData.map(record => {
         const timeString = useFormatedTime(record.date);
         return { ...record, date: timeString };
       });

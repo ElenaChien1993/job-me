@@ -60,6 +60,7 @@ const SettingWrapper = styled.div`
   justify-content: center;
   border-radius: 15px;
   background: ${color.white};
+  width: min-content;
   @media ${device.mobileM} {
     padding: 20px 20px;
   }
@@ -75,6 +76,12 @@ const OptionWrapper = styled.div`
   display: flex;
   align-items: flex-start;
   margin-top: 20px;
+  @media ${device.mobileM} {
+    min-width: 310px;
+  }
+  @media ${device.tablet} {
+    min-width: 410px;
+  }
 `;
 
 const StyledInput = styled(Input)`
@@ -114,19 +121,29 @@ const Dot = styled.div`
   min-width: 10px;
   min-height: 10px;
   border-radius: 5px;
-  background-color: ${color.primary};;
+  background-color: ${color.primary}; ;
 `;
 
 const Questions = styled.div`
-  margin-left: 140px;
   margin-top: 20px;
   max-width: 70%;
+  @media ${device.mobileM} {
+    margin-left: 120px;
+  }
+  @media ${device.tablet} {
+    margin-left: 140px;
+  }
 `;
 
 const Reminder = styled.div`
-  margin-left: 140px;
   margin-top: 20px;
   color: red;
+  @media ${device.mobileM} {
+    margin-left: 120px;
+  }
+  @media ${device.tablet} {
+    margin-left: 140px;
+  }
 `;
 
 const QtyWrapper = styled.div`
@@ -138,8 +155,24 @@ const ErrorText = styled.div`
   color: red;
 `;
 
+const InputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 const InputWrapper = styled.div`
   display: flex;
+`;
+
+const SideNote = styled.div`
+  color: #999;
+  margin-top: 10px;
+  @media ${device.mobileM} {
+    margin-left: 120px;
+  }
+  @media ${device.tablet} {
+    margin-left: 140px;
+  }
 `;
 
 const PracticeSetting = () => {
@@ -149,7 +182,15 @@ const PracticeSetting = () => {
   const [newQuestion, setNewQuestion] = useState('');
   const [qty, setQty] = useState(3);
   const [isQtyValid, setIsQtyValid] = useState(true);
-  const props = useOutletContext();
+  const [isInputInvalid, setIsInputInvalid] = useState(false);
+  const {
+    databaseNotes,
+    setBrief,
+    setPracticeQuestions,
+    brief,
+    recordType,
+    setRecordType,
+  } = useOutletContext();
 
   let params = useParams();
   const noteId = params.noteId;
@@ -167,22 +208,23 @@ const PracticeSetting = () => {
   }, [noteId]);
 
   useEffect(() => {
-    const noteBrief = props.databaseNotes.filter(
-      note => note.note_id === noteId
-    );
-    props.setBrief(...noteBrief);
-  }, [props.databaseNotes, noteId]);
-
-  // console.log(databaseNotes, brief, details);
+    const noteBrief = databaseNotes.filter(note => note.note_id === noteId);
+    setBrief(...noteBrief);
+  }, [databaseNotes, noteId, setBrief]);
 
   const handleInputChange = e => {
+    setIsInputInvalid(false);
     setNewQuestion(e.target.value);
   };
 
   const handleAddQuestion = () => {
+    if (newQuestion === '') {
+      setIsInputInvalid(true);
+      return;
+    }
     const update = [
       ...details.questions,
-      { question: newQuestion, answer: '' },
+      { question: newQuestion, answer: '', checked: true },
     ];
     setDetails(prev => {
       return { ...prev, questions: update };
@@ -217,7 +259,7 @@ const PracticeSetting = () => {
       return 0.5 - Math.random();
     });
     const selected = shuffled.slice(0, qty);
-    props.setPracticeQuestions(selected);
+    setPracticeQuestions(selected);
   };
 
   const handleStartPractice = () => {
@@ -247,7 +289,7 @@ const PracticeSetting = () => {
               <BackButton path="/practice" isStart={false} />
               <Title>面試練習設定</Title>
             </TitleWrapper>
-            <NoteBar brief={props.brief} />
+            <NoteBar brief={brief} />
           </TopWrapper>
           <SettingWrapper>
             <OptionWrapper>
@@ -271,6 +313,11 @@ const PracticeSetting = () => {
                 setter={setQuestionsBase}
               />
             </OptionWrapper>
+            {details.questions.length === 0 && questionsBase === '隨機' && (
+              <SideNote>
+                筆記中無面試猜題紀錄，請選擇「指定」新增此次練習題目
+              </SideNote>
+            )}
             <Questions>
               {details.questions.map((item, i) => {
                 return (
@@ -289,28 +336,33 @@ const PracticeSetting = () => {
                 );
               })}
               {questionsBase === '指定' && (
-                <InputWrapper>
-                  <IconButton
-                    aria-label="Add question"
-                    onClick={handleAddQuestion}
-                    icon={<PlusSquareIcon />}
-                    mr="10px"
-                  />
-                  <Input
-                    variant="flushed"
-                    value={newQuestion}
-                    onChange={handleInputChange}
-                    placeholder="請自行輸入題目"
-                  />
-                </InputWrapper>
+                <InputContainer>
+                  <InputWrapper>
+                    <Input
+                      isInvalid={isInputInvalid}
+                      errorBorderColor="crimson"
+                      variant="flushed"
+                      value={newQuestion}
+                      onChange={handleInputChange}
+                      placeholder="請自行輸入題目"
+                    />
+                    <IconButton
+                      aria-label="Add question"
+                      onClick={handleAddQuestion}
+                      icon={<PlusSquareIcon />}
+                      mr="10px"
+                    />
+                  </InputWrapper>
+                  {isInputInvalid && <ErrorText>無法新增空白內容</ErrorText>}
+                </InputContainer>
               )}
             </Questions>
             <OptionWrapper>
               <OptionTitle>紀錄模式</OptionTitle>
               <RadioGroup
                 items={['錄音', '錄影']}
-                value={props.recordType}
-                setter={props.setRecordType}
+                value={recordType}
+                setter={setRecordType}
               />
             </OptionWrapper>
             <Reminder>*稍後記得允許麥克風和相機使用權限</Reminder>
