@@ -29,7 +29,6 @@ const StyledInput = styled(Input)`
   border-radius: 10px;
   padding-left: 10px;
   font-size: 18px;
-  background-color: white;
 `;
 
 const NotesWrapper = styled.div`
@@ -74,6 +73,7 @@ const Notes = () => {
             type="text"
             placeholder="輸入公司 / 職稱 / 標籤搜尋"
             onChange={handleSearch}
+            bg="white"
           />
           <InputRightElement
             zIndex={0}

@@ -15,9 +15,9 @@ const Container = styled.div`
   @media ${device.mobileM} {
     flex-direction: row;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     flex-direction: column;
-    height: 76%;
+    height: ${props => (props.theme.isCorner ? '82%' : '76%')};
   }
 `;
 
@@ -25,24 +25,27 @@ const ChatWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  padding: 15px 16px;
   background-color: ${props => (props.isSelected ? color.third : '')};
   cursor: pointer;
   &:hover {
     background-color: ${color.third};
   }
   @media ${device.mobileM} {
+    width: 90px;
+    min-width: 90px;
     padding: 10px 10px;
     flex-direction: column;
+    justify-content: center;
   }
-  @media ${device.laptop} {
-    padding: 15px 16px;
+  @media ${device.laptopL} {
+    width: auto;
+    min-width: auto;
+    padding: ${props => (props.theme.isCorner ? '10px 15px' : '15px 25px')};
     flex-direction: row;
   }
 `;
 
 const BriefContent = styled.div`
-  width: 100%;
   display: flex;
   flex-direction: column;
   text-overflow: ellipsis;
@@ -50,9 +53,9 @@ const BriefContent = styled.div`
   overflow: hidden;
   @media ${device.mobileM} {
     margin-left: 0;
-    width: auto;
+    width: 100%;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     margin-left: 13px;
     width: 100%;
   }
@@ -66,17 +69,17 @@ const Name = styled.div`
   overflow: hidden;
   @media ${device.mobileM} {
     font-size: 16px;
-    margin: 5px 0;
+    margin: 5px auto;
   }
-  @media ${device.laptop} {
-    font-size: 20px;
-    margin: 0 0 10px;
+  @media ${device.laptopL} {
+    font-size: ${props => (props.theme.isCorner ? '16px' : '20px')};
+    margin: 0 0 5px;
   }
 `;
 
 const LatestMessage = styled.div`
   color: #4f5665;
-  font-size: 16px;
+  font-size: ${props => (props.theme.isCorner ? '13px' : '16px')};
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -85,17 +88,18 @@ const LatestMessage = styled.div`
   @media ${device.mobileM} {
     display: none;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     display: block;
   }
 `;
 
 const DateText = styled.div`
   font-size: 14px;
+  color: #aeaeae;
   @media ${device.mobileM} {
     display: none;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     display: ${props => (props.theme.isCorner ? 'none' : 'block')};
   }
 `;
@@ -107,20 +111,26 @@ const Upper = styled.div`
 
 const NewMessage = styled.div`
   position: absolute;
-  height: 26px;
-  width: 26px;
-  border-radius: 13px;
   background-color: red;
-  top: 38px;
   color: white;
   text-align: center;
   font-weight: 700;
   display: ${props => (props.isRead ? 'none' : 'block')};
   @media ${device.mobileM} {
-    right: 5px;
+    height: 22px;
+    width: 22px;
+    border-radius: 11px;
+    font-size: 13px;
+    right: ${props => (props.theme.isCorner ? '17px' : '13px')};
+    top: ${props => (props.theme.isCorner ? '34px' : '42px')};
   }
-  @media ${device.laptop} {
-    right: 17px;
+  @media ${device.laptopL} {
+    font-size: ${props => (props.theme.isCorner ? '13px' : '16px')};
+    height: ${props => (props.theme.isCorner ? '22px' : '26px')};
+    width: ${props => (props.theme.isCorner ? '22px' : '26px')};
+    border-radius: ${props => (props.theme.isCorner ? '11px' : '13px')};
+    top: ${props => (props.theme.isCorner ? '22px' : '47px')};
+    right: ${props => (props.theme.isCorner ? '11px' : '25px')};
   }
 `;
 
@@ -131,9 +141,10 @@ const TitleWrapper = styled.div`
     display: ${props => (props.theme.isCorner ? 'none' : 'flex')};
     padding: 15px 0 0 10px;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     display: flex;
-    padding: 25px 0 0 17px;
+    padding: ${props =>
+      props.theme.isCorner ? '15px 0 0 20px' : '25px 0 0 25px'};
   }
 `;
 
@@ -144,9 +155,9 @@ const Title = styled.div`
   @media ${device.mobileM} {
     font-size: 18px;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     display: block;
-    font-size: 24px;
+    font-size: ${props => (props.theme.isCorner ? '18px' : '24px')};
     margin-bottom: 20px;
   }
 `;
@@ -157,9 +168,24 @@ const SearchBar = styled.div`
     margin: 15px 0;
     width: 99%;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     margin: 0 0 30px;
-    width: 97%;
+    width: 94%;
+  }
+`;
+
+const Line = styled.div`
+  height: 1px;
+  background-color: #e8e7e7;
+  position: absolute;
+  bottom: 0;
+  width: 88%;
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.laptopL} {
+    display: block;
+    left: ${props => (props.theme.isCorner ? '15px' : '25px')};
   }
 `;
 
@@ -261,7 +287,7 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
           >
             <ProfileImage
               user={room.members}
-              size={50}
+              size={isCorner ? 40 : 50}
               hasBorder={false}
               marginRight={0}
             />
@@ -285,6 +311,7 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
             >
               {room.unread_qty}
             </NewMessage>
+            <Line />
           </ChatWrapper>
         ))}
         <div ref={observeTargetRef}></div>

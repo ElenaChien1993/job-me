@@ -21,15 +21,15 @@ const Container = styled.div`
   border-radius: 20px;
   position: relative;
   z-index: 3;
-  max-width: 1152px;
+  max-width: ${props => (props.theme.isCorner ? '800px' : '1152px')};
   box-shadow: 4px 4px 4px rgb(0 0 0 / 25%);
   @media ${device.mobileM} {
     margin: ${props => (props.theme.isCorner ? '' : '0 auto 40px')};
     top: ${props => (props.theme.isCorner ? '' : '40px')};
     width: ${props => (props.theme.isCorner ? '300px' : '90%')};
-    height: ${props => (props.theme.isCorner ? '454px' : '500px')};
+    height: ${props => (props.theme.isCorner ? '454px' : 'auto')};
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     margin: ${props => (props.theme.isCorner ? '' : '0 auto 70px')};
     top: ${props => (props.theme.isCorner ? '' : '40px')};
     width: ${props => (props.theme.isCorner ? '40vw' : '80%')};
@@ -38,7 +38,7 @@ const Container = styled.div`
 `;
 
 const LeftWrapper = styled.div`
-  background-color: #ececec;
+  background-color: #fafafa;
   flex-direction: column;
   @media ${device.mobileM} {
     border-radius: 20px 20px 0 0;
@@ -46,7 +46,7 @@ const LeftWrapper = styled.div`
     width: 100%;
     padding: 0 10px;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     border-radius: 20px 0 0 20px;
     position: absolute;
     left: 0;
@@ -59,14 +59,13 @@ const LeftWrapper = styled.div`
 const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
   @media ${device.mobileM} {
     width: 100%;
     margin-left: 0;
-    height: 388px;
+    height: 350px;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     width: 65%;
     height: 100%;
     margin-left: 35%;
@@ -82,7 +81,7 @@ const TopWrapper = styled.div`
   @media ${device.mobileM} {
     display: none;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     display: flex;
   }
 `;
@@ -98,8 +97,8 @@ const Content = styled.div`
   @media ${device.mobileM} {
     height: ${props => (props.theme.isCorner ? '285px' : '410px')};
   }
-  @media ${device.laptop} {
-    height: ${props => (props.theme.isCorner ? '272px' : '522px')};
+  @media ${device.laptopL} {
+    height: ${props => (props.theme.isCorner ? '272px' : '100%')};
   }
 `;
 

@@ -4,12 +4,22 @@ import styled from 'styled-components';
 
 import ProfileImage from '../ProfileImage';
 import useFormatedTime from '../../hooks/useFormatedTime';
+import { device } from '../../style/variable';
 
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
   padding-left: 20px;
   margin-top: 10px;
+`;
+
+const ImageWrapper = styled.div`
+  @media ${device.mobileM} {
+    display: none;
+  }
+  @media ${device.tablet} {
+    display: block;
+  }
 `;
 
 const Content = styled.div`
@@ -46,7 +56,7 @@ const ImageMessage = React.forwardRef((props, ref) => {
   );
 });
 
-const MESSAGE_TYPE = (props) => ({
+const MESSAGE_TYPE = props => ({
   0: <Text text={props.message.text} ref={props.bottomRef} />,
   1: <ImageMessage url={props.message.text} ref={props.bottomRef} />,
 });
@@ -55,14 +65,14 @@ const ChatReceived = React.forwardRef((props, ref) => {
   const timeString = useFormatedTime(props.message.create_at);
   return (
     <Wrapper ref={ref}>
-      {!props.isCorner && (
+      <ImageWrapper>
         <ProfileImage
           user={props.member}
           size={48}
           hasBorder={false}
           marginRight={16}
         />
-      )}
+      </ImageWrapper>
       {MESSAGE_TYPE(props)[props.message.type]}
       <DateText>{timeString}</DateText>
     </Wrapper>
