@@ -134,10 +134,11 @@ const MyProfile = () => {
               fontSize={['16px', null, null, null, '18px']}
               height="35px"
               _selected={{
-                color: color.primary,
+                color: isMobile ? 'white' : color.primary,
                 borderColor: color.primary,
                 borderBottomColor: color.third,
                 fontWeight: 'bold',
+                background: isMobile ? color.primary : color.backgroundGray,
               }}
             >
               Setting
@@ -149,10 +150,11 @@ const MyProfile = () => {
               fontSize={['16px', null, null, null, '18px']}
               height="35px"
               _selected={{
-                color: color.primary,
+                color: isMobile ? 'white' : color.primary,
                 borderColor: color.primary,
                 borderBottomColor: color.third,
                 fontWeight: 'bold',
+                background: isMobile ? color.primary : color.backgroundGray,
               }}
             >
               Records

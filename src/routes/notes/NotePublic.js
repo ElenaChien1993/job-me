@@ -12,8 +12,9 @@ import { useState, useEffect } from 'react';
 import { AiFillEye } from 'react-icons/ai';
 import { useOutletContext, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import EditorArea from '../../components/elements/Editor';
 
+import ChatCorner from '../../components/ChatCorner';
+import EditorArea from '../../components/elements/Editor';
 import Loader from '../../components/Loader';
 import NoteElement from '../../components/NoteCardEditable';
 import ProfileImage from '../../components/ProfileImage';
@@ -424,6 +425,7 @@ const NotePublic = () => {
           </TabPanels>
         </Tabs>
       </DetailsContainer>
+      <ChatCorner />
     </Background>
   );
 };

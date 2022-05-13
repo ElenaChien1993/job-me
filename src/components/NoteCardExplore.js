@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { AiFillEye } from 'react-icons/ai';
+import PropTypes from 'prop-types';
 
 import { device, color } from '../style/variable';
 import ProfileImage from './ProfileImage';
@@ -13,7 +14,7 @@ const NoteCard = styled.li`
   padding: 16px 0;
   transition: box-shadow 0.2s ease-in-out;
   &:hover {
-    box-shadow: 0 4px 16px 0 hsl(215deg 6% 62% / 8%);
+    box-shadow: 0 4px 16px 0 hsl(215deg 6% 62% / 33%);
   }
 `;
 
@@ -65,30 +66,38 @@ const Views = styled.div`
   font-weight: bold;
 `;
 
-const NoteCardExplore = () => {
+const NoteCardExplore = ({ note }) => {
+  const goToNote = (uid, noteId) => {
+    window.open(`/public/${uid}/${noteId}`, '_blank');
+  };
+
   return (
-    <NoteCard>
+    <NoteCard onClick={() => goToNote(note.creator, note.note_id)}>
       <Content>
-        <JobTitle>前端工程師</JobTitle>
-        <CompanyName>91APP</CompanyName>
+        <JobTitle>{note.job_title}</JobTitle>
+        <CompanyName>{note.company_name}</CompanyName>
       </Content>
       <Footer>
         <Wrapper>
           <ProfileImage
-            user={{ display: 'elena' }}
+            user={note.creator_info}
             size={25}
             hasBorder={false}
             marginRight={10}
           />
-          <Name>Elena</Name>
+          <Name>{note.creator_info.display_name}</Name>
         </Wrapper>
         <Wrapper>
           <Icon color="#9e9ea7" as={AiFillEye} boxSize="20px" mr="5px" />
-          <Views>88</Views>
+          <Views>{note.views}</Views>
         </Wrapper>
       </Footer>
     </NoteCard>
   );
+};
+
+NoteCardExplore.propTypes = {
+  note: PropTypes.object.isRequired,
 };
 
 export default NoteCardExplore;

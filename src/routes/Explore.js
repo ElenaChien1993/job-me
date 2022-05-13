@@ -1,12 +1,22 @@
-import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
-import { Search2Icon } from '@chakra-ui/icons';
+import { useState, useEffect } from 'react';
+import {
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+} from '@chakra-ui/react';
+import { Search2Icon, SmallCloseIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
+import firebase from '../utils/firebase';
 import { device, color } from '../style/variable';
 import image from '../images/explore.png';
 import NoteCardExplore from '../components/NoteCardExplore';
+import Loader from '../components/Loader';
 
-const Container = styled.div``;
+const Container = styled.div`
+  margin-bottom: 40px;
+`;
 
 const Upper = styled.div`
   display: flex;
@@ -140,8 +150,45 @@ const ContentGrid = styled.ol`
   }
 `;
 
+const NoData = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
 const Explore = () => {
+  const [databaseNotes, setDatabaseNotes] = useState(null);
+  const [renderNotes, setRenderNotes] = useState(null);
+  const [term, setTerm] = useState('');
+  const suggestions = ['工程師', '91APP', 'iOS', 'Android'];
+
+  useEffect(() => {
+    const fetchNotes = async () => {
+      const data = await firebase.getPublicNotes();
+      setDatabaseNotes(data);
+    };
+
+    fetchNotes();
+  }, []);
+
+  useEffect(() => {
+    setRenderNotes(databaseNotes);
+  }, [databaseNotes]);
+
+  useEffect(() => {
+    if (term === '') {
+      setRenderNotes(databaseNotes);
+      return;
+    }
+    const filtered = databaseNotes.filter(note => {
+      const regex = new RegExp(term, 'gi');
+      return note.company_name.match(regex) || note.job_title.match(regex);
+    });
+    setRenderNotes(filtered);
+  }, [term, databaseNotes]);
+
+  if (!renderNotes) return <Loader />;
+
   return (
     <Container>
       <Upper>
@@ -168,27 +215,48 @@ const Explore = () => {
                 border="none"
                 type="text"
                 placeholder="輸入公司 / 職稱 搜尋公開筆記"
-                // onChange={handleSearch}
+                value={term}
+                onChange={e => setTerm(e.target.value)}
                 bg="white"
                 borderRadius="10px"
                 h="60px"
                 pl="50px"
                 boxShadow="0px 8px 20px rgb(0 0 0 / 6%);"
               />
+              <InputRightElement
+                mr="10px"
+                zIndex={2}
+                children={<SmallCloseIcon color="brand.300" />}
+                top="11px"
+                cursor="pointer"
+                onClick={() => setTerm('')}
+              />
             </InputGroup>
           </InputWrapper>
           <Suggest>
             <ListTitle>搜尋建議：</ListTitle>
-            <ListItem>工程師</ListItem>
-            <ListItem>人資</ListItem>
+            {suggestions.map(suggestion => (
+              <ListItem key={suggestion} onClick={() => setTerm(suggestion)}>
+                {suggestion}
+              </ListItem>
+            ))}
           </Suggest>
         </SearchWrapper>
       </Upper>
       <Content>
-        <ContentGrid>
-          <NoteCardExplore />
-          <NoteCardExplore />
-        </ContentGrid>
+        {renderNotes.length !== 0 ? (
+          <ContentGrid>
+            {renderNotes.map(note => (
+              <NoteCardExplore key={note.note_id} note={note} />
+            ))}
+          </ContentGrid>
+        ) : (
+          <NoData>
+            抱歉，尚無此關鍵字的公開筆記
+            <br />
+            <span>您可以嘗試新增拋磚引玉！</span>
+          </NoData>
+        )}
       </Content>
     </Container>
   );

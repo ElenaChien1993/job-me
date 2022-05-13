@@ -247,6 +247,26 @@ const firebase = {
   signOut() {
     return signOut(auth);
   },
+  async getPublicNotes() {
+    const publicNotes = query(
+      collectionGroup(db, 'notes'),
+      where('is_share', '==', true),
+      orderBy('views', 'desc')
+    );
+    const querySnapshot = await getDocs(publicNotes);
+    let notes = [];
+    querySnapshot.forEach(doc => {
+      notes.push(doc.data());
+    });
+    
+    const users = await Promise.all(
+      notes.map(async note => {
+        const userData = await this.getUserInfo(note.creator);
+        return { ...note, creator_info: userData };
+      })
+    );
+    return users;
+  },
   async getRecommendedUsers(company, job, uid) {
     const membersByCompany = query(
       collectionGroup(db, 'notes'),

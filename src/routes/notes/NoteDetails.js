@@ -34,6 +34,7 @@ import EditFiles from '../../components/elements/EditFiles';
 import EditorArea from '../../components/elements/Editor';
 import RecommendModal from '../../components/RecommendModal';
 import EditableInputField from '../../components/EditableInputField';
+import ChatCorner from '../../components/ChatCorner';
 import { device, color } from '../../style/variable';
 
 const Background = styled.div`
@@ -814,6 +815,7 @@ const NoteDetails = () => {
           </Tabs>
         </Container>
       )}
+      <ChatCorner />
     </Background>
   );
 };
