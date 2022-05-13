@@ -26,7 +26,7 @@ import {
   Timestamp,
   orderBy,
   limit,
-  addDoc,
+  increment,
 } from 'firebase/firestore';
 import {
   getStorage,
@@ -162,6 +162,15 @@ const firebase = {
       console.log(err);
     }
   },
+  async increaseViews(uid, noteId) {
+    try {
+      await updateDoc(doc(db, 'users', uid, 'notes', noteId), {
+        views: increment(1),
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  },
   async deleteNote(uid, noteId) {
     try {
       await deleteDoc(doc(db, 'users', uid, 'notes', noteId));
@@ -267,7 +276,6 @@ const firebase = {
     });
     const uniqueByJob = helper.findUnique(dataByJob);
 
-    console.log(uniqueByCompany, uniqueByJob);
     const data = helper.compare(uniqueByCompany, uniqueByJob);
     const users = await Promise.all(
       data.map(async note => {
@@ -275,8 +283,6 @@ const firebase = {
         return { ...note, creator_info: userData };
       })
     );
-    // const filteredData = users.filter(item => item.creator !== uid);
-    console.log(users);
     return users;
   },
   async uploadFile(path, file) {
