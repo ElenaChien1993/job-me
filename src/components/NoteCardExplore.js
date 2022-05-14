@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { AiFillEye } from 'react-icons/ai';
 import PropTypes from 'prop-types';
 
-import { device, color } from '../style/variable';
+import { color } from '../style/variable';
 import ProfileImage from './ProfileImage';
 import { Icon } from '@chakra-ui/react';
 

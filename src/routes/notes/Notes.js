@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useOutletContext } from 'react-router-dom';
+import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import { InputGroup, InputRightElement, Input, Button } from '@chakra-ui/react';
 import { Search2Icon } from '@chakra-ui/icons';
 import styled from 'styled-components';
@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import firebase from '../../utils/firebase';
 import Note from '../../components/NoteCard';
 import ChatCorner from '../../components/ChatCorner';
-import { color } from '../../style/variable';
+import { color, device } from '../../style/variable';
 
 const Container = styled.div`
   display: flex;
@@ -36,10 +36,33 @@ const NotesWrapper = styled.div`
   flex-direction: column;
 `;
 
+const NoNote = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  color: #999;
+  @media ${device.mobileM} {
+    font-size: 15px;
+  }
+  @media ${device.tablet} {
+    font-size: 18px;
+  }
+  & span {
+    color: ${color.secondary};
+    font-weight: bold;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
 const Notes = () => {
   const [databaseNotes, setDatabaseNotes] = useState([]);
   const [renderNotes, setRenderNotes] = useState([]);
   const { currentUserId } = useOutletContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     firebase.getNotes(currentUserId).then(data => {
@@ -84,13 +107,23 @@ const Notes = () => {
       </SearchBar>
 
       <Link to="/notes/create" style={{ alignSelf: 'flex-end' }}>
-        <Button _hover={{background: 'none', color: color.primary, border: `1px solid ${color.primary}`}} h="2rem" fontSize="14px" my="10px" colorScheme="brand">
+        <Button
+          _hover={{
+            background: 'none',
+            color: color.primary,
+            border: `1px solid ${color.primary}`,
+          }}
+          h="2rem"
+          fontSize="14px"
+          my="10px"
+          colorScheme="brand"
+        >
           建立筆記
         </Button>
       </Link>
 
       <NotesWrapper>
-        {databaseNotes.length !== 0 &&
+        {databaseNotes.length !== 0 ? (
           renderNotes.map(note => {
             return (
               <Note
@@ -102,7 +135,13 @@ const Notes = () => {
                 setDatabaseNotes={setDatabaseNotes}
               />
             );
-          })}
+          })
+        ) : (
+          <NoNote>
+            <p>尚未建立過筆記，請點擊右上方按鈕開始建立</p>
+            <p>或是前往<span onClick={() => navigate('/explore')}>探索</span>查看其他會員的公開筆記</p>
+          </NoNote>
+        )}
       </NotesWrapper>
       <ChatCorner />
     </Container>

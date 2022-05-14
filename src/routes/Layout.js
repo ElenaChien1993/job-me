@@ -174,17 +174,22 @@ const Nav = ({ userInfo, currentUserId }) => {
           </Link>
           <NavItem>
             <StyledNavLink to="/notes">
-              {({ isActive }) => <Span isActive={isActive}>Notes</Span>}
+              {({ isActive }) => <Span isActive={isActive}>我的筆記</Span>}
             </StyledNavLink>
           </NavItem>
           <NavItem>
             <StyledNavLink to="/practice">
-              {({ isActive }) => <Span isActive={isActive}>Practice</Span>}
+              {({ isActive }) => <Span isActive={isActive}>面試練習</Span>}
+            </StyledNavLink>
+          </NavItem>
+          <NavItem>
+            <StyledNavLink to="/explore">
+              {({ isActive }) => <Span isActive={isActive}>探索</Span>}
             </StyledNavLink>
           </NavItem>
           <NavItem>
             <StyledNavLink to="/messages">
-              {({ isActive }) => <Span isActive={isActive}>Messages</Span>}
+              {({ isActive }) => <Span isActive={isActive}>聊天室</Span>}
             </StyledNavLink>
           </NavItem>
           {currentUserId ? (
@@ -213,7 +218,7 @@ const Nav = ({ userInfo, currentUserId }) => {
                 </ImageWrapper>
               </MenuButton>
               <MenuList w="100px">
-                <MenuItem onClick={goToProfile}>Profile</MenuItem>
+                <MenuItem onClick={goToProfile}>個人資料</MenuItem>
                 <MenuItem onClick={handleLogout}>登出</MenuItem>
               </MenuList>
             </Menu>
@@ -245,7 +250,7 @@ const Nav = ({ userInfo, currentUserId }) => {
                       <MobileNavItem>
                         <StyledNavLink to="/notes">
                           {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>Notes</MobileSpan>
+                            <MobileSpan isActive={isActive}>我的筆記</MobileSpan>
                           )}
                         </StyledNavLink>
                       </MobileNavItem>
@@ -253,7 +258,16 @@ const Nav = ({ userInfo, currentUserId }) => {
                         <StyledNavLink to="/practice">
                           {({ isActive }) => (
                             <MobileSpan isActive={isActive}>
-                              Practice
+                              面試練習
+                            </MobileSpan>
+                          )}
+                        </StyledNavLink>
+                      </MobileNavItem>
+                      <MobileNavItem>
+                        <StyledNavLink to="/explore">
+                          {({ isActive }) => (
+                            <MobileSpan isActive={isActive}>
+                              探索
                             </MobileSpan>
                           )}
                         </StyledNavLink>
@@ -262,7 +276,7 @@ const Nav = ({ userInfo, currentUserId }) => {
                         <StyledNavLink to="/messages">
                           {({ isActive }) => (
                             <MobileSpan isActive={isActive}>
-                              Messages
+                              聊天室
                             </MobileSpan>
                           )}
                         </StyledNavLink>
@@ -270,7 +284,7 @@ const Nav = ({ userInfo, currentUserId }) => {
                       <MobileNavItem>
                         <StyledNavLink to={`/profile/${currentUserId}?tab=setting`}>
                           {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>Profile</MobileSpan>
+                            <MobileSpan isActive={isActive}>個人資料</MobileSpan>
                           )}
                         </StyledNavLink>
                       </MobileNavItem>

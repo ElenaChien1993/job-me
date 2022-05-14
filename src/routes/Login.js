@@ -24,7 +24,7 @@ import {
 } from 'react-icons/bs';
 import styled from 'styled-components';
 
-import image from '../images/login.png';
+import image from '../images/log.png';
 import firebase from '../utils/firebase';
 import { device, color } from '../style/variable';
 
@@ -90,6 +90,11 @@ const StyledSpan = styled.span`
   color: ${color.secondary};
   font-weight: bold;
   cursor: pointer;
+`;
+
+const Creditor = styled.a`
+  font-size: 0.7rem;
+  margin-top: 25px;
 `;
 
 const Login = () => {
@@ -198,7 +203,6 @@ const Login = () => {
   };
 
   const handleChange = prop => event => {
-
     setValues(prev => {
       return { ...prev, [prop]: event.target.value };
     });
@@ -216,21 +220,24 @@ const Login = () => {
       px="5%"
       flexDir={['column', null, null, 'row']}
     >
-      <Flex flexDir="column" w={["95%", null, null, "45%"]} align="center">
+      <Flex flexDir="column" w={['95%', null, null, '45%']} align="center">
         <WebTitle>Welcome To JobMe</WebTitle>
         <ImageWrapper>
           <Image src={image} alt="Login" />
         </ImageWrapper>
+        <Creditor href="https://storyset.com">
+          Illustrations by Storyset
+        </Creditor>
       </Flex>
       <Flex
-        w={["95%", null, null, "55%"]}
+        w={['95%', null, null, '55%']}
         h="auto"
         bg="white"
         borderRadius="8px"
         flexDir="column"
         align="center"
         p="3%"
-        ml={["", null, null, "5%"]}
+        ml={['', null, null, '5%']}
       >
         <Wrapper
           variant="ghost"

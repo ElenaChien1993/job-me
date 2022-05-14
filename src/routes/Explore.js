@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import firebase from '../utils/firebase';
 import { device, color } from '../style/variable';
 import image from '../images/explore.png';
+import ChatCorner from '../components/ChatCorner';
 import NoteCardExplore from '../components/NoteCardExplore';
 import Loader from '../components/Loader';
 
@@ -146,7 +147,7 @@ const ContentGrid = styled.ol`
     padding: 0 32px;
   }
   @media ${device.laptop} {
-    padding: 0 72px;
+    padding: 0 10%;
   }
 `;
 
@@ -167,7 +168,7 @@ const Explore = () => {
       const data = await firebase.getPublicNotes();
       setDatabaseNotes(data);
     };
-
+    
     fetchNotes();
   }, []);
 
@@ -258,6 +259,7 @@ const Explore = () => {
           </NoData>
         )}
       </Content>
+      <ChatCorner />
     </Container>
   );
 };
