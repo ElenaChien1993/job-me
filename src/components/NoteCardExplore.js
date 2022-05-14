@@ -26,7 +26,7 @@ const Footer = styled.div`
   align-items: center;
   border-top: 1px solid #f4f5f6;
   display: flex;
-  justify-content: space-between;
+  justify-content: ${props => (props.isProfile ? 'flex-end' : 'space-between')};
   margin-top: 12px;
   padding: 16px 16px 0;
 `;
@@ -66,7 +66,7 @@ const Views = styled.div`
   font-weight: bold;
 `;
 
-const NoteCardExplore = ({ note }) => {
+const NoteCardExplore = ({ note, isProfile }) => {
   const goToNote = (uid, noteId) => {
     window.open(`/public/${uid}/${noteId}`, '_blank');
   };
@@ -77,16 +77,18 @@ const NoteCardExplore = ({ note }) => {
         <JobTitle>{note.job_title}</JobTitle>
         <CompanyName>{note.company_name}</CompanyName>
       </Content>
-      <Footer>
-        <Wrapper>
-          <ProfileImage
-            user={note.creator_info}
-            size={25}
-            hasBorder={false}
-            marginRight={10}
-          />
-          <Name>{note.creator_info.display_name}</Name>
-        </Wrapper>
+      <Footer isProfile={isProfile}>
+        {!isProfile && (
+          <Wrapper>
+            <ProfileImage
+              user={note.creator_info}
+              size={25}
+              hasBorder={false}
+              marginRight={10}
+            />
+            <Name>{note.creator_info.display_name}</Name>
+          </Wrapper>
+        )}
         <Wrapper>
           <Icon color="#9e9ea7" as={AiFillEye} boxSize="20px" mr="5px" />
           <Views>{note.views}</Views>
@@ -98,6 +100,7 @@ const NoteCardExplore = ({ note }) => {
 
 NoteCardExplore.propTypes = {
   note: PropTypes.object.isRequired,
+  isProfile: PropTypes.bool,
 };
 
 export default NoteCardExplore;

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
-  font-size: 50px;
+  font-size: 30px;
   font-weight: 700;
 `;
 

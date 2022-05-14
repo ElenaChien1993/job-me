@@ -8,6 +8,7 @@ import firebase from '../../utils/firebase';
 import Note from '../../components/NoteCard';
 import ChatCorner from '../../components/ChatCorner';
 import { color, device } from '../../style/variable';
+import Loader from '../../components/Loader';
 
 const Container = styled.div`
   display: flex;
@@ -59,7 +60,7 @@ const NoNote = styled.div`
 `;
 
 const Notes = () => {
-  const [databaseNotes, setDatabaseNotes] = useState([]);
+  const [databaseNotes, setDatabaseNotes] = useState(null);
   const [renderNotes, setRenderNotes] = useState([]);
   const { currentUserId } = useOutletContext();
   const navigate = useNavigate();
@@ -87,6 +88,8 @@ const Notes = () => {
     });
     setRenderNotes(filtered);
   };
+
+  if (!databaseNotes) return <Loader />;
 
   return (
     <Container>

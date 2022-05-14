@@ -151,10 +151,6 @@ const ImageWrapper = styled.div`
 
 const Line = styled.hr`
   height: 1px;
-  outline: none;
-  border: none;
-  margin: 0 auto;
-  padding: 0;
   width: 100%;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   max-width: 1260px;

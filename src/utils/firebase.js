@@ -258,7 +258,7 @@ const firebase = {
     querySnapshot.forEach(doc => {
       notes.push(doc.data());
     });
-    
+
     const users = await Promise.all(
       notes.map(async note => {
         const userData = await this.getUserInfo(note.creator);
@@ -266,6 +266,19 @@ const firebase = {
       })
     );
     return users;
+  },
+  async getPersonalPublicNotes(uid) {
+    const q = query(
+      collection(db, 'users', uid, 'notes'),
+      where('is_share', '==', true),
+      orderBy('views', 'desc')
+    );
+    const querySnapshot = await getDocs(q);
+    let notes = [];
+    querySnapshot.forEach(doc => {
+      notes.push(doc.data());
+    });
+    return notes;
   },
   async getRecommendedUsers(company, job, uid) {
     const membersByCompany = query(

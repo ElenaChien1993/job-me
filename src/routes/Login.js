@@ -95,6 +95,18 @@ const StyledSpan = styled.span`
 const Creditor = styled.a`
   font-size: 0.7rem;
   margin-top: 25px;
+  display: none;
+  @media ${device.tablet} {
+    display: block;
+  }
+`;
+
+const Guest = styled.div`
+  position: absolute;
+  top: 6px;
+  right: 0;
+  color: #999;
+  font-size: 14px;
 `;
 
 const Login = () => {
@@ -281,10 +293,16 @@ const Login = () => {
             </InputGroup>
           </FormControl>
         )}
-        <FormControl isRequired isInvalid={isInvalid.email} mt="10px">
+        <FormControl
+          isRequired
+          isInvalid={isInvalid.email}
+          mt="10px"
+          position="relative"
+        >
           <FormLabel htmlFor="email" fontSize="20px">
             Email
           </FormLabel>
+          {isRegistered && <Guest>客用帳號：guest@gmail.com</Guest>}
           <InputGroup flexDir="column">
             <InputLeftElement
               pointerEvents="none"
@@ -306,6 +324,7 @@ const Login = () => {
           <FormLabel htmlFor="password" fontSize="20px">
             Password
           </FormLabel>
+          {isRegistered && <Guest>客用密碼：123456</Guest>}
           <InputGroup flexDir="column">
             <InputLeftElement
               pointerEvents="none"

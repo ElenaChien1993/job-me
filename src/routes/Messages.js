@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation, useOutletContext } from 'react-router-dom';
+import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import { BiSend, BiImageAdd, BiGame } from 'react-icons/bi';
 import { BsEmojiHeartEyes } from 'react-icons/bs';
 import { Input, IconButton, useDisclosure, Flex, Icon } from '@chakra-ui/react';
@@ -151,7 +151,19 @@ const CloseButton = styled(IconButton)`
 
 const EmptyText = styled.div`
   color: #a0aec0;
-  font-size: 30px;
+  font-size: 18px;
+  text-align: center;
+  & span {
+    color: ${color.secondary};
+    font-weight: bold;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  @media ${device.tablet} {
+    font-size: 24px;
+  }
 `;
 
 const Messages = () => {
@@ -163,8 +175,10 @@ const Messages = () => {
   const bottomRef = useRef();
   const emojisRef = useRef();
   const isSendingRef = useRef(false);
-  const { currentUserId, active, setActive, databaseRooms } = useOutletContext();
+  const { currentUserId, active, setActive, databaseRooms } =
+    useOutletContext();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const { onOpen, isOpen, onClose } = useDisclosure({ id: 'addImage' });
 
@@ -294,13 +308,17 @@ const Messages = () => {
               </BottomWrapper>
             </>
           ) : (
-            <Flex
-              flexDir="column"
-              align="center"
-              justify="center"
-            >
-              <Icon w="200px" h="200px" color="#A0AEC0" as={BiGame} />
-              <EmptyText>{databaseRooms.length === 0 ? '尚無聊天室記錄' : '請選取聊天室'}</EmptyText>
+            <Flex flexDir="column" align="center" justify="center">
+              <Icon w="100px" h="100px" color="#A0AEC0" as={BiGame} />
+              {databaseRooms.length === 0 ? (
+                <EmptyText>
+                  尚無聊天室紀錄
+                  <br />
+                  要不要去<span onClick={() => navigate('/explore')}>探索</span>和其他會員交流一下？
+                </EmptyText>
+              ) : (
+                <EmptyText>請選取聊天室</EmptyText>
+              )}
             </Flex>
           )}
         </RightWrapper>

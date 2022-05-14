@@ -18,7 +18,7 @@ const StyledVideo = styled.video`
     width: 90%;
   }
   @media ${device.tablet} {
-    width: 60%;
+    width: 80%;
   }
 `;
 
