@@ -387,6 +387,7 @@ const firebase = {
           };
         })
       );
+      console.log('firebase', rooms)
       callback(rooms);
     });
   },

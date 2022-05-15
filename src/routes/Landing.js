@@ -191,7 +191,7 @@ const Landing = () => {
           <HeroText>
             好的工作是留給充分準備的人，
             <br />
-            充分準備交給 Job Me！
+            充分準備用 JOB ME！
           </HeroText>
           <Button
             colorScheme="brand"
@@ -238,7 +238,7 @@ const Landing = () => {
         <HeroText>
           工欲善其事，必先利其器
           <br />
-          求職用 JOB ME，企業笑咪咪
+          求職用 JOB ME，面試不擔心
         </HeroText>
         <Button
           colorScheme="brand"

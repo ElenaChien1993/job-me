@@ -128,14 +128,14 @@ const NewMessage = styled.div`
     border-radius: 11px;
     font-size: 13px;
     right: ${props => (props.theme.isCorner ? '17px' : '13px')};
-    top: ${props => (props.theme.isCorner ? '34px' : '42px')};
+    top: ${props => (props.theme.isCorner ? '28px' : '38px')};
   }
   @media ${device.laptopL} {
     font-size: ${props => (props.theme.isCorner ? '13px' : '16px')};
     height: ${props => (props.theme.isCorner ? '22px' : '26px')};
     width: ${props => (props.theme.isCorner ? '22px' : '26px')};
     border-radius: ${props => (props.theme.isCorner ? '11px' : '13px')};
-    top: ${props => (props.theme.isCorner ? '22px' : '47px')};
+    top: ${props => (props.theme.isCorner ? '22px' : '39px')};
     right: ${props => (props.theme.isCorner ? '11px' : '25px')};
   }
 `;
@@ -195,7 +195,7 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
   const roomsQtyRef = useRef(0);
 
   useEffect(() => {
-    setRenderRooms(databaseRooms.slice(0, 5));
+    setRenderRooms(databaseRooms.slice(0, 6));
   }, [databaseRooms]);
 
   useEffect(() => {
@@ -205,7 +205,7 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
   const handleSearch = e => {
     const term = e.target.value;
     if (!term) {
-      setRenderRooms(databaseRooms.slice(0, 5));
+      setRenderRooms(databaseRooms.slice(0, 6));
       return;
     }
     const filtered = databaseRooms.filter(room => {
@@ -217,12 +217,11 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
 
   useEffect(() => {
     const callback = ([entry]) => {
-      if (!entry || !entry.isIntersecting) return;
       if (firstRenderRef.current) {
         firstRenderRef.current = false;
         return;
       }
-
+      if (!entry || !entry.isIntersecting) return;
       const startIndex = roomsQtyRef.current;
       if (startIndex === databaseRooms.length) return;
 
