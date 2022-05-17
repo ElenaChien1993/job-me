@@ -97,7 +97,7 @@ const BeforeRecord = ({
             <Text>此題定時</Text>
             <Select
               mt="10px"
-              onChange={e => setTimer(e.target.value)}
+              onChange={e => setTimer(parseInt(e.target.value))}
               placeholder="請選擇計時時間"
               isRequired
               colorScheme="brand"

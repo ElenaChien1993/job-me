@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
+
 import { device, color } from '../../style/variable';
 
 const NoteWrapper = styled.div`
@@ -16,9 +18,7 @@ const NoteWrapper = styled.div`
 const CompanyName = styled.span`
   font-weight: 700;
   color: ${color.primary};
-  @media ${device.mobileM} {
-    font-size: 20px;
-  }
+  font-size: 20px;
   @media ${device.tablet} {
     font-size: 24px;
   }
@@ -29,9 +29,7 @@ const JobTitle = styled.p`
   align-items: center;
   font-weight: 700;
   color: black;
-  @media ${device.mobileM} {
-    font-size: 20px;
-  }
+  font-size: 20px;
   @media ${device.tablet} {
     font-size: 24px;
   }
@@ -46,6 +44,14 @@ const NoteBar = ({ brief, className }) => {
       </JobTitle>
     </NoteWrapper>
   );
+};
+
+NoteBar.propTypes = {
+  brief: PropTypes.shape({
+    job_title: PropTypes.string,
+    company_name: PropTypes.string,
+  }).isRequired,
+  className: PropTypes.string,
 };
 
 export default NoteBar;

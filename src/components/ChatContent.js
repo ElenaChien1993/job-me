@@ -93,7 +93,6 @@ const ChatContent = ({
           messages[room.id].map((message) =>
             message.uid !== currentUserId ? (
               <ChatReceived
-                isCorner={isCorner}
                 member={room.members}
                 key={message.id}
                 message={message}

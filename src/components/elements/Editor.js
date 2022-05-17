@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+
 import {
   Editor,
   EditorState,
@@ -8,6 +9,7 @@ import {
 } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import firebase from '../../utils/firebase';
 
@@ -144,6 +146,13 @@ const EditorArea = ({ noteId, details, objectKey, isPublic }) => {
       )}
     </>
   );
+};
+
+EditorArea.propTypes = {
+  noteId: PropTypes.string.isRequired,
+  details: PropTypes.object.isRequired,
+  objectKey: PropTypes.string.isRequired,
+  isPublic: PropTypes.bool,
 };
 
 export default EditorArea;

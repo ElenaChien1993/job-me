@@ -103,7 +103,7 @@ const PracticeStart = () => {
   return (
     <Container>
       <TitleWrapper>
-        <BackButton path="/practice" isStart />
+        <BackButton path="/practice" $isStart />
         <StyledNoteBar brief={props.brief} />
       </TitleWrapper>
       {progress !== 'finished' && (

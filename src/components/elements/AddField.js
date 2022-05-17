@@ -32,7 +32,8 @@ const AddField = ({ setter, objectKey, newValue }) => {
 AddField.propTypes = {
   setter: PropTypes.func.isRequired,
   objectKey: PropTypes.string.isRequired,
-  newValue: PropTypes.object.isRequired,
+  newValue: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+    .isRequired,
 };
 
 export default AddField;

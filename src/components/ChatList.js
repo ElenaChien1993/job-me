@@ -4,6 +4,7 @@ import { useOutletContext } from 'react-router-dom';
 import { Search2Icon } from '@chakra-ui/icons';
 import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
 import styled, { ThemeProvider } from 'styled-components';
+import PropTypes from 'prop-types';
 
 import { device, color } from '../style/variable';
 import ProfileImage from './ProfileImage';
@@ -26,13 +27,14 @@ const ChatWrapper = styled.div`
   display: flex;
   align-items: center;
   background-color: ${props => (props.isSelected ? 'white' : '')};
-  box-shadow: ${props => (props.isSelected ? '0 4px 16px rgb(91 96 103 / 8%)' : '')};
+  box-shadow: ${props =>
+    props.isSelected ? '0 4px 16px rgb(91 96 103 / 8%)' : ''};
   cursor: pointer;
   border-radius: 10px;
   &:hover {
     background-color: white;
     box-shadow: 0 4px 16px rgb(91 96 103 / 8%);
-    transition: all .2s ease-in;
+    transition: all 0.2s ease-in;
   }
   @media ${device.mobileM} {
     width: 90px;
@@ -308,5 +310,11 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
     </ThemeProvider>
   );
 });
+
+ChatList.propTypes = {
+  active: PropTypes.object,
+  setActive: PropTypes.func.isRequired,
+  isCorner: PropTypes.bool.isRequired,
+};
 
 export default ChatList;

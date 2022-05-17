@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
-import { BiSend, BiImageAdd, BiGame } from 'react-icons/bi';
-import { BsEmojiHeartEyes } from 'react-icons/bs';
+
 import { Input, IconButton, useDisclosure, Flex, Icon } from '@chakra-ui/react';
 import { SmallCloseIcon } from '@chakra-ui/icons';
+import { BsEmojiHeartEyes } from 'react-icons/bs';
+import { BiSend, BiImageAdd, BiGame } from 'react-icons/bi';
 import styled, { ThemeProvider } from 'styled-components';
-import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
+import 'emoji-mart/css/emoji-mart.css';
 
 import ChatList from '../components/ChatList';
 import firebase from '../utils/firebase';

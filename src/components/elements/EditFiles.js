@@ -4,19 +4,16 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  IconButton,
   Input,
 } from '@chakra-ui/react';
-import { SmallCloseIcon } from '@chakra-ui/icons';
+import PropTypes from 'prop-types';
 
 import { device } from '../../style/variable';
 
 const Reminder = styled.p`
   margin-bottom: 5px;
   color: #999;
-  @media ${device.mobileM} {
-    font-size: 14px;
-  }
+  font-size: 14px;
   @media ${device.tablet} {
     font-size: 16px;
   }
@@ -34,6 +31,8 @@ const FilesWrap = styled.div`
   width: 100%;
   margin-bottom: 10px;
   justify-content: space-between;
+  align-items: flex-start;
+  flex-direction: column;
   & input {
     @media ${device.tablet} {
       margin-right: 10px;
@@ -49,10 +48,6 @@ const FilesWrap = styled.div`
       width: 30%;
     }
   }
-  @media ${device.mobileM} {
-    align-items: flex-start;
-    flex-direction: column;
-  }
   @media ${device.tablet} {
     align-items: flex-start;
     flex-direction: row;
@@ -63,10 +58,8 @@ const FileName = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  @media ${device.mobileM} {
-    width: 100%;
-    margin-bottom: 5px;
-  }
+  width: 100%;
+  margin-bottom: 5px;
   @media ${device.tablet} {
     width: 40%;
     margin-right: 10px;
@@ -78,9 +71,7 @@ const FileLink = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  @media ${device.mobileM} {
-    width: 100%;
-  }
+  width: 100%;
   @media ${device.tablet} {
     width: 60%;
   }
@@ -88,12 +79,10 @@ const FileLink = styled.div`
 
 const DeleteButton = styled(CloseButton)`
   && {
-    @media ${device.mobileM} {
-      margin-right: 0;
-      position: absolute;
-      right: 0;
-      z-index: 1;
-    }
+    margin-right: 0;
+    position: absolute;
+    right: 0;
+    z-index: 1;
     @media ${device.tablet} {
       margin-right: 5px;
       position: static;
@@ -223,6 +212,15 @@ const EditFiles = ({ details, setDetails }) => {
       })}
     </>
   );
+};
+
+EditFiles.propTypes = {
+  details: PropTypes.shape({
+    attached_files: PropTypes.array,
+    job_link: PropTypes.string,
+    resume_link: PropTypes.string,
+  }).isRequired,
+  setDetails: PropTypes.func.isRequired,
 };
 
 export default EditFiles;

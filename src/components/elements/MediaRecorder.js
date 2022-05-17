@@ -1,7 +1,9 @@
 import { useRef, useEffect } from 'react';
+
 import { Badge } from '@chakra-ui/react';
 import Lottie from 'react-lottie-player';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import recordingJson from '../../images/recording.json';
 import { device } from '../../style/variable';
@@ -14,9 +16,7 @@ const Container = styled.div`
 `;
 
 const StyledVideo = styled.video`
-  @media ${device.mobileM} {
-    width: 90%;
-  }
+  width: 90%;
   @media ${device.tablet} {
     width: 80%;
   }
@@ -45,6 +45,10 @@ const VideoPreview = ({ stream }) => {
   return <StyledVideo ref={videoRef} autoPlay controls />;
 };
 
+VideoPreview.propTypes = {
+  stream: PropTypes.object,
+};
+
 const Audio = ({ status, mediaBlobUrl }) => {
   return (
     <Container>
@@ -66,6 +70,11 @@ const Audio = ({ status, mediaBlobUrl }) => {
   );
 };
 
+Audio.propTypes = {
+  status: PropTypes.string,
+  mediaBlobUrl: PropTypes.string,
+};
+
 const Video = ({ status, mediaBlobUrl, previewStream }) => {
   return (
     <Container>
@@ -80,6 +89,12 @@ const Video = ({ status, mediaBlobUrl, previewStream }) => {
       )}
     </Container>
   );
+};
+
+Video.propTypes = {
+  status: PropTypes.string,
+  mediaBlobUrl: PropTypes.string,
+  previewStream: PropTypes.object,
 };
 
 export { Audio, Video };

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
+
 import { Button, Input, IconButton, useToast } from '@chakra-ui/react';
 import { ArrowForwardIcon, PlusSquareIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
@@ -17,9 +18,7 @@ const Container = styled.div`
   align-items: center;
   margin: 20px auto 0;
   max-width: 1000px;
-  @media ${device.mobileM} {
-    width: 90%;
-  }
+  width: 90%;
   @media ${device.laptop} {
     width: 80%;
   }
@@ -35,9 +34,7 @@ const TitleWrapper = styled.div`
   justify-content: center;
   position: relative;
   margin-top: 10px;
-  @media ${device.mobileM} {
-    flex-direction: column;
-  }
+  flex-direction: column;
   @media ${device.tablet} {
     flex-direction: row;
   }
@@ -46,9 +43,7 @@ const TitleWrapper = styled.div`
 const Title = styled.div`
   font-weight: 700;
   color: ${color.secondary};
-  @media ${device.mobileM} {
-    font-size: 30px;
-  }
+  font-size: 30px;
   @media ${device.tablet} {
     font-size: 42px;
   }
@@ -61,9 +56,7 @@ const SettingWrapper = styled.div`
   border-radius: 15px;
   background: ${color.white};
   width: min-content;
-  @media ${device.mobileM} {
-    padding: 20px 20px;
-  }
+  padding: 20px 20px;
   @media ${device.tablet} {
     padding: 20px 40px;
   }
@@ -76,9 +69,7 @@ const OptionWrapper = styled.div`
   display: flex;
   align-items: flex-start;
   margin-top: 20px;
-  @media ${device.mobileM} {
-    min-width: 310px;
-  }
+  min-width: 310px;
   @media ${device.tablet} {
     min-width: 410px;
   }
@@ -87,7 +78,7 @@ const OptionWrapper = styled.div`
 const StyledInput = styled(Input)`
   && {
     border-radius: 10px;
-    border-color: ${props => (props.isValid ? 'black' : 'red')};
+    border-color: ${props => (props.$isValid ? 'black' : 'red')};
   }
 `;
 
@@ -95,9 +86,7 @@ const OptionTitle = styled.div`
   font-size: 24px;
   font-weight: 700;
   color: ${color.primary};
-  @media ${device.mobileM} {
-    min-width: 120px;
-  }
+  min-width: 120px;
   @media ${device.tablet} {
     min-width: 140px;
   }
@@ -127,9 +116,7 @@ const Dot = styled.div`
 const Questions = styled.div`
   margin-top: 20px;
   max-width: 70%;
-  @media ${device.mobileM} {
-    margin-left: 120px;
-  }
+  margin-left: 120px;
   @media ${device.tablet} {
     margin-left: 140px;
   }
@@ -138,9 +125,7 @@ const Questions = styled.div`
 const Reminder = styled.div`
   margin-top: 20px;
   color: red;
-  @media ${device.mobileM} {
-    margin-left: 120px;
-  }
+  margin-left: 120px;
   @media ${device.tablet} {
     margin-left: 140px;
   }
@@ -167,9 +152,7 @@ const InputWrapper = styled.div`
 const SideNote = styled.div`
   color: #999;
   margin-top: 10px;
-  @media ${device.mobileM} {
-    margin-left: 120px;
-  }
+  margin-left: 120px;
   @media ${device.tablet} {
     margin-left: 140px;
   }
@@ -296,7 +279,7 @@ const PracticeSetting = () => {
               <OptionTitle>練習題數</OptionTitle>
               <QtyWrapper>
                 <StyledInput
-                  isValid={isQtyValid}
+                  $isValid={isQtyValid}
                   type="number"
                   size="sm"
                   value={qty}

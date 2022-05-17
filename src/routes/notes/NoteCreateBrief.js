@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+
 import {
   Input,
   IconButton,
@@ -15,6 +16,7 @@ import {
 } from '@chakra-ui/react';
 import { QuestionIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import firebase from '../../utils/firebase';
 import SearchableInput from '../../components/SearchableInput';
@@ -339,6 +341,15 @@ const NoteCreateBrief = props => {
       </ButtonGroup>
     </>
   );
+};
+
+NoteCreateBrief.propTypes = {
+  nextStep: PropTypes.func.isRequired,
+  handleChange: PropTypes.func.isRequired,
+  values: PropTypes.object.isRequired,
+  setValues: PropTypes.func.isRequired,
+  noteDataBrief: PropTypes.object.isRequired,
+  noteDetails: PropTypes.object.isRequired,  
 };
 
 export default NoteCreateBrief;
