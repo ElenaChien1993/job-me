@@ -26,7 +26,7 @@ import {
   Timestamp,
   orderBy,
   limit,
-  addDoc,
+  increment,
 } from 'firebase/firestore';
 import {
   getStorage,
@@ -105,7 +105,10 @@ const firebase = {
       docs.forEach(doc => {
         data.push(doc.data());
       });
-      const transformed = data.map(record => {
+      const millisData = data.map(item => {
+        return { ...item, date: item.date.toMillis() };
+      });
+      const transformed = millisData.map(record => {
         const timeString = useFormatedTime(record.date);
         return { ...record, date: timeString };
       });
@@ -155,6 +158,15 @@ const firebase = {
   async updateNoteBrief(uid, noteId, data) {
     try {
       await updateDoc(doc(db, 'users', uid, 'notes', noteId), data);
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  async increaseViews(uid, noteId) {
+    try {
+      await updateDoc(doc(db, 'users', uid, 'notes', noteId), {
+        views: increment(1),
+      });
     } catch (err) {
       console.log(err);
     }
@@ -235,11 +247,45 @@ const firebase = {
   signOut() {
     return signOut(auth);
   },
+  async getPublicNotes() {
+    const publicNotes = query(
+      collectionGroup(db, 'notes'),
+      where('is_share', '==', true),
+      orderBy('views', 'desc')
+    );
+    const querySnapshot = await getDocs(publicNotes);
+    let notes = [];
+    querySnapshot.forEach(doc => {
+      notes.push(doc.data());
+    });
+
+    const users = await Promise.all(
+      notes.map(async note => {
+        const userData = await this.getUserInfo(note.creator);
+        return { ...note, creator_info: userData };
+      })
+    );
+    return users;
+  },
+  async getPersonalPublicNotes(uid) {
+    const q = query(
+      collection(db, 'users', uid, 'notes'),
+      where('is_share', '==', true),
+      orderBy('views', 'desc')
+    );
+    const querySnapshot = await getDocs(q);
+    let notes = [];
+    querySnapshot.forEach(doc => {
+      notes.push(doc.data());
+    });
+    return notes;
+  },
   async getRecommendedUsers(company, job, uid) {
     const membersByCompany = query(
       collectionGroup(db, 'notes'),
       where('company_name', '==', company),
       where('is_share', '==', true),
+      where('creator', '!=', uid),
       limit(15)
     );
     const querySnapshot = await getDocs(membersByCompany);
@@ -253,6 +299,7 @@ const firebase = {
       collectionGroup(db, 'notes'),
       where('job_title', '==', job),
       where('is_share', '==', true),
+      where('creator', '!=', uid),
       limit(15)
     );
     const Snapshots = await getDocs(membersByJob);
@@ -262,7 +309,6 @@ const firebase = {
     });
     const uniqueByJob = helper.findUnique(dataByJob);
 
-    console.log(uniqueByCompany, uniqueByJob);
     const data = helper.compare(uniqueByCompany, uniqueByJob);
     const users = await Promise.all(
       data.map(async note => {
@@ -270,9 +316,7 @@ const firebase = {
         return { ...note, creator_info: userData };
       })
     );
-    const filteredData = users.filter(item => item.creator !== uid);
-    console.log(filteredData);
-    return filteredData;
+    return users;
   },
   async uploadFile(path, file) {
     const fileRef = ref(storage, path);
@@ -343,6 +387,7 @@ const firebase = {
           };
         })
       );
+      console.log('firebase', rooms)
       callback(rooms);
     });
   },
@@ -358,7 +403,7 @@ const firebase = {
     const docSnaps = await getDocs(
       query(
         collection(db, `chatrooms/${roomId}/messages`),
-        where('create_at', '<', message.create_at),
+        where('create_at', '<', Timestamp.fromMillis(message.create_at)),
         orderBy('create_at', 'desc'),
         limit(20)
       )
@@ -367,8 +412,11 @@ const firebase = {
     docSnaps.forEach(doc => {
       data.push(doc.data());
     });
-    data.sort((a, b) => !b.create_at - a.create_at);
-    return data;
+    const millisData = data.map(item => {
+      return { ...item, create_at: item.create_at.toMillis() };
+    });
+    millisData.sort((a, b) => a.create_at - b.create_at);
+    return millisData;
   },
   listenMessagesChange(room, callback, uid) {
     const q = query(
@@ -379,29 +427,32 @@ const firebase = {
     return onSnapshot(
       q,
       async snapshot => {
-        console.log('msg listener 1');
         let data = [];
         snapshot.docChanges().forEach(change => {
           if (change.type === 'added') {
             data.push(change.doc.data());
           }
         });
-        data.sort((a, b) => !b.create_at - a.create_at);
+        const millisData = data.map(item => {
+          return { ...item, create_at: item.create_at.toMillis() };
+        });
+        millisData.sort((a, b) => a.create_at - b.create_at);
+        console.log(millisData);
         callback(prev => {
           if (!prev[room.id]) {
             return {
               ...prev,
-              [room.id]: data,
+              [room.id]: millisData,
             };
           } else {
             // 我這邊是先比較後來監聽拿到的 messages 是不是已經存在之前的 state 中
             const stateIds = prev[room.id].map(item => item.id);
-            const dataIds = data.map(item => item.id);
+            const dataIds = millisData.map(item => item.id);
             const filteredIds = dataIds.filter(
               id => stateIds.indexOf(id) === -1
             );
             if (filteredIds.length === 0) return prev;
-            const filteredData = data.filter(
+            const filteredData = millisData.filter(
               message => filteredIds.indexOf(message.id) !== -1
             );
             return { ...prev, [room.id]: [...prev[room.id], ...filteredData] };

@@ -8,16 +8,17 @@ import ChatCorner from '../../components/ChatCorner';
 import Loader from '../../components/Loader';
 import ProfileImage from '../../components/ProfileImage';
 import { device, color } from '../../style/variable';
-
 import firebase from '../../utils/firebase';
+import useRWD from '../../hooks/useRWD';
+import NoteCardExplore from '../../components/NoteCardExplore';
 
-const Container = styled.div``;
+const Container = styled.div`
+  
+`;
 
 const Upper = styled.div`
   background-color: ${color.third};
-  @media ${device.mobileM} {
-    height: 130px;
-  }
+  height: 130px;
   @media ${device.tablet} {
     height: 180px;
   }
@@ -30,12 +31,13 @@ const InfoContainer = styled.div`
   justify-content: center;
   position: absolute;
   left: 50%;
+  width: 90%;
+  padding-bottom: 40px;
   transform: translate(-50%, 0);
-  @media ${device.mobileM} {
-    top: 100px;
-  }
+  top: 135px;
   @media ${device.tablet} {
-    top: 150px;
+    top: 160px;
+    width: 80%;
   }
 `;
 
@@ -43,13 +45,10 @@ const NameWrapper = styled.div`
   color: #000000;
   margin-top: 20px;
   text-align: center;
-  @media ${device.mobileM} {
-    font-size: 36px;
-    line-height: 36px;
-  }
+  font-size: 30px;
+  line-height: 36px;
   @media ${device.tablet} {
-    font-size: 48px;
-    line-height: 65px;
+    font-size: 36px;
   }
 `;
 
@@ -57,11 +56,9 @@ const JobTitle = styled.div`
   color: #6c6c6c;
   margin-top: 10px;
   text-align: center;
-  @media ${device.mobileM} {
-    font-size: 24px;
-  }
+  font-size: 22px;
   @media ${device.tablet} {
-    font-size: 30px;
+    font-size: 24px;
   }
 `;
 
@@ -69,11 +66,9 @@ const About = styled.div`
   color: #6c6c6c;
   margin-top: 10px;
   text-align: center;
-  @media ${device.mobileM} {
-    font-size: 18px;
-  }
+  font-size: 16px;
   @media ${device.tablet} {
-    font-size: 22px;
+    font-size: 18px;
   }
 `;
 
@@ -81,14 +76,11 @@ const Counts = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  @media ${device.mobileM} {
-    margin: 10px 0 20px;
-    & p {
-      font-size: 18px;
-    }
+  margin: 0 0 20px;
+  & p {
+    font-size: 18px;
   }
   @media ${device.tablet} {
-    margin: 20px 0;
     & p {
       font-size: 24px;
     }
@@ -96,27 +88,61 @@ const Counts = styled.div`
 `;
 
 const Number = styled.div`
-  @media ${device.mobileM} {
-    font-size: 36px;
-  }
+  font-size: 36px;
   @media ${device.tablet} {
     font-size: 50px;
   }
 `;
 
+const Line = styled.hr`
+  height: 1px;
+  width: 100%;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  max-width: 1260px;
+`;
+
+const SectionTitle = styled.div`
+  font-size: 22px;
+  font-weight: 600;
+  color: ${color.primary};
+  margin-top: 20px;
+`;
+
+const ContentGrid = styled.ol`
+  display: grid;
+  grid-gap: 15px 30px;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  list-style: none;
+  width: 100%;
+  margin: 20px 0;
+  @media ${device.mobileM} {
+    padding: 0 20px;
+  }
+  @media ${device.table} {
+    padding: 0 32px;
+  }
+  @media ${device.laptop} {
+    padding: 0 10%;
+  }
+`;
+
 const MemberProfile = React.memo(() => {
   const [info, setInfo] = useState(null);
+  const [notes, setNotes] = useState(null);
   const { currentUserId, setChatOpen, setActive } = useOutletContext();
   const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
   const navigate = useNavigate();
   let params = useParams();
   const uid = params.uid;
 
+  const isMobile = useRWD();
+
   useEffect(() => {
     if (!uid) return;
     firebase.getUser(uid).then(doc => {
       setInfo(doc.data());
     });
+    firebase.getPersonalPublicNotes(uid).then(data => setNotes(data));
   }, [uid]);
 
   const createChat = async () => {
@@ -159,16 +185,17 @@ const MemberProfile = React.memo(() => {
       />
       <Upper />
       <InfoContainer>
-        <ProfileImage user={info} size={200} hasBorder marginRight={0} />
+        <ProfileImage
+          user={info}
+          size={isMobile ? 120 : 160}
+          hasBorder
+          marginRight={0}
+        />
         <NameWrapper>{info.display_name}</NameWrapper>
         <JobTitle>{info.title || '尚未提供'}</JobTitle>
         <About>{info.about_me || '尚未提供'}</About>
-        <Counts>
-          <Number>{info.notes_qty}</Number>
-          <p>Notes</p>
-        </Counts>
         <Button
-          mb="50px"
+          mt="20px"
           w="100px"
           variant="solid"
           colorScheme="brand"
@@ -176,6 +203,21 @@ const MemberProfile = React.memo(() => {
         >
           傳送訊息
         </Button>
+        <Counts>
+          <Number>{info.notes_qty}</Number>
+          <p>Notes</p>
+        </Counts>
+        <Line />
+        {notes && (
+          <>
+            <SectionTitle>公開筆記</SectionTitle>
+            <ContentGrid>
+              {notes.map(note => (
+                <NoteCardExplore key={note.note_id} note={note} isProfile />
+              ))}
+            </ContentGrid>
+          </>
+        )}
       </InfoContainer>
       {currentUserId && <ChatCorner />}
     </Container>

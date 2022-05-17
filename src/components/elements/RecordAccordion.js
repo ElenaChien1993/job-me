@@ -139,12 +139,11 @@ const RecordAccordion = ({
                       size="sm"
                       isRound
                       color="white"
-                      bg="#306172"
+                      colorScheme="brand"
                       aria-label="Save Recording"
                       fontSize="16px"
                       _hover={{
                         filter: 'brightness(150%)',
-                        color: 'black',
                       }}
                       onClick={() =>
                         handleDownload(record.link, record.record_name)

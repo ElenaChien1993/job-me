@@ -15,6 +15,8 @@ import {
   TabPanel,
   Divider,
   Tooltip,
+  useToast,
+  CloseButton,
 } from '@chakra-ui/react';
 import {
   SmallCloseIcon,
@@ -32,6 +34,7 @@ import EditFiles from '../../components/elements/EditFiles';
 import EditorArea from '../../components/elements/Editor';
 import RecommendModal from '../../components/RecommendModal';
 import EditableInputField from '../../components/EditableInputField';
+import ChatCorner from '../../components/ChatCorner';
 import { device, color } from '../../style/variable';
 
 const Background = styled.div`
@@ -74,14 +77,9 @@ const PublicButtons = styled.div`
   top: 32px;
 `;
 
-const DeleteButton = styled(IconButton)`
+const DeleteButton = styled(CloseButton)`
   && {
     margin-left: auto;
-    height: 20px;
-  }
-  & svg {
-    width: 15px;
-    height: 15px;
   }
 `;
 
@@ -107,7 +105,7 @@ const Title = styled.p`
   font-size: 18px;
   font-weight: 500;
   margin-bottom: 10px;
-  color: #306172;
+  color: ${color.primary};
   z-index: 1;
   position: relative;
 `;
@@ -157,15 +155,11 @@ const QuestionCard = styled.div`
   position: relative;
 `;
 
-const CustomDeleteButton = styled(IconButton)`
+const CustomDeleteButton = styled(CloseButton)`
   && {
-    height: 20px;
     position: absolute;
-    right: 20px;
-  }
-  & svg {
-    width: 15px;
-    height: 15px;
+    right: 8px;
+    top: 8px;
   }
 `;
 
@@ -243,6 +237,7 @@ const NoteDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { currentUserId } = useOutletContext();
   const submitRef = useRef();
+  const toast = useToast();
 
   const { onOpen, isOpen, onClose } = useDisclosure({ id: 'recommend' });
   let params = useParams();
@@ -336,6 +331,9 @@ const NoteDetails = () => {
 
   const handleDelete = (i, objectKey) => {
     const newData = details[objectKey].filter((_, index) => index !== i);
+    setDetails(prev => {
+      return { ...prev, [objectKey]: newData };
+    });
     firebase.updateNoteDetails(noteId, { [objectKey]: newData });
   };
 
@@ -346,6 +344,23 @@ const NoteDetails = () => {
   };
 
   const handleFilesSubmit = () => {
+    const regex =
+      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gm;
+
+    if (
+      (!details.job_link.match(regex) && details.job_link !== '') ||
+      (!details.resume_link.match(regex) && details.resume_link !== '')
+    ) {
+      toast({
+        title: '請填寫正確的 URL 格式',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      return;
+    }
+
     firebase.updateNoteDetails(noteId, {
       job_link: details.job_link,
       resume_link: details.resume_link,
@@ -485,7 +500,7 @@ const NoteDetails = () => {
                   <Title>薪資範圍</Title>
                   <StyledSalaryWrapper>
                     <StyledEditable
-                      value={
+                      defaultValue={
                         details.salary.range === ''
                           ? '尚未填寫資料'
                           : details.salary.range
@@ -657,34 +672,39 @@ const NoteDetails = () => {
                   </TitleWrapper>
                   {!isFilesEditing ? (
                     <Content>
-                      <StyledListItem>
-                        <Dot />
-                        <StyledLink href={details.job_link} target="_blank">
-                          職缺連結
-                        </StyledLink>
-                      </StyledListItem>
-                      <StyledListItem>
-                        <Dot />
-                        <StyledLink href={details.resume_link} target="_blank">
-                          我的履歷連結
-                        </StyledLink>
-                      </StyledListItem>
+                      {details.job_link !== '' && (
+                        <StyledListItem>
+                          <Dot />
+                          <StyledLink href={details.job_link} target="_blank">
+                            職缺連結
+                          </StyledLink>
+                        </StyledListItem>
+                      )}
+                      {details.resume_link !== '' && (
+                        <StyledListItem>
+                          <Dot />
+                          <StyledLink
+                            href={details.resume_link}
+                            target="_blank"
+                          >
+                            我的履歷連結
+                          </StyledLink>
+                        </StyledListItem>
+                      )}
                       {details.attached_files.map((file, i) => {
                         return (
                           <React.Fragment key={file.file_link}>
-                            <StyledListItem>
-                              <Dot />
-                              <StyledLink href={file.file_link} target="_blank">
-                                {file.file_name}
-                              </StyledLink>
-                              <DeleteButton
-                                aria-label="delete item"
-                                icon={<SmallCloseIcon />}
-                                onClick={() =>
-                                  handleDelete(i, 'attached_files')
-                                }
-                              />
-                            </StyledListItem>
+                            {file.file_link !== '' && (
+                              <StyledListItem key={file.file_link}>
+                                <Dot />
+                                <StyledLink
+                                  href={file.file_link}
+                                  target="_blank"
+                                >
+                                  {file.file_name}
+                                </StyledLink>
+                              </StyledListItem>
+                            )}
                           </React.Fragment>
                         );
                       })}
@@ -708,7 +728,7 @@ const NoteDetails = () => {
                   <QuestionCardsWrapper>
                     {details.questions.map((q, i) => {
                       return (
-                        <QuestionCard key={q.question}>
+                        <QuestionCard key={q.question + i}>
                           <QuestionTitle>
                             <EditableInputField
                               style={{ fontWeight: '700' }}
@@ -761,7 +781,6 @@ const NoteDetails = () => {
                     <TitleBack />
                   </TitleSection>
                   <Content>
-                    <div>Ex: 想問公司的問題？</div>
                     <EditorArea
                       noteId={noteId}
                       details={details}
@@ -796,6 +815,7 @@ const NoteDetails = () => {
           </Tabs>
         </Container>
       )}
+      <ChatCorner />
     </Background>
   );
 };

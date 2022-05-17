@@ -17,15 +17,16 @@ import { device, color } from '../style/variable';
 import ProfileInfo from './ProfileInfo';
 
 const Container = styled.div`
-  margin: 20px 0;
-  padding: 30px 0;
   display: flex;
   justify-content: center;
   align-items: center;
   @media ${device.mobileM} {
+    padding: 20px 0;
     flex-direction: column;
   }
   @media ${device.tablet} {
+    margin: 20px 0;
+    padding: 30px 0;
     flex-direction: row;
   }
 `;
@@ -47,7 +48,6 @@ const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
   @media ${device.mobileM} {
-    margin-top: 230px;
     width: 100%;
   }
   @media ${device.tablet} {

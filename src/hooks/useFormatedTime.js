@@ -1,8 +1,8 @@
 const useFormatedTime = date => {
-  const timeString = `${date.toDate().toLocaleDateString(undefined, {
+  const timeString = `${new Date(date).toLocaleDateString(undefined, {
     month: 'numeric',
     day: 'numeric',
-  })} ${date.toDate().toLocaleTimeString([], {
+  })} ${new Date(date).toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,

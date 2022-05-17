@@ -19,25 +19,25 @@ import styled from 'styled-components';
 
 import ChatCorner from './ChatCorner';
 import firebase from '../utils/firebase';
-import useRWD from '../hooks/useRWD';
 import { MdSaveAlt } from 'react-icons/md';
 import { color, device } from '../style/variable';
 import ProfileMobileRecords from './ProfileMobileRecords';
 import AlertModal from './AlertModal';
+import Loader from './Loader';
 
 const Container = styled.div`
   width: 100%;
-  margin: 20px 0;
-  padding: 30px 0;
   display: flex;
   justify-content: center;
   @media ${device.mobileM} {
-    margin-top: 240px;
+    padding: 20px 0 0;
+    margin-bottom: 40px;
     flex-direction: column;
     align-items: center;
   }
   @media ${device.tablet} {
-    margin-top: 0;
+    margin: 0 0 20px;
+    padding: 30px 0;
     flex-direction: row;
     align-items: flex-start;
   }
@@ -154,17 +154,21 @@ const NoFileWrapper = styled.div`
   justify-content: center;
 `;
 
-const ProfileRecords = () => {
-  const [audioRecords, setAudioRecords] = useState([]);
-  const [videoRecords, setVideoRecords] = useState([]);
+const StyledAudio = styled.audio`
+  width: 100%;
+  border-radius: 30px;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.3);
+`;
+
+const ProfileRecords = ({ isMobile }) => {
+  const [audioRecords, setAudioRecords] = useState(null);
+  const [videoRecords, setVideoRecords] = useState(null);
   const [activeAudio, setActiveAudio] = useState(null);
   const [activeVideo, setActiveVideo] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
   const { currentUserId } = useOutletContext();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
-
-  const isMobile = useRWD();
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -219,6 +223,8 @@ const ProfileRecords = () => {
       position: 'top-right',
     });
   };
+
+  if (!audioRecords || !videoRecords) return <Loader />;
 
   return (
     <Container>
@@ -336,7 +342,7 @@ const ProfileRecords = () => {
                 </SelectionWrapper>
                 <Divider mb="20px" />
                 {tabIndex === 0 ? (
-                  <audio
+                  <StyledAudio
                     src={activeAudio?.link}
                     controls
                     style={{ width: '100%' }}

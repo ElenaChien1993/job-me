@@ -1,16 +1,18 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Flex, Button, Icon, useDisclosure } from '@chakra-ui/react';
 import { BiCircle } from 'react-icons/bi';
 import { BsCheckCircleFill } from 'react-icons/bs';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import NoteCreateBrief from './NoteCreateBrief';
 import DetailsStep1 from './DetailsStep1';
 import DetailsStep2 from './DetailsStep2';
 import DetailsStep3 from './DetailsStep3';
-import { useNavigate } from 'react-router-dom';
-import { device, color } from '../../style/variable';
 import AlertModal from '../../components/AlertModal';
+import { device, color } from '../../style/variable';
 
 const Container = styled.div`
   max-width: 1152px;
@@ -80,7 +82,7 @@ const RightWrapper = styled.div`
 `;
 
 const StyledIcon = styled(Icon)`
-  color: ${props => (props.isComplete ? 'white' : '#04608c')};
+  color: ${props => (props.isComplete ? 'white' : '#6c6c6c')};
   @media ${device.mobileM} {
     width: 25px;
     height: 25px;
@@ -96,7 +98,7 @@ const StyledIcon = styled(Icon)`
 `;
 
 const StepText = styled.p`
-  color: ${props => (props.isComplete ? 'white' : '#04608c')};
+  color: ${props => (props.isComplete ? 'white' : '#6c6c6c')};
   font-size: 20px;
   font-weight: bold;
   cursor: default;
@@ -115,7 +117,7 @@ const StraightLine = styled.div`
   height: 30px;
   margin: 3px 0;
   margin-left: 16px;
-  background-color: ${props => (props.isComplete ? 'white' : '#04608c')};
+  background-color: ${props => (props.isComplete ? 'white' : '#6c6c6c')};
   @media ${device.mobileM} {
     display: none;
   }
@@ -139,6 +141,7 @@ const NoteCreate = () => {
     is_share: true,
     address: '',
     status: '未申請',
+    views: 0,
     tags: [],
     product: '',
     job_link: '',
@@ -161,6 +164,7 @@ const NoteCreate = () => {
     company_name,
     address,
     is_share,
+    views,
     tags,
     status,
     job_title,
@@ -226,6 +230,7 @@ const NoteCreate = () => {
         w="20%"
         colorScheme="brand"
         mb="40px"
+        ml="auto"
       >
         取消
       </Button>
@@ -241,7 +246,7 @@ const NoteCreate = () => {
               <StyledIcon as={BsCheckCircleFill} isComplete />
               <StepText isComplete>基本資料</StepText>
             </Flex>
-            <StraightLine isComplete />
+            <StraightLine isComplete={step !== 1} />
             <Flex align="center" justify="center">
               <StyledIcon
                 as={step !== 1 ? BsCheckCircleFill : BiCircle}
@@ -249,7 +254,7 @@ const NoteCreate = () => {
               />
               <StepText isComplete={step !== 1}>詳細資訊</StepText>
             </Flex>
-            <StraightLine isComplete={step !== 1} />
+            <StraightLine isComplete={step === 4} />
             <Flex align="center" justify="center">
               <StyledIcon
                 as={step === 4 ? BsCheckCircleFill : BiCircle}

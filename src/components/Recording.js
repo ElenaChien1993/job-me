@@ -7,14 +7,14 @@ import {
   VscDebugStart,
   VscStopCircle,
 } from 'react-icons/vsc';
-import { MdSaveAlt, MdNavigateNext, MdTimer } from 'react-icons/md';
+import { MdOutlineSave, MdNavigateNext, MdTimer } from 'react-icons/md';
 import styled from 'styled-components';
 
 import { Audio, Video } from './elements/MediaRecorder';
 import CountDown from './elements/CountDown';
 import firebase from '../utils/firebase';
 import Loader from './Loader';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { device, color } from '../style/variable';
 
 const ButtonsWrapper = styled.div`
@@ -66,6 +66,7 @@ const Recording = ({
     echoCancellation: true,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const controllRef = useRef();
   const { company_name, job_title } = brief;
   const user = firebase.auth.currentUser;
   const toast = useToast();
@@ -81,7 +82,7 @@ const Recording = ({
         position: 'top-right',
       });
     }
-  }, [error]);
+  }, [error, toast]);
 
   const getDownloadURL = async (type, id) => {
     const fileBlob = await fetch(mediaBlobUrl).then(r => r.blob());
@@ -150,7 +151,7 @@ const Recording = ({
       {status === 'acquiring_media' && <Loader isLoading hasShadow />}
       {status !== 'stopped' && (
         <CountDownWrapper>
-          <Icon as={MdTimer} boxSize="4rem" mr="10px" />
+          <Icon as={MdTimer} boxSize="3rem" mr="10px" />
           <CountDown
             timer={timer}
             status={status}
@@ -265,7 +266,7 @@ const Recording = ({
                       border: `2px solid ${color.primary}`,
                     }}
                     onClick={() => handleSave(recordType === '錄音' ? 0 : 1)}
-                    icon={<MdSaveAlt />}
+                    icon={<MdOutlineSave />}
                   />
                 </Tooltip>
                 <Button
@@ -273,7 +274,9 @@ const Recording = ({
                   onClick={goNext}
                   rightIcon={<MdNavigateNext />}
                 >
-                  前往下一題
+                  {current === practiceQuestions.length - 1
+                    ? '結束練習'
+                    : '前往下一題'}
                 </Button>
               </>
             )}

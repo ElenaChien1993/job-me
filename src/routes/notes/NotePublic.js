@@ -1,4 +1,5 @@
 import {
+  Icon,
   Tab,
   TabList,
   TabPanel,
@@ -8,10 +9,12 @@ import {
   TagLabel,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { AiFillEye } from 'react-icons/ai';
+import { useOutletContext, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import EditorArea from '../../components/elements/Editor';
 
+import ChatCorner from '../../components/ChatCorner';
+import EditorArea from '../../components/elements/Editor';
 import Loader from '../../components/Loader';
 import NoteElement from '../../components/NoteCardEditable';
 import ProfileImage from '../../components/ProfileImage';
@@ -19,11 +22,14 @@ import { device, color } from '../../style/variable';
 import firebase from '../../utils/firebase';
 
 const Background = styled.div`
+  max-width: 1000px;
   @media ${device.mobileM} {
-    margin: 30px 5% 0;
+    margin: 30px auto 0;
+    width: 90%;
   }
   @media ${device.tablet} {
-    margin: 30px 10% 0;
+    width: 80%;
+    margin: 30px auto 0;
   }
 `;
 
@@ -88,6 +94,7 @@ const DetailsContainer = styled.div`
   border-radius: 24px;
   background: ${color.white};
   margin-bottom: 60px;
+  position: relative;
   @media ${device.mobileM} {
     padding: 20px 20px 0;
   }
@@ -180,10 +187,26 @@ const QuestionTitle = styled.div`
   font-size: 18px;
 `;
 
+const ViewsWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 14px;
+  right: 23px;
+`;
+
+const Views = styled.div`
+  position: relative;
+  top: -1.5px;
+  color: #9e9ea7;
+  font-weight: bold;
+`;
+
 const NotePublic = () => {
   const [brief, setBrief] = useState();
   const [details, setDetails] = useState();
   const [info, setInfo] = useState();
+  const { currentUserId } = useOutletContext();
   let params = useParams();
   const noteId = params.noteId;
   const uid = params.uid;
@@ -191,19 +214,27 @@ const NotePublic = () => {
   const tabs = ['公司資訊', '工作內容', '面試準備', '筆記心得'];
 
   useEffect(() => {
-    firebase.getNote(uid, noteId).then(snap => {
-      setBrief(snap.data());
-    });
-    firebase.getNoteDetails(noteId).then(snap => {
-      setDetails(snap.data());
-    });
-    firebase.getUser(uid).then(doc => {
-      setInfo(doc.data());
-    });
-  }, [uid, noteId]);
+    const fetch = async () => {
+      if (currentUserId !== uid) {
+        await firebase.increaseViews(uid, noteId);
+      }
+
+      firebase.getNote(uid, noteId).then(snap => {
+        setBrief(snap.data());
+      });
+      firebase.getNoteDetails(noteId).then(snap => {
+        setDetails(snap.data());
+      });
+      firebase.getUser(uid).then(doc => {
+        setInfo(doc.data());
+      });
+    };
+
+    fetch();
+  }, [uid, noteId, currentUserId]);
 
   const goToProfile = id => {
-    window.open(`/profile/${id}`, '_blank');
+    window.open(`/profile/${id}?tab=setting`, '_blank');
   };
 
   if (!info || !brief || !details) return <Loader />;
@@ -227,170 +258,174 @@ const NotePublic = () => {
           </Name>
         </Creator>
       </UpperContainer>
-      {brief && <NoteElement uid={uid} noteId={noteId} note={brief} isPublic />}
-      {details && (
-        <DetailsContainer>
-          <Tabs variant="soft-rounded" colorScheme="brand">
-            <TabList>
-              {tabs.map((tab, i) => {
-                return (
-                  <Tab
-                    key={i}
-                    borderRadius={['18px', null, null, 'full']}
-                    p={['9px', null, null, '10px 15px']}
-                    m="10px"
-                    fontSize={['16px', null, null, '18px']}
-                  >
-                    {tab}
-                  </Tab>
-                );
-              })}
-            </TabList>
-            <Line />
-            <TabPanels>
-              <TabPanel>
-                <FieldWrapper>
-                  <Title>公司主要產品 / 服務</Title>
-                  <Content>
-                    {details.product === '' ? '未填寫' : details.product}
-                  </Content>
-                </FieldWrapper>
-                <FieldWrapper>
-                  <Title>薪資範圍</Title>
-                  <Content>
-                    {`${
-                      details.salary.range === ''
-                        ? '未填寫'
-                        : details.salary.range
-                    } K(千) ${details.salary.type}`}
-                  </Content>
-                </FieldWrapper>
-              </TabPanel>
-              <TabPanel>
-                <FieldWrapper>
-                  <TitleSection>
-                    <Title>工作內容</Title>
-                    <TitleBack />
-                  </TitleSection>
-                  <ListWrapper>
-                    {details.responsibilities.length === 0
+      <NoteElement uid={uid} noteId={noteId} note={brief} isPublic />
+
+      <DetailsContainer>
+        <ViewsWrapper>
+          <Icon color="#9e9ea7" as={AiFillEye} boxSize="20px" mr="5px" />
+          <Views>{brief.views}</Views>
+        </ViewsWrapper>
+        <Tabs variant="soft-rounded" colorScheme="brand">
+          <TabList mt={['10px', null, null, '0']}>
+            {tabs.map((tab, i) => {
+              return (
+                <Tab
+                  key={i}
+                  borderRadius={['18px', null, null, 'full']}
+                  p={['9px', null, null, '10px 15px']}
+                  m="10px"
+                  fontSize={['16px', null, null, '18px']}
+                >
+                  {tab}
+                </Tab>
+              );
+            })}
+          </TabList>
+          <Line />
+          <TabPanels>
+            <TabPanel>
+              <FieldWrapper>
+                <Title>公司主要產品 / 服務</Title>
+                <Content>
+                  {details.product === '' ? '未填寫' : details.product}
+                </Content>
+              </FieldWrapper>
+              <FieldWrapper>
+                <Title>薪資範圍</Title>
+                <Content>
+                  {`${
+                    details.salary.range === ''
                       ? '未填寫'
-                      : details.responsibilities.map((item) => {
-                          return (
-                            <ListItem key={item}>
-                              <Dot />
-                              <Content>{item}</Content>
-                            </ListItem>
-                          );
-                        })}
-                  </ListWrapper>
-                </FieldWrapper>
-                <FieldWrapper>
-                  <TitleSection>
-                    <Title>必備技能</Title>
-                    <TitleBack />
-                  </TitleSection>
-                  <ListWrapper>
-                    {details.requirements.length === 0
-                      ? '未填寫'
-                      : details.requirements.map((item) => {
-                          return (
-                            <ListItem key={item.description}>
-                              <Dot />
-                              <Content>{item.description}</Content>
-                            </ListItem>
-                          );
-                        })}
-                  </ListWrapper>
-                </FieldWrapper>
-                <FieldWrapper>
-                  <TitleSection>
-                    <Title>加分項目</Title>
-                    <TitleBack />
-                  </TitleSection>
-                  <ListWrapper>
-                    {details.bonus.length === 0
-                      ? '未填寫'
-                      : details.bonus.map((item) => {
-                          return (
-                            <ListItem key={item.description}>
-                              <Dot />
-                              <Content>{item.description}</Content>
-                            </ListItem>
-                          );
-                        })}
-                  </ListWrapper>
-                </FieldWrapper>
-              </TabPanel>
-              <TabPanel>
-                {details.job_link !== '' && (
-                  <FieldWrapper>
-                    <Title>相關準備資料連結</Title>
-                    <ListItem>
-                      <Dot />
-                      <StyledLink href={details.job_link} target="_blank">
-                        職缺連結
-                      </StyledLink>
-                    </ListItem>
-                  </FieldWrapper>
-                )}
-                <FieldWrapper>
-                  <Title>面試題目猜題</Title>
-                  {details.questions.length !== 0 && (
-                    <QuestionCardsWrapper>
-                      {details.questions.map((q) => {
+                      : details.salary.range
+                  } K(千) ${details.salary.type}`}
+                </Content>
+              </FieldWrapper>
+            </TabPanel>
+            <TabPanel>
+              <FieldWrapper>
+                <TitleSection>
+                  <Title>工作內容</Title>
+                  <TitleBack />
+                </TitleSection>
+                <ListWrapper>
+                  {details.responsibilities.length === 0
+                    ? '未填寫'
+                    : details.responsibilities.map(item => {
                         return (
-                          <QuestionCard key={q.question}>
-                            <QuestionTitle>{q.question}</QuestionTitle>
-                          </QuestionCard>
+                          <ListItem key={item}>
+                            <Dot />
+                            <Content>{item}</Content>
+                          </ListItem>
                         );
                       })}
-                    </QuestionCardsWrapper>
-                  )}
-                </FieldWrapper>
-              </TabPanel>
-              <TabPanel>
+                </ListWrapper>
+              </FieldWrapper>
+              <FieldWrapper>
+                <TitleSection>
+                  <Title>必備技能</Title>
+                  <TitleBack />
+                </TitleSection>
+                <ListWrapper>
+                  {details.requirements.length === 0
+                    ? '未填寫'
+                    : details.requirements.map(item => {
+                        return (
+                          <ListItem key={item.description}>
+                            <Dot />
+                            <Content>{item.description}</Content>
+                          </ListItem>
+                        );
+                      })}
+                </ListWrapper>
+              </FieldWrapper>
+              <FieldWrapper>
+                <TitleSection>
+                  <Title>加分項目</Title>
+                  <TitleBack />
+                </TitleSection>
+                <ListWrapper>
+                  {details.bonus.length === 0
+                    ? '未填寫'
+                    : details.bonus.map(item => {
+                        return (
+                          <ListItem key={item.description}>
+                            <Dot />
+                            <Content>{item.description}</Content>
+                          </ListItem>
+                        );
+                      })}
+                </ListWrapper>
+              </FieldWrapper>
+            </TabPanel>
+            <TabPanel>
+              {details.job_link !== '' && (
                 <FieldWrapper>
-                  <TitleSection>
-                    <Title>面試前筆記區</Title>
-                    <TitleBack />
-                  </TitleSection>
-                  <EditorArea
-                    isPublic
-                    noteId={noteId}
-                    details={details}
-                    objectKey="before_note"
-                  />
+                  <Title>相關準備資料連結</Title>
+                  <ListItem>
+                    <Dot />
+                    <StyledLink href={details.job_link} target="_blank">
+                      職缺連結
+                    </StyledLink>
+                  </ListItem>
                 </FieldWrapper>
-                <FieldWrapper>
-                  <TitleSection>
-                    <Title>面試中筆記區</Title>
-                    <TitleBack />
-                  </TitleSection>
-                  <EditorArea
-                    isPublic
-                    noteId={noteId}
-                    details={details}
-                    objectKey="ing_note"
-                  />
-                </FieldWrapper>
-                <FieldWrapper>
-                  <TitleSection>
-                    <Title>面試後心得區</Title>
-                    <TitleBack />
-                  </TitleSection>
-                  <EditorArea
-                    isPublic
-                    noteId={noteId}
-                    details={details}
-                    objectKey="after_note"
-                  />
-                </FieldWrapper>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-        </DetailsContainer>
-      )}
+              )}
+              <FieldWrapper>
+                <Title>面試題目猜題</Title>
+                {details.questions.length !== 0 && (
+                  <QuestionCardsWrapper>
+                    {details.questions.map(q => {
+                      return (
+                        <QuestionCard key={q.question}>
+                          <QuestionTitle>{q.question}</QuestionTitle>
+                        </QuestionCard>
+                      );
+                    })}
+                  </QuestionCardsWrapper>
+                )}
+              </FieldWrapper>
+            </TabPanel>
+            <TabPanel>
+              <FieldWrapper>
+                <TitleSection>
+                  <Title>面試前筆記區</Title>
+                  <TitleBack />
+                </TitleSection>
+                <EditorArea
+                  isPublic
+                  noteId={noteId}
+                  details={details}
+                  objectKey="before_note"
+                />
+              </FieldWrapper>
+              <FieldWrapper>
+                <TitleSection>
+                  <Title>面試中筆記區</Title>
+                  <TitleBack />
+                </TitleSection>
+                <EditorArea
+                  isPublic
+                  noteId={noteId}
+                  details={details}
+                  objectKey="ing_note"
+                />
+              </FieldWrapper>
+              <FieldWrapper>
+                <TitleSection>
+                  <Title>面試後心得區</Title>
+                  <TitleBack />
+                </TitleSection>
+                <EditorArea
+                  isPublic
+                  noteId={noteId}
+                  details={details}
+                  objectKey="after_note"
+                />
+              </FieldWrapper>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </DetailsContainer>
+      <ChatCorner />
     </Background>
   );
 };

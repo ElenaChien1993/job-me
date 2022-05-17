@@ -12,7 +12,6 @@ const PracticeParent = () => {
   const user = firebase.auth.currentUser;
 
   useEffect(() => {
-    // if (!user) return;
     firebase.getNotes(user.uid).then(data => {
       setDatabaseNotes(data);
     });

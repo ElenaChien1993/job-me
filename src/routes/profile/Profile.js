@@ -7,13 +7,14 @@ const Profile = () => {
   const { currentUserId } = useOutletContext();
   let params = useParams();
   const uid = params.uid;
+  const tab = params.tab;
 
   if (!currentUserId) {
     return <MemberProfile uid={uid} />;
   }
 
   return (
-    <>{uid === currentUserId ? <MyProfile /> : <MemberProfile uid={uid} />}</>
+    <>{uid === currentUserId ? <MyProfile tab={tab} /> : <MemberProfile uid={uid} />}</>
   );
 };
 

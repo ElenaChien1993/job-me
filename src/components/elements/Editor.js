@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Editor,
   EditorState,
@@ -11,10 +11,16 @@ import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
 
+const Wrapper = styled.div`
+  padding-left: 1em;
+  margin-top: 1em;
+`;
+
 const StyledEditor = styled.div`
   border: 1px transparent solid;
-  padding: 1.5em 2em 2.75em 2em;
-  margin: 1.25em;
+  padding: 1em;
+  margin: 0.3em 1em 1em 0;
+  min-height: 90px;
   font-size: 100%;
   letter-spacing: 1.2px;
   border-color: #999999;
@@ -61,6 +67,7 @@ const EditorArea = ({ noteId, details, objectKey, isPublic }) => {
           convertFromRaw(JSON.parse(details[objectKey]))
         )
   );
+  const editorRef = useRef();
 
   const handleKeyCommand = (command, editorState) => {
     const newState = RichUtils.handleKeyCommand(editorState, command);
@@ -107,7 +114,7 @@ const EditorArea = ({ noteId, details, objectKey, isPublic }) => {
           <Editor readOnly editorState={editorState} />
         </ReadMode>
       ) : (
-        <>
+        <Wrapper>
           <StyledButton id="underline" onClick={onUnderlineClick}>
             U
           </StyledButton>
@@ -120,15 +127,20 @@ const EditorArea = ({ noteId, details, objectKey, isPublic }) => {
           <StyledButton id="linethrough" onClick={onStrikeThroughClick}>
             abc
           </StyledButton>
-          <StyledEditor>
+          <StyledEditor
+            onClick={() => {
+              editorRef.current.focus();
+            }}
+          >
             <Editor
               editorState={editorState}
               onChange={handleChange}
               handleKeyCommand={handleKeyCommand}
               onBlur={onBlur}
+              ref={editorRef}
             />
           </StyledEditor>
-        </>
+        </Wrapper>
       )}
     </>
   );

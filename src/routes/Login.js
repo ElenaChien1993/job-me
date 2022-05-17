@@ -24,7 +24,7 @@ import {
 } from 'react-icons/bs';
 import styled from 'styled-components';
 
-import image from '../images/login.png';
+import image from '../images/log.png';
 import firebase from '../utils/firebase';
 import { device, color } from '../style/variable';
 
@@ -90,6 +90,23 @@ const StyledSpan = styled.span`
   color: ${color.secondary};
   font-weight: bold;
   cursor: pointer;
+`;
+
+const Creditor = styled.a`
+  font-size: 0.7rem;
+  margin-top: 25px;
+  display: none;
+  @media ${device.tablet} {
+    display: block;
+  }
+`;
+
+const Guest = styled.div`
+  position: absolute;
+  top: 6px;
+  right: 0;
+  color: #999;
+  font-size: 14px;
 `;
 
 const Login = () => {
@@ -198,7 +215,6 @@ const Login = () => {
   };
 
   const handleChange = prop => event => {
-
     setValues(prev => {
       return { ...prev, [prop]: event.target.value };
     });
@@ -209,28 +225,31 @@ const Login = () => {
 
   return (
     <Flex
-      bg={color.demoBackground}
+      bg={color.backgroundGray}
       justify="center"
       align="center"
       my="5%"
       px="5%"
       flexDir={['column', null, null, 'row']}
     >
-      <Flex flexDir="column" w={["95%", null, null, "45%"]} align="center">
+      <Flex flexDir="column" w={['95%', null, null, '45%']} align="center">
         <WebTitle>Welcome To JobMe</WebTitle>
         <ImageWrapper>
           <Image src={image} alt="Login" />
         </ImageWrapper>
+        <Creditor href="https://storyset.com">
+          Illustrations by Storyset
+        </Creditor>
       </Flex>
       <Flex
-        w={["95%", null, null, "55%"]}
+        w={['95%', null, null, '55%']}
         h="auto"
         bg="white"
         borderRadius="8px"
         flexDir="column"
         align="center"
         p="3%"
-        ml={["", null, null, "5%"]}
+        ml={['', null, null, '5%']}
       >
         <Wrapper
           variant="ghost"
@@ -274,10 +293,16 @@ const Login = () => {
             </InputGroup>
           </FormControl>
         )}
-        <FormControl isRequired isInvalid={isInvalid.email} mt="10px">
+        <FormControl
+          isRequired
+          isInvalid={isInvalid.email}
+          mt="10px"
+          position="relative"
+        >
           <FormLabel htmlFor="email" fontSize="20px">
             Email
           </FormLabel>
+          {isRegistered && <Guest>客用帳號：guest@gmail.com</Guest>}
           <InputGroup flexDir="column">
             <InputLeftElement
               pointerEvents="none"
@@ -299,6 +324,7 @@ const Login = () => {
           <FormLabel htmlFor="password" fontSize="20px">
             Password
           </FormLabel>
+          {isRegistered && <Guest>客用密碼：123456</Guest>}
           <InputGroup flexDir="column">
             <InputLeftElement
               pointerEvents="none"

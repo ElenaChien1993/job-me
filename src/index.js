@@ -22,7 +22,9 @@ import Login from './routes/Login';
 import NotFound from './routes/NotFound';
 import NotePublic from './routes/notes/NotePublic';
 
-import {color} from './style/variable'
+import { color } from './style/variable';
+import Explore from './routes/Explore';
+import Landing from './routes/Landing';
 
 const breakpoints = {
   xs: '375px',
@@ -30,7 +32,7 @@ const breakpoints = {
   md: '768px',
   lg: '1024px',
   xl: '1440px',
-  '2xl': '1536px'
+  '2xl': '1536px',
 };
 
 const theme = extendTheme({
@@ -83,16 +85,7 @@ const App = () => {
         <GlobalStyle />
         {!isLoading && (
           <Routes>
-            <Route
-              path="/"
-              element={
-                <Layout
-                  isLogIn={isLogIn}
-                  isLoading={isLoading}
-                  setIsLoading={setIsLoading}
-                />
-              }
-            >
+            <Route path="/" element={<Layout />}>
               <Route element={<PrivateRoute isLogIn={isLogIn} />}>
                 <Route index element={<Navigate to="/notes" />} />
                 <Route path="notes">
@@ -124,6 +117,10 @@ const App = () => {
                   <Route path=":noteId" element={<NotePublic />} />
                 </Route>
               </Route>
+
+              <Route path="explore" element={<Explore />} />
+
+              <Route path="product" element={<Landing />} />
 
               <Route path="*" element={<NotFound />} />
             </Route>

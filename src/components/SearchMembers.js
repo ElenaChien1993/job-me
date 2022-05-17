@@ -11,6 +11,7 @@ import styled from 'styled-components';
 
 import Member from './Member';
 import firebase from '../utils/firebase';
+import { Search2Icon } from '@chakra-ui/icons';
 
 const Container = styled.div`
   display: flex;
@@ -50,7 +51,20 @@ const SearchWrapper = styled.div`
   width: 100%;
 `;
 
-const RenderList = ({ data, value, setValue, toggle, setToggle }) => {
+const NotFound = styled.div`
+  margin-top: 5px;
+  padding-left: 10px;
+  color: #787676;
+`;
+
+const RenderList = ({
+  data,
+  value,
+  setValue,
+  toggle,
+  setToggle,
+  handleSearch,
+}) => {
   if (value && data) {
     const filteredList = data.filter(item => {
       const regex = new RegExp(value, 'gi');
@@ -67,6 +81,7 @@ const RenderList = ({ data, value, setValue, toggle, setToggle }) => {
                   onClick={() => {
                     setToggle(false);
                     setValue(item.name);
+                    handleSearch(item.name);
                   }}
                 >
                   {item.name}
@@ -80,7 +95,7 @@ const RenderList = ({ data, value, setValue, toggle, setToggle }) => {
 
     return (
       <div>
-        <li>查無此紀錄～請嘗試其他關鍵字</li>
+        <NotFound>無相關資料～請嘗試其他關鍵字</NotFound>
       </div>
     );
   }
@@ -105,10 +120,10 @@ const SearchMembers = () => {
     if (data) return;
 
     fetchData();
-  }, []);
+  }, [data]);
 
-  const handleSearch = async () => {
-    if (term === '') {
+  const handleSearch = async value => {
+    if (value === '') {
       toast({
         title: '哎呀',
         description: '請輸入搜尋字',
@@ -120,11 +135,18 @@ const SearchMembers = () => {
       return;
     }
     const result = await firebase.getRecommendedUsers(
-      term,
-      term,
+      value,
+      value,
       currentUserId
     );
     setSearchResult(result);
+  };
+
+  const onInputChange = value => {
+    setSearchResult(null);
+    setTerm(value);
+    if (value === '') return;
+    setToggle(true);
   };
 
   return (
@@ -137,13 +159,16 @@ const SearchMembers = () => {
       <InputGroup size="md">
         <SearchWrapper>
           <Input
+            bg="white"
             pr="4.5rem"
             placeholder="請輸入完整公司名 / 職稱"
             value={term}
-            onChange={e => {
-              setTerm(e.target.value);
-              setToggle(true);
-            }}
+            onChange={e => onInputChange(e.target.value)}
+          />
+          <InputRightElement
+            zIndex={0}
+            pointerEvents="none"
+            children={<Search2Icon color="brand.300" />}
           />
           <RenderList
             data={data}
@@ -151,20 +176,9 @@ const SearchMembers = () => {
             setValue={setTerm}
             toggle={toggle}
             setToggle={setToggle}
+            handleSearch={handleSearch}
           />
         </SearchWrapper>
-        <InputRightElement width="4.5rem">
-          <Button
-            mr="10px"
-            h="1.75rem"
-            size="sm"
-            colorScheme="brand"
-            variant="ghost"
-            onClick={handleSearch}
-          >
-            確認搜尋
-          </Button>
-        </InputRightElement>
       </InputGroup>
       <ResultWrapper>
         {searchResult &&

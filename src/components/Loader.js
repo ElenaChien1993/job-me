@@ -9,7 +9,7 @@ const Container = styled.div`
   right: 0px;
   background: ${props =>
     props.hasShadow ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255)'};
-  z-index: 5;
+  z-index: 10;
 `;
 
 const Img = styled(LoaderSvg)`

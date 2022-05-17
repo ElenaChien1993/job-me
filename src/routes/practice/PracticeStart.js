@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { Button } from '@chakra-ui/react';
 import { CgProfile } from 'react-icons/cg';
@@ -42,13 +42,13 @@ const StyledNoteBar = styled(NoteBar)`
 const Question = styled.div`
   font-weight: 700;
   color: ${color.primary};
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   text-align: center;
   @media ${device.mobileM} {
-    font-size: 30px;
+    font-size: 28px;
   }
   @media ${device.tablet} {
-    font-size: 42px;
+    font-size: 34px;
   }
 `;
 
@@ -90,8 +90,14 @@ const PracticeStart = () => {
     }
   }, []);
 
+  // useEffect(() => {
+  //   console.log('scroll')
+  //   if (!controllRef.current) return;
+  //   controllRef.current.scrollIntoView({ behavior: 'smooth' });
+  // }, [progress]);
+
   const goToProfile = () => {
-    navigate(`/profile/${props.user.uid}`);
+    navigate(`/profile/${props.user.uid}?tab=records`);
   };
 
   return (
@@ -101,10 +107,13 @@ const PracticeStart = () => {
         <StyledNoteBar brief={props.brief} />
       </TitleWrapper>
       {progress !== 'finished' && (
-        <Question>{props.practiceQuestions[current]?.question}</Question>
+        <Question>
+          {props.practiceQuestions[current]?.question}
+        </Question>
       )}
       {progress === 'before' && (
         <BeforeRecord
+          setRecordType={props.setRecordType}
           recordType={props.recordType}
           timer={timer}
           setTimer={setTimer}

@@ -9,11 +9,13 @@ import {
   ModalCloseButton,
   Button,
   Image,
+  useToast,
 } from '@chakra-ui/react';
 import { v4 as uuid } from 'uuid';
-
 import styled from 'styled-components';
+
 import firebase from '../utils/firebase';
+import Loader from './Loader';
 import { color } from '../style/variable';
 
 const StyledImage = styled(Image)`
@@ -30,7 +32,9 @@ const ImageWrapper = styled.div`
 
 const AddImageModal = ({ isOpen, onClose, room, send }) => {
   const [image, setImage] = useState({ preview: '', raw: '' });
+  const [isLoading, setIsLoading] = useState(false);
   const hiddenInputRef = useRef();
+  const toast = useToast();
 
   const handleChooseFile = e => {
     hiddenInputRef.current.click();
@@ -46,13 +50,26 @@ const AddImageModal = ({ isOpen, onClose, room, send }) => {
   };
 
   const handleUpload = async () => {
+    if (image.raw === '') {
+      toast({
+        title: '您並未選擇欲傳送的圖片',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      return;
+    }
+
+    onClose();
+    setIsLoading(true);
     const path = `chatrooms/${room.id}/${uuid()}`;
     const url = await firebase.uploadFile(path, image.raw).then(() => {
       return firebase.getDownloadURL(path);
     });
 
     await send(url, 1);
-    onClose();
+    setIsLoading(false);
 
     setImage({
       preview: '',
@@ -92,6 +109,7 @@ const AddImageModal = ({ isOpen, onClose, room, send }) => {
               />
               <input
                 type="file"
+                accept="image/*"
                 ref={hiddenInputRef}
                 onChange={handleFileChange}
                 style={{ display: 'none' }}
@@ -114,6 +132,7 @@ const AddImageModal = ({ isOpen, onClose, room, send }) => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+      {isLoading && <Loader isLoading={isLoading} hasShadow />}
     </>
   );
 };

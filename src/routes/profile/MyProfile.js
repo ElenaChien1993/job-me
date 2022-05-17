@@ -1,5 +1,10 @@
+import { useState, useEffect } from 'react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
-import { useOutletContext } from 'react-router-dom';
+import {
+  useNavigate,
+  useOutletContext,
+  useSearchParams,
+} from 'react-router-dom';
 import styled from 'styled-components';
 import Loader from '../../components/Loader';
 import ProfileInfo from '../../components/ProfileInfo';
@@ -7,6 +12,7 @@ import ProfileInfo from '../../components/ProfileInfo';
 import ProfileRecords from '../../components/ProfileRecords';
 import ProfileSetting from '../../components/ProfileSetting';
 import { device, color } from '../../style/variable';
+import useRWD from '../../hooks/useRWD';
 
 const Container = styled.div`
   height: 100%;
@@ -41,14 +47,16 @@ const WebTitle = styled.div`
 
 const StyledTabList = styled(TabList)`
   && {
-    position: absolute;
-    width: 90%;
     @media ${device.mobileM} {
-      top: 410px;
-      justify-content: space-around;
+      margin: 0 auto;
+      width: 90%;
     }
     @media ${device.tablet} {
+      position: absolute;
+      width: 100%;
       top: 235px;
+      left: 0;
+      padding-left: 10%;
       justify-content: flex-start;
     }
   }
@@ -71,10 +79,7 @@ const InfoWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: absolute;
-    top: 100px;
-    left: 50%;
-    transform: translate(-50%, 0);
+    transform: translate(0, -23%);
   }
   @media ${device.tablet} {
     display: none;
@@ -82,7 +87,25 @@ const InfoWrapper = styled.div`
 `;
 
 const MyProfile = () => {
+  const [tabIndex, setTabIndex] = useState(0);
   const { userInfo, currentUserId } = useOutletContext();
+  let [searchParams, setSearchParams] = useSearchParams();
+  let tab = searchParams.get('tab');
+  const navigate = useNavigate();
+
+  const isMobile = useRWD();
+
+  useEffect(() => {
+    if (tab !== 'setting' && tab !== 'records') {
+      navigate('/notfound');
+    }
+    setTabIndex(() => (tab === 'setting' ? 0 : 1));
+  }, [tab, navigate]);
+
+  const handleTabsChange = index => {
+    const value = index === 0 ? 'setting' : 'records';
+    setSearchParams({ tab: value });
+  };
 
   if (!userInfo) return <Loader />;
 
@@ -95,21 +118,44 @@ const MyProfile = () => {
         <InfoWrapper>
           <ProfileInfo userInfo={userInfo} currentUserId={currentUserId} />
         </InfoWrapper>
-        <Tabs size="lg" isLazy variant="soft-rounded" colorScheme="brand">
+        <Tabs
+          size="lg"
+          isLazy
+          variant={isMobile ? 'soft-rounded' : 'enclosed'}
+          colorScheme="brand"
+          index={tabIndex}
+          onChange={handleTabsChange}
+        >
           <StyledTabList>
             <Tab
+              color="#999"
               w={['50%', null, null, '12%']}
               p="5px"
               fontSize={['16px', null, null, null, '18px']}
               height="35px"
+              _selected={{
+                color: isMobile ? 'white' : color.primary,
+                borderColor: color.primary,
+                borderBottomColor: color.third,
+                fontWeight: 'bold',
+                background: isMobile ? color.primary : color.backgroundGray,
+              }}
             >
               Setting
             </Tab>
             <Tab
+              color="#999"
               w={['50%', null, null, '12%']}
               p="5px"
               fontSize={['16px', null, null, null, '18px']}
               height="35px"
+              _selected={{
+                color: isMobile ? 'white' : color.primary,
+                borderColor: color.primary,
+                borderBottomColor: color.third,
+                fontWeight: 'bold',
+                background: isMobile ? color.primary : color.backgroundGray,
+              }}
             >
               Records
             </Tab>
@@ -120,7 +166,7 @@ const MyProfile = () => {
               <ProfileSetting />
             </TabPanel>
             <TabPanel px={0}>
-              <ProfileRecords />
+              <ProfileRecords isMobile={isMobile} />
             </TabPanel>
           </TabPanels>
         </Tabs>

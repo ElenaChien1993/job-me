@@ -9,6 +9,9 @@ import { device, color } from '../style/variable';
 
 const PlayerWrapper = styled.div`
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   @media ${device.mobileM} {
     font-size: 1.2rem;
   }
@@ -45,7 +48,13 @@ const SelectWrapper = styled.div`
   justify-content: center;
 `;
 
-const BeforeRecord = ({ recordType, timer, setTimer, setProgress }) => {
+const BeforeRecord = ({
+  setRecordType,
+  recordType,
+  timer,
+  setTimer,
+  setProgress,
+}) => {
   const [isTimer, setIsTimer] = useState(true);
   const toast = useToast();
 
@@ -67,12 +76,19 @@ const BeforeRecord = ({ recordType, timer, setTimer, setProgress }) => {
     setProgress('recording');
   };
 
+  const toggleRecordType = () => {
+    recordType === '錄音' ? setRecordType('錄影') : setRecordType('錄音');
+  };
+
   return (
     <>
       <PlayerWrapper>
         {recordType === '錄音'
           ? '此次練習將以錄音方式進行'
           : '此次練習將以錄影方式進行'}
+        <Button mt="10px" colorScheme="brand" variant="ghost" onClick={toggleRecordType}>
+          {recordType === '錄音' ? '切換為錄影' : '切換為錄音'}
+        </Button>
       </PlayerWrapper>
       <TimerSettingWrapper>
         <Icon as={MdTimer} boxSize="5rem" mr="20px" />

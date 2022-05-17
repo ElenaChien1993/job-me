@@ -1,6 +1,7 @@
 import { Button } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import { color } from '../../style/variable';
 
@@ -26,6 +27,12 @@ const AddField = ({ setter, objectKey, newValue }) => {
       新增欄位
     </StyledAddButton>
   );
+};
+
+AddField.propTypes = {
+  setter: PropTypes.func.isRequired,
+  objectKey: PropTypes.string.isRequired,
+  newValue: PropTypes.object.isRequired,
 };
 
 export default AddField;

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation, useOutletContext } from 'react-router-dom';
+import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import { BiSend, BiImageAdd, BiGame } from 'react-icons/bi';
 import { BsEmojiHeartEyes } from 'react-icons/bs';
 import { Input, IconButton, useDisclosure, Flex, Icon } from '@chakra-ui/react';
+import { SmallCloseIcon } from '@chakra-ui/icons';
 import styled, { ThemeProvider } from 'styled-components';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
@@ -19,24 +20,25 @@ const Container = styled.div`
   background-color: ${color.white};
   border-radius: 20px;
   position: relative;
-  z-index: 1;
-  max-width: 1152px;
+  z-index: 3;
+  max-width: ${props => (props.theme.isCorner ? '800px' : '1152px')};
+  box-shadow: 4px 4px 4px rgb(0 0 0 / 25%);
   @media ${device.mobileM} {
-    margin: ${props => (props.theme.isCorner ? '' : '0 auto 80px')};
+    margin: ${props => (props.theme.isCorner ? '' : '0 auto 40px')};
     top: ${props => (props.theme.isCorner ? '' : '40px')};
     width: ${props => (props.theme.isCorner ? '300px' : '90%')};
     height: ${props => (props.theme.isCorner ? '454px' : 'auto')};
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     margin: ${props => (props.theme.isCorner ? '' : '0 auto 70px')};
     top: ${props => (props.theme.isCorner ? '' : '40px')};
     width: ${props => (props.theme.isCorner ? '40vw' : '80%')};
-    height: ${props => (props.theme.isCorner ? '400px' : '650px')};
+    height: ${props => (props.theme.isCorner ? '400px' : '80vh')};
   }
 `;
 
 const LeftWrapper = styled.div`
-  background-color: #ececec;
+  background-color: #fafafa;
   flex-direction: column;
   @media ${device.mobileM} {
     border-radius: 20px 20px 0 0;
@@ -44,7 +46,7 @@ const LeftWrapper = styled.div`
     width: 100%;
     padding: 0 10px;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     border-radius: 20px 0 0 20px;
     position: absolute;
     left: 0;
@@ -57,12 +59,15 @@ const LeftWrapper = styled.div`
 const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: center;
   @media ${device.mobileM} {
     width: 100%;
     margin-left: 0;
+    height: 350px;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     width: 65%;
+    height: 100%;
     margin-left: 35%;
   }
 `;
@@ -72,10 +77,11 @@ const TopWrapper = styled.div`
   align-items: center;
   padding-left: 20px;
   height: 64px;
+  border-radius: 0 20px 0 0;
   @media ${device.mobileM} {
     display: none;
   }
-  @media ${device.laptop} {
+  @media ${device.laptopL} {
     display: flex;
   }
 `;
@@ -91,8 +97,8 @@ const Content = styled.div`
   @media ${device.mobileM} {
     height: ${props => (props.theme.isCorner ? '285px' : '410px')};
   }
-  @media ${device.laptop} {
-    height: ${props => (props.theme.isCorner ? '272px' : '522px')};
+  @media ${device.laptopL} {
+    height: ${props => (props.theme.isCorner ? '272px' : '100%')};
   }
 `;
 
@@ -131,9 +137,33 @@ const EmojisPicker = styled.span`
   z-index: 1;
 `;
 
+const PickerWrapper = styled.div`
+  position: relative;
+`;
+
+const CloseButton = styled(IconButton)`
+  && {
+    position: absolute;
+    right: -15px;
+    top: -16px;
+  }
+`;
+
 const EmptyText = styled.div`
   color: #a0aec0;
-  font-size: 30px;
+  font-size: 18px;
+  text-align: center;
+  & span {
+    color: ${color.secondary};
+    font-weight: bold;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  @media ${device.tablet} {
+    font-size: 24px;
+  }
 `;
 
 const Messages = () => {
@@ -144,8 +174,11 @@ const Messages = () => {
   const rootRef = useRef();
   const bottomRef = useRef();
   const emojisRef = useRef();
-  const { currentUserId, active, setActive } = useOutletContext();
+  const isSendingRef = useRef(false);
+  const { currentUserId, active, setActive, databaseRooms } =
+    useOutletContext();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const { onOpen, isOpen, onClose } = useDisclosure({ id: 'addImage' });
 
@@ -175,9 +208,12 @@ const Messages = () => {
     bottomRef.current.scrollIntoView({ behavior: 'auto' });
   };
 
-  const handleEnter = (e, value, type) => {
+  const handleEnter = async (e, value, type) => {
     if (e.keyCode === 13) {
-      send(value, type);
+      if (isSendingRef.current) return;
+      isSendingRef.current = true;
+      await send(value, type);
+      isSendingRef.current = false;
     }
   };
 
@@ -193,11 +229,7 @@ const Messages = () => {
     <ThemeProvider theme={{ isCorner }}>
       <Container>
         <LeftWrapper>
-          <ChatList
-            active={active}
-            setActive={setActive}
-            isCorner={isCorner}
-          />
+          <ChatList active={active} setActive={setActive} isCorner={isCorner} />
         </LeftWrapper>
         <RightWrapper>
           {active ? (
@@ -238,10 +270,20 @@ const Messages = () => {
                 />
                 {showEmojis && (
                   <EmojisPicker ref={emojisRef}>
-                    <Picker
-                      onSelect={addEmoji}
-                      emojiTooltip={true}
-                      title="JobMe"
+                    <PickerWrapper>
+                      <Picker
+                        onSelect={addEmoji}
+                        emojiTooltip={true}
+                        title="JobMe"
+                      />
+                    </PickerWrapper>
+                    <CloseButton
+                      isRound
+                      size="sm"
+                      colorScheme="brand"
+                      aria-label="delete item"
+                      icon={<SmallCloseIcon />}
+                      onClick={() => setShowEmojis(false)}
                     />
                   </EmojisPicker>
                 )}
@@ -266,15 +308,17 @@ const Messages = () => {
               </BottomWrapper>
             </>
           ) : (
-            <Flex
-              flexDir="column"
-              align="center"
-              justify="center"
-              mt={['50px', null, null, null, '100px']}
-              mb={['30px', null, null, null, 0]}
-            >
-              <Icon w="200px" h="200px" color="#A0AEC0" as={BiGame} />
-              <EmptyText>請選取聊天室</EmptyText>
+            <Flex flexDir="column" align="center" justify="center">
+              <Icon w="100px" h="100px" color="#A0AEC0" as={BiGame} />
+              {databaseRooms.length === 0 ? (
+                <EmptyText>
+                  尚無聊天室紀錄
+                  <br />
+                  要不要去<span onClick={() => navigate('/explore')}>探索</span>和其他會員交流一下？
+                </EmptyText>
+              ) : (
+                <EmptyText>請選取聊天室</EmptyText>
+              )}
             </Flex>
           )}
         </RightWrapper>
