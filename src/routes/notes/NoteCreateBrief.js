@@ -170,7 +170,6 @@ const NoteCreateBrief = props => {
     firebase.getWholeCollection('job_titles').then(data => {
       setJobTitles(data);
     });
-    // initMap(setValues, inputRef);
   }, []);
 
   useEffect(() => {

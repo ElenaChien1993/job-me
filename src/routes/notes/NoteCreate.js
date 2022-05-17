@@ -1,16 +1,18 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Flex, Button, Icon, useDisclosure } from '@chakra-ui/react';
 import { BiCircle } from 'react-icons/bi';
 import { BsCheckCircleFill } from 'react-icons/bs';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import NoteCreateBrief from './NoteCreateBrief';
 import DetailsStep1 from './DetailsStep1';
 import DetailsStep2 from './DetailsStep2';
 import DetailsStep3 from './DetailsStep3';
-import { useNavigate } from 'react-router-dom';
-import { device, color } from '../../style/variable';
 import AlertModal from '../../components/AlertModal';
+import { device, color } from '../../style/variable';
 
 const Container = styled.div`
   max-width: 1152px;
