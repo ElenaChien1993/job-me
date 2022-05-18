@@ -82,7 +82,7 @@ const RightWrapper = styled.div`
 `;
 
 const StyledIcon = styled(Icon)`
-  color: ${props => (props.isComplete ? 'white' : '#6c6c6c')};
+  color: ${props => (props.$isComplete ? 'white' : '#6c6c6c')};
   @media ${device.mobileM} {
     width: 25px;
     height: 25px;
@@ -98,7 +98,7 @@ const StyledIcon = styled(Icon)`
 `;
 
 const StepText = styled.p`
-  color: ${props => (props.isComplete ? 'white' : '#6c6c6c')};
+  color: ${props => (props.$isComplete ? 'white' : '#6c6c6c')};
   font-size: 20px;
   font-weight: bold;
   cursor: default;
@@ -117,7 +117,7 @@ const StraightLine = styled.div`
   height: 30px;
   margin: 3px 0;
   margin-left: 16px;
-  background-color: ${props => (props.isComplete ? 'white' : '#6c6c6c')};
+  background-color: ${props => (props.$isComplete ? 'white' : '#6c6c6c')};
   @media ${device.mobileM} {
     display: none;
   }
@@ -243,24 +243,24 @@ const NoteCreate = () => {
             justify={['space-around', null, null, 'center']}
           >
             <Flex align="center" justify="center">
-              <StyledIcon as={BsCheckCircleFill} isComplete />
-              <StepText isComplete>基本資料</StepText>
+              <StyledIcon as={BsCheckCircleFill} $isComplete />
+              <StepText $isComplete>基本資料</StepText>
             </Flex>
-            <StraightLine isComplete={step !== 1} />
+            <StraightLine $isComplete={step !== 1} />
             <Flex align="center" justify="center">
               <StyledIcon
                 as={step !== 1 ? BsCheckCircleFill : BiCircle}
-                isComplete={step !== 1}
+                $isComplete={step !== 1}
               />
-              <StepText isComplete={step !== 1}>詳細資訊</StepText>
+              <StepText $isComplete={step !== 1}>詳細資訊</StepText>
             </Flex>
-            <StraightLine isComplete={step === 4} />
+            <StraightLine $isComplete={step === 4} />
             <Flex align="center" justify="center">
               <StyledIcon
                 as={step === 4 ? BsCheckCircleFill : BiCircle}
-                isComplete={step === 4}
+                $isComplete={step === 4}
               />
-              <StepText isComplete={step === 4}>準備小記</StepText>
+              <StepText $isComplete={step === 4}>準備小記</StepText>
             </Flex>
           </Flex>
           <Flex

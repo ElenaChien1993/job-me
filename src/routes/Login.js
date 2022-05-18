@@ -152,7 +152,7 @@ const Login = () => {
     try {
       const user = await firebase.register(values.email, values.password);
       firebase.updateUser(values.name);
-      firebase.signUp(user.uid, values.name);
+      firebase.setNewUser(user.uid, values.name);
       toast({
         title: '註冊成功！',
         status: 'success',

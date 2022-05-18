@@ -66,7 +66,7 @@ const Notes = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    firebase.getNotes(currentUserId).then(data => {
+    firebase.getWholeCollection(`users/${currentUserId}/notes`).then(data => {
       setDatabaseNotes(data);
       setRenderNotes(data);
     });

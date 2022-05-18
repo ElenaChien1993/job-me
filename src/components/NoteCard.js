@@ -35,14 +35,14 @@ const Note = ({
   const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
   const { pathname } = useLocation();
 
-  const handleDeleteNote = () => {
-    firebase.deleteNote(currentUserId, note.note_id).then(() => {
-      const update = databaseNotes.filter(
-        item => item.note_id !== note.note_id
-      );
-      setDatabaseNotes(update);
-      setRenderNotes(update);
+  const handleDeleteNote = async () => {
+    await firebase.deleteData(`users/${currentUserId}/notes/${note.note_id}`);
+    await firebase.updateUserInfo(currentUserId, {
+      notes_qty: firebase.increment(-1),
     });
+    const update = databaseNotes.filter(item => item.note_id !== note.note_id);
+    setDatabaseNotes(update);
+    setRenderNotes(update);
   };
 
   return (

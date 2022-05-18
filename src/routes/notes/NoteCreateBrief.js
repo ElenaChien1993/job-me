@@ -196,22 +196,29 @@ const NoteCreateBrief = props => {
       });
       return;
     }
-    const noteId = await firebase.setNoteBrief(currentUserId, {
-      ...noteDataBrief,
-      creator: currentUserId,
-    });
-    const notes = await firebase.getNotes(currentUserId);
-    firebase.updateUserInfo(currentUserId, { notes_qty: notes.length });
+    const noteId = await firebase.createDoc(
+      `users/${currentUserId}/notes`,
+      {
+        ...noteDataBrief,
+        creator: currentUserId,
+      },
+      'note_id'
+    );
+    await firebase.increaseDataNumber(`users/${currentUserId}`, 'notes_qty');
 
     await firebase.setNoteDetails(noteId, noteDetails);
 
     if (
       companies.map(company => company.name).indexOf(values.company_name) === -1
     ) {
-      await firebase.createDoc('companies', { name: values.company_name });
+      await firebase.createDoc(
+        'companies',
+        { name: values.company_name },
+        'id'
+      );
     }
     if (jobTitles.map(job => job.name).indexOf(values.job_title) === -1) {
-      await firebase.createDoc('job_titles', { name: values.job_title });
+      await firebase.createDoc('job_titles', { name: values.job_title }, 'id');
     }
 
     navigate(`/notes/details/${noteId}`);
@@ -349,7 +356,7 @@ NoteCreateBrief.propTypes = {
   values: PropTypes.object.isRequired,
   setValues: PropTypes.func.isRequired,
   noteDataBrief: PropTypes.object.isRequired,
-  noteDetails: PropTypes.object.isRequired,  
+  noteDetails: PropTypes.object.isRequired,
 };
 
 export default NoteCreateBrief;

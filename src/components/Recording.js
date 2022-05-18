@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
+
 import { useReactMediaRecorder } from 'react-media-recorder';
 import { Button, IconButton, Icon, Tooltip, useToast } from '@chakra-ui/react';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
@@ -14,7 +17,6 @@ import { Audio, Video } from './elements/MediaRecorder';
 import CountDown from './elements/CountDown';
 import firebase from '../utils/firebase';
 import Loader from './Loader';
-import { useEffect, useState, useRef } from 'react';
 import { device, color } from '../style/variable';
 
 const ButtonsWrapper = styled.div`
@@ -66,9 +68,8 @@ const Recording = ({
     echoCancellation: true,
   });
   const [isLoading, setIsLoading] = useState(false);
-  const controllRef = useRef();
   const { company_name, job_title } = brief;
-  const user = firebase.auth.currentUser;
+  const { currentUserId } = useOutletContext();
   const toast = useToast();
 
   useEffect(() => {
@@ -86,9 +87,9 @@ const Recording = ({
 
   const getDownloadURL = async (type, id) => {
     const fileBlob = await fetch(mediaBlobUrl).then(r => r.blob());
-    const path = `${type === 0 ? 'audios' : 'videos'}/${
-      user.uid
-    }/${company_name}｜${job_title}/${
+    const path = `${
+      type === 0 ? 'audios' : 'videos'
+    }/${currentUserId}/${company_name}｜${job_title}/${
       practiceQuestions[current].question
     }-${id}`;
 
@@ -107,31 +108,33 @@ const Recording = ({
       record_name: practiceQuestions[current].question,
       record_job: `${company_name}｜${job_title}`,
     };
-    firebase.setRecord(user.uid, recordData).then(async id => {
-      try {
-        const url = await getDownloadURL(type, id);
-        firebase.updateRecord(user.uid, id, { link: url });
-        setIsLoading(false);
-        toast({
-          title: '成功！',
-          description: '已將檔案存在您的個人檔案中',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top-right',
-        });
-      } catch (error) {
-        console.log(error);
-        toast({
-          title: '哎呀',
-          description: '上傳檔案時發生錯誤，請稍後再試',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top-right',
-        });
-      }
-    });
+    firebase
+      .createDoc(`users/${currentUserId}/records`, recordData, 'record_id')
+      .then(async id => {
+        try {
+          const url = await getDownloadURL(type, id);
+          firebase.updateRecord(currentUserId, id, { link: url });
+          setIsLoading(false);
+          toast({
+            title: '成功！',
+            description: '已將檔案存在您的個人檔案中',
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right',
+          });
+        } catch (error) {
+          console.log(error);
+          toast({
+            title: '哎呀',
+            description: '上傳檔案時發生錯誤，請稍後再試',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+            position: 'top-right',
+          });
+        }
+      });
   };
 
   const goNext = () => {

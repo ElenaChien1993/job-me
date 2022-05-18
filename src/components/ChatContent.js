@@ -24,8 +24,15 @@ const ChatContent = ({
   useEffect(() => {
     const unsubscribe = firebase.listenMessagesChange(
       room,
-      setMessages,
-      currentUserId
+      currentUserId,
+      (data) => {
+        setMessages(prev => {
+          return {
+            ...prev,
+            [room.id]: data,
+          };
+        })
+      },
     );
 
     return () => unsubscribe();

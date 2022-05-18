@@ -115,8 +115,8 @@ const StyledNavLink = styled(NavLink)`
 `;
 
 const Span = styled.span`
-  color: ${props => (props.isActive ? 'white' : 'rgba(255, 255, 255, 0.7)')};
-  font-weight: ${props => (props.isActive ? '700' : '500')};
+  color: ${(props) => (props.isActive ? 'white' : 'rgba(255, 255, 255, 0.7)')};
+  font-weight: ${(props) => (props.isActive ? '700' : '500')};
   &:hover {
     color: white;
     font-weight: 700;
@@ -134,8 +134,8 @@ const MobileNavItem = styled.li`
 `;
 
 const MobileSpan = styled.span`
-  color: ${props => (props.isActive ? color.primary : '#999')};
-  font-weight: ${props => (props.isActive ? '700' : '500')};
+  color: ${(props) => (props.isActive ? color.primary : '#999')};
+  font-weight: ${(props) => (props.isActive ? '700' : '500')};
   &:hover {
     color: ${color.primary};
     font-weight: 700;
@@ -152,7 +152,7 @@ const Nav = ({ userInfo, currentUserId }) => {
       .then(() => {
         navigate('/login', { state: { from: { pathname: '/notes' } } });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   };
@@ -250,7 +250,9 @@ const Nav = ({ userInfo, currentUserId }) => {
                       <MobileNavItem>
                         <StyledNavLink to="/notes">
                           {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>我的筆記</MobileSpan>
+                            <MobileSpan isActive={isActive}>
+                              我的筆記
+                            </MobileSpan>
                           )}
                         </StyledNavLink>
                       </MobileNavItem>
@@ -266,25 +268,25 @@ const Nav = ({ userInfo, currentUserId }) => {
                       <MobileNavItem>
                         <StyledNavLink to="/explore">
                           {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>
-                              探索
-                            </MobileSpan>
+                            <MobileSpan isActive={isActive}>探索</MobileSpan>
                           )}
                         </StyledNavLink>
                       </MobileNavItem>
                       <MobileNavItem>
                         <StyledNavLink to="/messages">
                           {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>
-                              聊天室
-                            </MobileSpan>
+                            <MobileSpan isActive={isActive}>聊天室</MobileSpan>
                           )}
                         </StyledNavLink>
                       </MobileNavItem>
                       <MobileNavItem>
-                        <StyledNavLink to={`/profile/${currentUserId}?tab=setting`}>
+                        <StyledNavLink
+                          to={`/profile/${currentUserId}?tab=setting`}
+                        >
                           {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>個人資料</MobileSpan>
+                            <MobileSpan isActive={isActive}>
+                              個人資料
+                            </MobileSpan>
                           )}
                         </StyledNavLink>
                       </MobileNavItem>
@@ -322,7 +324,11 @@ const Layout = () => {
     if (!currentUserId) return;
     const unsubscribe = firebase.listenUserProfileChange(
       currentUserId,
-      setUserInfo
+      (data) => {
+        setUserInfo((prev) => {
+          return { ...prev, ...data };
+        });
+      }
     );
 
     return () => unsubscribe();
@@ -368,10 +374,7 @@ const Layout = () => {
 
   return (
     <Container>
-      <Nav
-        userInfo={userInfo}
-        currentUserId={currentUserId}
-      />
+      <Nav userInfo={userInfo} currentUserId={currentUserId} />
       <ContentContainer>
         <Outlet context={props} />
       </ContentContainer>

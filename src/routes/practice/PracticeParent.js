@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useOutletContext } from 'react-router-dom';
 
 import firebase from '../../utils/firebase';
 
@@ -8,14 +8,13 @@ const PracticeParent = () => {
   const [brief, setBrief] = useState();
   const [practiceQuestions, setPracticeQuestions] = useState([]);
   const [recordType, setRecordType] = useState('錄影');
-
-  const user = firebase.auth.currentUser;
+  const { currentUserId } = useOutletContext();
 
   useEffect(() => {
-    firebase.getNotes(user.uid).then(data => {
+    firebase.getWholeCollection(`users/${currentUserId}/notes`).then(data => {
       setDatabaseNotes(data);
     });
-  }, [user.uid]);
+  }, [currentUserId]);
 
   const props = {
     databaseNotes,
@@ -26,7 +25,7 @@ const PracticeParent = () => {
     setRecordType,
     brief,
     setBrief,
-    user,
+    currentUserId,
   };
 
   return <Outlet context={props} />;

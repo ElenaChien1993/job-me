@@ -210,9 +210,10 @@ const ProfileRecords = ({ isMobile }) => {
       path = `videos/${currentUserId}/${activeVideo.record_job}/${activeVideo.record_name}-${activeVideo.record_id}`;
     }
     await firebase.deleteFile(path);
-    await firebase.deleteRecord(
-      currentUserId,
-      tabIndex === 0 ? activeAudio.record_id : activeVideo.record_id
+    await firebase.deleteData(
+      `users/${currentUserId}/records/${
+        tabIndex === 0 ? activeAudio.record_id : activeVideo.record_id
+      }`
     );
     toast({
       title: '成功',

@@ -216,7 +216,7 @@ const NotePublic = () => {
   useEffect(() => {
     const fetch = async () => {
       if (currentUserId !== uid) {
-        await firebase.increaseViews(uid, noteId);
+        await firebase.increaseDataNumber(`users/${uid}/notes/${noteId}`, 'views');
       }
 
       firebase.getNote(uid, noteId).then(snap => {

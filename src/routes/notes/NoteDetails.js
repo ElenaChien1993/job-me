@@ -257,7 +257,7 @@ const NoteDetails = () => {
       console.log('database changed', doc.data());
     });
 
-    return unsubscribe;
+    return () => unsubscribe();
   }, [currentUserId, noteId]);
 
   useEffect(() => {

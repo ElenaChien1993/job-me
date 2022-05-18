@@ -12,9 +12,7 @@ import firebase from '../../utils/firebase';
 import useRWD from '../../hooks/useRWD';
 import NoteCardExplore from '../../components/NoteCardExplore';
 
-const Container = styled.div`
-  
-`;
+const Container = styled.div``;
 
 const Upper = styled.div`
   background-color: ${color.third};
@@ -159,12 +157,10 @@ const MemberProfile = React.memo(() => {
     const roomExist = await firebase.checkIsRoomExist(data.members);
     if (roomExist.length !== 0) {
       await setActive(...roomExist);
-      setChatOpen(true);
     } else {
-      firebase.setChatroom(data).then(() => {
-        setChatOpen(true);
-      });
+      await firebase.createDoc('chatrooms', data, 'id');
     }
+    setChatOpen(true);
   };
 
   if (!info) return <Loader />;

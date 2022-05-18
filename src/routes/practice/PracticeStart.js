@@ -97,7 +97,7 @@ const PracticeStart = () => {
   // }, [progress]);
 
   const goToProfile = () => {
-    navigate(`/profile/${props.user.uid}?tab=records`);
+    navigate(`/profile/${props.currentUserId}?tab=records`);
   };
 
   return (
