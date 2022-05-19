@@ -27,14 +27,14 @@ import {
 import { MdPreview } from 'react-icons/md';
 import styled from 'styled-components';
 
-import NoteElement from '../../components/NoteCardEditable';
+import NoteElement from '../../components/notes/NoteCardEditable';
 import firebase from '../../utils/firebase';
 import AddField from '../../components/elements/AddField';
 import EditFiles from '../../components/elements/EditFiles';
 import EditorArea from '../../components/elements/Editor';
-import RecommendModal from '../../components/RecommendModal';
-import EditableInputField from '../../components/EditableInputField';
-import ChatCorner from '../../components/ChatCorner';
+import RecommendModal from '../../components/notes/RecommendModal';
+import EditableInputField from '../../components/notes/EditableInputField';
+import ChatCorner from '../../components/messages/ChatCorner';
 import { device, color } from '../../style/variable';
 
 const Background = styled.div`
@@ -369,15 +369,16 @@ const NoteDetails = () => {
     setIsFilesEditing(false);
   };
 
-  const showConnectModal = () => {
+  const showConnectModal = async () => {
     setIsLoading(true);
     onOpen();
-    firebase
-      .getRecommendedUsers(brief.company_name, brief.job_title, currentUserId)
-      .then(members => {
-        setRecommend(members);
-        setIsLoading(false);
-      });
+    const members = await firebase.getRecommendedUsers(
+      brief.company_name,
+      brief.job_title,
+      currentUserId
+    );
+    setRecommend(members);
+    setIsLoading(false);
   };
 
   const openPreview = () => {
@@ -407,8 +408,7 @@ const NoteDetails = () => {
             size="sm"
             leftIcon={<ChevronLeftIcon />}
             variant="outline"
-            color="#00403B"
-            borderColor="#00403B"
+            colorScheme="brand"
           >
             回前頁
           </Button>

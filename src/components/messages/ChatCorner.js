@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+
 import { IconButton } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { IoChatbubbleEllipsesSharp } from 'react-icons/io5';
 import styled from 'styled-components';
 
-import Messages from '../routes/Messages';
-import { device, color } from '../style/variable';
-import firebase from '../utils/firebase';
+import Messages from '../../routes/Messages';
+import { device, color } from '../../style/variable';
 
 const IconWrapper = styled.div`
   position: fixed;

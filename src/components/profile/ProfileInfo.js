@@ -11,11 +11,11 @@ import {
 import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
-import firebase from '../utils/firebase';
-import ProfileImage from './ProfileImage';
-import { device } from '../style/variable';
-import AlertModal from './AlertModal';
-import Loader from './Loader';
+import firebase from '../../utils/firebase';
+import ProfileImage from '../ProfileImage';
+import { device } from '../../style/variable';
+import AlertModal from '../AlertModal';
+import Loader from '../Loader';
 
 const ImageContainer = styled.div`
   position: relative;

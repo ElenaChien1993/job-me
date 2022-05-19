@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
+
 import {
   Input,
   Editable,
@@ -7,12 +9,11 @@ import {
   Select,
   IconButton,
 } from '@chakra-ui/react';
-import { useLocation } from 'react-router-dom';
 import { EditIcon, CheckCircleIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
-import firebase from '../utils/firebase';
-import { device, color } from '../style/variable';
+import firebase from '../../utils/firebase';
+import { device, color } from '../../style/variable';
 
 const Container = styled.div`
   display: flex;

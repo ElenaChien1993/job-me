@@ -1,14 +1,13 @@
 import React, { useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
-import firebase from '../utils/firebase';
-import ChatReceived from './elements/ChatReceived';
-import ChatSent from './elements/ChatSent';
+import firebase from '../../utils/firebase';
+import ChatReceived from '../elements/ChatReceived';
+import ChatSent from '../elements/ChatSent';
 
 const ChatContent = ({
   room,
   rootRef,
-  isCorner,
   bottomRef,
   messages,
   setMessages,

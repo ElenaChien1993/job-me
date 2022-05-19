@@ -4,7 +4,7 @@ import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import AlertModal from '../../components/AlertModal';
 
-import ChatCorner from '../../components/ChatCorner';
+import ChatCorner from '../../components/messages/ChatCorner';
 import Loader from '../../components/Loader';
 import ProfileImage from '../../components/ProfileImage';
 import { device, color } from '../../style/variable';

@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+
 import {
-  Button,
   Input,
   InputGroup,
   InputRightElement,
   useToast,
 } from '@chakra-ui/react';
+import { Search2Icon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import Member from './Member';
-import firebase from '../utils/firebase';
-import { Search2Icon } from '@chakra-ui/icons';
+import firebase from '../../utils/firebase';
 
 const Container = styled.div`
   display: flex;

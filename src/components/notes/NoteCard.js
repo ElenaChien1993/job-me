@@ -1,12 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
+
 import { IconButton, useDisclosure } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
-import firebase from '../utils/firebase';
+import firebase from '../../utils/firebase';
 import NoteElement from './NoteCardEditable';
-import { device } from '../style/variable';
-import AlertModal from './AlertModal';
+import AlertModal from '../AlertModal';
 
 const Container = styled.div`
   position: relative;

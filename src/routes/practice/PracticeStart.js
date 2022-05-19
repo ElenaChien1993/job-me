@@ -1,6 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
+
 import { Button } from '@chakra-ui/react';
 import { CgProfile } from 'react-icons/cg';
 import Lottie from 'react-lottie-player';
@@ -8,8 +8,8 @@ import styled from 'styled-components';
 
 import BackButton from '../../components/elements/BackButton';
 import NoteBar from '../../components/elements/NoteBar';
-import BeforeRecord from '../../components/BeforeRecord';
-import Recording from '../../components/Recording';
+import BeforeRecord from '../../components/practice/BeforeRecord';
+import Recording from '../../components/practice/Recording';
 import finishJson from '../../images/finish.json';
 import { device, color } from '../../style/variable';
 

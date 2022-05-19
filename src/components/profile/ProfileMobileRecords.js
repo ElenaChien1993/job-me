@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { FaMicrophone, FaFilm } from 'react-icons/fa';
 import styled from 'styled-components';
 
-import firebase from '../utils/firebase';
-import RecordAccordion from './elements/RecordAccordion';
+import firebase from '../../utils/firebase';
+import RecordAccordion from '../elements/RecordAccordion';
 
 const LeftWrapper = styled.div`
   display: flex;
@@ -22,7 +23,7 @@ const Text = styled.div`
   text-align: center;
 `;
 
-const ProfileMobileRecords = ({onOpen}) => {
+const ProfileMobileRecords = ({ onOpen }) => {
   const [audioRecords, setAudioRecords] = useState([]);
   const [videoRecords, setVideoRecords] = useState([]);
   const [activeRecord, setActiveRecord] = useState(null);
@@ -59,7 +60,7 @@ const ProfileMobileRecords = ({onOpen}) => {
           variant="line"
           colorScheme="brand"
           size="lg"
-          onChange={(index) => setTabIndex(index)}
+          onChange={index => setTabIndex(index)}
         >
           <TabList>
             <Tab px="5px">

@@ -13,11 +13,11 @@ import {
 import { MdOutlineSave, MdNavigateNext, MdTimer } from 'react-icons/md';
 import styled from 'styled-components';
 
-import { Audio, Video } from './elements/MediaRecorder';
-import CountDown from './elements/CountDown';
-import firebase from '../utils/firebase';
-import Loader from './Loader';
-import { device, color } from '../style/variable';
+import { Audio, Video } from '../elements/MediaRecorder';
+import CountDown from '../elements/CountDown';
+import firebase from '../../utils/firebase';
+import Loader from '../Loader';
+import { device, color } from '../../style/variable';
 
 const ButtonsWrapper = styled.div`
   display: flex;

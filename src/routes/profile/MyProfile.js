@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import {
   useNavigate,
   useOutletContext,
   useSearchParams,
 } from 'react-router-dom';
-import styled from 'styled-components';
-import Loader from '../../components/Loader';
-import ProfileInfo from '../../components/ProfileInfo';
 
-import ProfileRecords from '../../components/ProfileRecords';
-import ProfileSetting from '../../components/ProfileSetting';
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
+import styled from 'styled-components';
+
+import Loader from '../../components/Loader';
+import ProfileInfo from '../../components/profile/ProfileInfo';
+import ProfileRecords from '../../components/profile/ProfileRecords';
+import ProfileSetting from '../../components/profile/ProfileSetting';
 import { device, color } from '../../style/variable';
 import useRWD from '../../hooks/useRWD';
 

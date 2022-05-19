@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import firebase from '../utils/firebase';
 import { device, color } from '../style/variable';
 import image from '../images/explore.png';
-import ChatCorner from '../components/ChatCorner';
+import ChatCorner from '../components/messages/ChatCorner';
 import NoteCardExplore from '../components/NoteCardExplore';
 import Loader from '../components/Loader';
 

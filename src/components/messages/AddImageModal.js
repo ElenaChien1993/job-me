@@ -14,9 +14,9 @@ import {
 import { v4 as uuid } from 'uuid';
 import styled from 'styled-components';
 
-import firebase from '../utils/firebase';
-import Loader from './Loader';
-import { color } from '../style/variable';
+import firebase from '../../utils/firebase';
+import Loader from '../Loader';
+import { color } from '../../style/variable';
 
 const StyledImage = styled(Image)`
   cursor: pointer;
@@ -104,7 +104,7 @@ const AddImageModal = ({ isOpen, onClose, room, send }) => {
                 boxSize={image.preview === '' ? '50px' : '200px'}
                 alt="upload"
                 src={image.preview}
-                fallbackSrc={require('../images/add-document.svg').default}
+                fallbackSrc={require('../../images/add-document.svg').default}
                 onClick={handleChooseFile}
               />
               <input

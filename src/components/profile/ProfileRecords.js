@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+
 import {
   Tabs,
   TabList,
@@ -15,15 +16,15 @@ import {
 } from '@chakra-ui/react';
 import { FaMicrophone, FaFilm } from 'react-icons/fa';
 import { RiFileUnknowLine } from 'react-icons/ri';
+import { MdSaveAlt } from 'react-icons/md';
 import styled from 'styled-components';
 
-import ChatCorner from './ChatCorner';
-import firebase from '../utils/firebase';
-import { MdSaveAlt } from 'react-icons/md';
-import { color, device } from '../style/variable';
+import ChatCorner from '../messages/ChatCorner';
+import firebase from '../../utils/firebase';
+import { color, device } from '../../style/variable';
 import ProfileMobileRecords from './ProfileMobileRecords';
-import AlertModal from './AlertModal';
-import Loader from './Loader';
+import AlertModal from '../AlertModal';
+import Loader from '../Loader';
 
 const Container = styled.div`
   width: 100%;

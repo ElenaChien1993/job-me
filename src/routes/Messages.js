@@ -9,12 +9,12 @@ import styled, { ThemeProvider } from 'styled-components';
 import { Picker } from 'emoji-mart';
 import 'emoji-mart/css/emoji-mart.css';
 
-import ChatList from '../components/ChatList';
+import ChatList from '../components/messages/ChatList';
+import ChatContent from '../components/messages/ChatContent';
 import firebase from '../utils/firebase';
 import ProfileImage from '../components/ProfileImage';
-import AddImageModal from '../components/AddImageModal';
+import AddImageModal from '../components/messages/AddImageModal';
 import useClickOutside from '../hooks/useClickOutside';
-import ChatContent from '../components/ChatContent';
 import { device, color } from '../style/variable';
 
 const Container = styled.div`

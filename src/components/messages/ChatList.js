@@ -6,8 +6,8 @@ import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
 import styled, { ThemeProvider } from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { device, color } from '../style/variable';
-import ProfileImage from './ProfileImage';
+import { device, color } from '../../style/variable';
+import ProfileImage from '../ProfileImage';
 
 const Container = styled.div`
   display: flex;

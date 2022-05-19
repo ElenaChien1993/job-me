@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+
 import {
   Button,
   ButtonGroup,
@@ -7,13 +8,12 @@ import {
   Input,
   Textarea,
 } from '@chakra-ui/react';
-
 import styled from 'styled-components';
 
-import firebase from '../utils/firebase';
-import Loader from '../components/Loader';
-import ChatCorner from './ChatCorner';
-import { device, color } from '../style/variable';
+import firebase from '../../utils/firebase';
+import Loader from '../Loader';
+import ChatCorner from '../messages/ChatCorner';
+import { device, color } from '../../style/variable';
 import ProfileInfo from './ProfileInfo';
 
 const Container = styled.div`

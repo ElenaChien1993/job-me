@@ -13,10 +13,10 @@ import { AiFillEye } from 'react-icons/ai';
 import { useOutletContext, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
-import ChatCorner from '../../components/ChatCorner';
+import ChatCorner from '../../components/messages/ChatCorner';
 import EditorArea from '../../components/elements/Editor';
 import Loader from '../../components/Loader';
-import NoteElement from '../../components/NoteCardEditable';
+import NoteElement from '../../components/notes/NoteCardEditable';
 import ProfileImage from '../../components/ProfileImage';
 import { device, color } from '../../style/variable';
 import firebase from '../../utils/firebase';

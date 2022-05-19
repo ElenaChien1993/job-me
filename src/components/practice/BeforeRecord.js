@@ -4,8 +4,8 @@ import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { MdTimer } from 'react-icons/md';
 import styled from 'styled-components';
 
-import SwitchElement from './elements/Switch';
-import { device, color } from '../style/variable';
+import SwitchElement from '../elements/Switch';
+import { device, color } from '../../style/variable';
 
 const PlayerWrapper = styled.div`
   margin-bottom: 20px;
