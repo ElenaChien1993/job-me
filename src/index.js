@@ -1,5 +1,4 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
@@ -21,7 +20,6 @@ import Loader from './components/Loader';
 import Login from './routes/Login';
 import NotFound from './routes/NotFound';
 import NotePublic from './routes/notes/NotePublic';
-
 import { color } from './style/variable';
 import Explore from './routes/Explore';
 import Landing from './routes/Landing';
