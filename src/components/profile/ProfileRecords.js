@@ -30,12 +30,10 @@ const Container = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  @media ${device.mobileM} {
-    padding: 20px 0 0;
-    margin-bottom: 40px;
-    flex-direction: column;
-    align-items: center;
-  }
+  padding: 20px 0 0;
+  margin-bottom: 40px;
+  flex-direction: column;
+  align-items: center;
   @media ${device.tablet} {
     margin: 0 0 20px;
     padding: 30px 0;
@@ -48,11 +46,9 @@ const LeftWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  @media ${device.mobileM} {
-    border-right: none;
-    padding-right: 0;
-    width: 100%;
-  }
+  border-right: none;
+  padding-right: 0;
+  width: 100%;
   @media ${device.tablet} {
     border-right: 5px solid #c4c4c4;
     padding-right: 20px;
@@ -63,11 +59,9 @@ const LeftWrapper = styled.div`
 const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  @media ${device.mobileM} {
-    width: 100%;
-    padding-left: 0;
-    margin-top: 20px;
-  }
+  width: 100%;
+  padding-left: 0;
+  margin-top: 20px;
   @media ${device.tablet} {
     width: 60%;
     padding-left: 50px;
@@ -102,9 +96,7 @@ const Record = styled.div`
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    @media ${device.mobileM} {
-      font-size: 16px;
-    }
+    font-size: 16px;
     @media ${device.tablet} {
       font-size: 18px;
     }
@@ -112,9 +104,7 @@ const Record = styled.div`
   & p {
     text-align: end;
     max-width: 20%;
-    @media ${device.mobileM} {
-      font-size: 14px;
-    }
+    font-size: 14px;
     @media ${device.tablet} {
       font-size: 16px;
     }

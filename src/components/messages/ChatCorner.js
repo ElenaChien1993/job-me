@@ -12,9 +12,7 @@ const IconWrapper = styled.div`
   position: fixed;
   z-index: 1;
   bottom: 7%;
-  @media ${device.mobileM} {
-    right: 10%;
-  }
+  right: 10%;
   @media ${device.tablet} {
     right: 7%;
   }
@@ -24,9 +22,7 @@ const MessageWrapper = styled.div`
   position: fixed;
   z-index: 1;
   bottom: 15%;
-  @media ${device.mobileM} {
-    right: 10%;
-  }
+  right: 10%;
   @media ${device.tablet} {
     right: 7%;
   }

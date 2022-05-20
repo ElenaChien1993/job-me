@@ -39,9 +39,7 @@ const ImageContainer = styled.div`
 
 const StyledImage = styled.img`
   object-fit: cover;
-  @media ${device.mobileM} {
-    height: 250px;
-  }
+  height: 250px;
   @media ${device.tablet} {
     height: 360px;
   }
@@ -77,7 +75,7 @@ const SmallText = styled.div`
   font-weight: 500;
   line-height: 22px;
   text-shadow: black 0.1em 0.1em 0.2em;
-  @media ${device.table} {
+  @media ${device.tablet} {
     font-size: 20px;
     font-weight: 400;
     line-height: 32px;
@@ -140,10 +138,8 @@ const ContentGrid = styled.ol`
   grid-gap: 36px;
   grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
   list-style: none;
-  @media ${device.mobileM} {
-    padding: 0 20px;
-  }
-  @media ${device.table} {
+  padding: 0 20px;
+  @media ${device.tablet} {
     padding: 0 32px;
   }
   @media ${device.laptop} {
@@ -168,7 +164,7 @@ const Explore = () => {
       const data = await firebase.getPublicNotes();
       setDatabaseNotes(data);
     };
-    
+
     fetchNotes();
   }, []);
 

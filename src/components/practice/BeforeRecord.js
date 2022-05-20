@@ -12,9 +12,7 @@ const PlayerWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  @media ${device.mobileM} {
-    font-size: 1.2rem;
-  }
+  font-size: 1.2rem;
   @media ${device.tablet} {
     font-size: 1.5rem;
   }
@@ -28,10 +26,8 @@ const TimerSettingWrapper = styled.div`
   border-radius: 20px;
   padding: 20px;
   background-color: ${color.white};
-  @media ${device.mobileM} {
-    width: 340px;
-    height: 180px;
-  }
+  width: 340px;
+  height: 180px;
   @media ${device.tablet} {
     width: 450px;
     height: 140px;
@@ -86,7 +82,12 @@ const BeforeRecord = ({
         {recordType === '錄音'
           ? '此次練習將以錄音方式進行'
           : '此次練習將以錄影方式進行'}
-        <Button mt="10px" colorScheme="brand" variant="ghost" onClick={toggleRecordType}>
+        <Button
+          mt="10px"
+          colorScheme="brand"
+          variant="ghost"
+          onClick={toggleRecordType}
+        >
           {recordType === '錄音' ? '切換為錄影' : '切換為錄音'}
         </Button>
       </PlayerWrapper>

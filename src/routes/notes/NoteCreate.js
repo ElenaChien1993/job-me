@@ -1,11 +1,10 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 
-import { Flex, Button, Icon, useDisclosure } from '@chakra-ui/react';
+import { Flex, Button, Icon, useDisclosure, useToast } from '@chakra-ui/react';
 import { BiCircle } from 'react-icons/bi';
 import { BsCheckCircleFill } from 'react-icons/bs';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
 
 import NoteCreateBrief from './NoteCreateBrief';
 import DetailsStep1 from './DetailsStep1';
@@ -13,13 +12,12 @@ import DetailsStep2 from './DetailsStep2';
 import DetailsStep3 from './DetailsStep3';
 import AlertModal from '../../components/AlertModal';
 import { device, color } from '../../style/variable';
+import firebase from '../../utils/firebase';
 
 const Container = styled.div`
   max-width: 1152px;
-  @media ${device.mobileM} {
-    width: 90%;
-    margin: 20px auto;
-  }
+  width: 90%;
+  margin: 20px auto;
   @media ${device.laptop} {
     width: 80%;
     margin: 40px auto;
@@ -42,14 +40,12 @@ const LeftWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-around;
-  @media ${device.mobileM} {
-    flex-direction: row;
-    width: 100%;
-    height: 10%;
-    border-radius: 30px 30px 0px 0px;
-    top: -20px;
-    padding: 20px 20px;
-  }
+  flex-direction: row;
+  width: 100%;
+  height: 10%;
+  border-radius: 30px 30px 0px 0px;
+  top: -20px;
+  padding: 20px 20px;
   @media ${device.tablet} {
     flex-direction: column;
     width: 35%;
@@ -64,12 +60,10 @@ const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  @media ${device.mobileM} {
-    padding: 0 22px 60px;
-    width: 100%;
-    height: 90%;
-    padding-top: 23%;
-  }
+  padding: 0 22px 60px;
+  width: 100%;
+  height: 90%;
+  padding-top: 23%;
   @media ${device.tablet} {
     padding-top: 40px;
     width: 65%;
@@ -83,11 +77,9 @@ const RightWrapper = styled.div`
 
 const StyledIcon = styled(Icon)`
   color: ${props => (props.$isComplete ? 'white' : '#6c6c6c')};
-  @media ${device.mobileM} {
-    width: 25px;
-    height: 25px;
-    margin-right: 5px;
-  }
+  width: 25px;
+  height: 25px;
+  margin-right: 5px;
   @media ${device.mobileL} {
     margin-right: 10px;
   }
@@ -102,10 +94,8 @@ const StepText = styled.p`
   font-size: 20px;
   font-weight: bold;
   cursor: default;
-  @media ${device.mobileM} {
-    font-size: 16px;
-    line-height: 22px;
-  }
+  font-size: 16px;
+  line-height: 22px;
   @media ${device.tablet} {
     font-size: 20px;
     line-height: 1.5;
@@ -118,20 +108,18 @@ const StraightLine = styled.div`
   margin: 3px 0;
   margin-left: 16px;
   background-color: ${props => (props.$isComplete ? 'white' : '#6c6c6c')};
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.tablet} {
     display: block;
   }
 `;
 
-const CTEATE_STEP = props => ({
-  1: <NoteCreateBrief {...props} />,
-  2: <DetailsStep1 {...props} />,
-  3: <DetailsStep2 {...props} />,
-  4: <DetailsStep3 {...props} />,
-});
+const CTEATE_PAGE = {
+  1: NoteCreateBrief,
+  2: DetailsStep1,
+  3: DetailsStep2,
+  4: DetailsStep3,
+};
 
 const NoteCreate = () => {
   const [step, setStep] = useState(1);
@@ -159,6 +147,20 @@ const NoteCreate = () => {
   });
   const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
   const navigate = useNavigate();
+  const toast = useToast();
+  const { currentUserId, companies, setCompanies, jobTitles, setJobTitles } =
+    useOutletContext();
+
+  useEffect(() => {
+    if (companies) return;
+    firebase.getWholeCollection('companies').then(data => {
+      setCompanies(data);
+    });
+    if (jobTitles) return;
+    firebase.getWholeCollection('job_titles').then(data => {
+      setJobTitles(data);
+    });
+  }, []);
 
   const {
     company_name,
@@ -203,6 +205,48 @@ const NoteCreate = () => {
     navigate('/notes');
   };
 
+  const Detail = CTEATE_PAGE[step];
+
+  const createNote = async () => {
+    if (values.company_name === '' || values.job_title === '') {
+      toast({
+        title: '哎呀',
+        description: '公司名稱和應徵職稱為必填欄位',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      return;
+    }
+    const noteId = await firebase.createDoc(
+      `users/${currentUserId}/notes`,
+      {
+        ...noteDataBrief,
+        creator: currentUserId,
+      },
+      'note_id'
+    );
+    await firebase.increaseDataNumber(`users/${currentUserId}`, 'notes_qty');
+
+    await firebase.setNoteDetails(noteId, noteDetails);
+
+    if (
+      companies.map(company => company.name).indexOf(values.company_name) === -1
+    ) {
+      await firebase.createDoc(
+        'companies',
+        { name: values.company_name },
+        'id'
+      );
+    }
+    if (jobTitles.map(job => job.name).indexOf(values.job_title) === -1) {
+      await firebase.createDoc('job_titles', { name: values.job_title }, 'id');
+    }
+
+    navigate(`/notes/details/${noteId}`);
+  };
+
   const props = {
     nextStep,
     prevStep,
@@ -211,6 +255,7 @@ const NoteCreate = () => {
     setValues,
     noteDataBrief,
     noteDetails,
+    createNote,
   };
 
   return (
@@ -283,7 +328,9 @@ const NoteCreate = () => {
             取消
           </Button>
         </LeftWrapper>
-        <RightWrapper>{CTEATE_STEP(props)[step]}</RightWrapper>
+        <RightWrapper>
+          <Detail {...props} />
+        </RightWrapper>
       </Main>
     </Container>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, NavLink } from 'react-router-dom';
+
 import {
   Menu,
   MenuButton,
@@ -56,9 +57,7 @@ const Logo = styled.img`
 const NavItem = styled.li`
   font-size: 16px;
   margin: 10px;
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.tablet} {
     display: block;
   }
@@ -72,9 +71,7 @@ const ImageWrapper = styled.div`
   overflow: hidden;
   margin-right: 20px;
   cursor: pointer;
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.tablet} {
     display: block;
   }
@@ -115,8 +112,8 @@ const StyledNavLink = styled(NavLink)`
 `;
 
 const Span = styled.span`
-  color: ${(props) => (props.isActive ? 'white' : 'rgba(255, 255, 255, 0.7)')};
-  font-weight: ${(props) => (props.isActive ? '700' : '500')};
+  color: ${props => (props.isActive ? 'white' : 'rgba(255, 255, 255, 0.7)')};
+  font-weight: ${props => (props.isActive ? '700' : '500')};
   &:hover {
     color: white;
     font-weight: 700;
@@ -134,8 +131,8 @@ const MobileNavItem = styled.li`
 `;
 
 const MobileSpan = styled.span`
-  color: ${(props) => (props.isActive ? color.primary : '#999')};
-  font-weight: ${(props) => (props.isActive ? '700' : '500')};
+  color: ${props => (props.isActive ? color.primary : '#999')};
+  font-weight: ${props => (props.isActive ? '700' : '500')};
   &:hover {
     color: ${color.primary};
     font-weight: 700;
@@ -147,14 +144,9 @@ const Nav = ({ userInfo, currentUserId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleLogout = () => {
-    firebase
-      .signOut()
-      .then(() => {
-        navigate('/login', { state: { from: { pathname: '/notes' } } });
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    firebase.signOut().then(() => {
+      navigate('/login', { state: { from: { pathname: '/notes' } } });
+    });
   };
 
   const handleLogIn = () => {
@@ -165,6 +157,13 @@ const Nav = ({ userInfo, currentUserId }) => {
     navigate(`/profile/${currentUserId}?tab=setting`);
   };
 
+  const tabs = [
+    ['/notes', '我的筆記'],
+    ['/practice', '面試練習'],
+    ['/explore', '探索'],
+    ['/messages', '聊天室'],
+  ];
+
   return (
     <>
       <StyledNav>
@@ -172,26 +171,13 @@ const Nav = ({ userInfo, currentUserId }) => {
           <Link to="/notes">
             <Logo alt="logo" src={logo} />
           </Link>
-          <NavItem>
-            <StyledNavLink to="/notes">
-              {({ isActive }) => <Span isActive={isActive}>我的筆記</Span>}
-            </StyledNavLink>
-          </NavItem>
-          <NavItem>
-            <StyledNavLink to="/practice">
-              {({ isActive }) => <Span isActive={isActive}>面試練習</Span>}
-            </StyledNavLink>
-          </NavItem>
-          <NavItem>
-            <StyledNavLink to="/explore">
-              {({ isActive }) => <Span isActive={isActive}>探索</Span>}
-            </StyledNavLink>
-          </NavItem>
-          <NavItem>
-            <StyledNavLink to="/messages">
-              {({ isActive }) => <Span isActive={isActive}>聊天室</Span>}
-            </StyledNavLink>
-          </NavItem>
+          {tabs.map(tab => (
+            <NavItem key={tab[0]}>
+              <StyledNavLink to={tab[0]}>
+                {({ isActive }) => <Span isActive={isActive}>{tab[1]}</Span>}
+              </StyledNavLink>
+            </NavItem>
+          ))}
           {currentUserId ? (
             <Menu>
               <MenuButton ml="auto">
@@ -247,38 +233,17 @@ const Nav = ({ userInfo, currentUserId }) => {
                   <DrawerCloseButton />
                   <DrawerBody>
                     <MobileUl>
-                      <MobileNavItem>
-                        <StyledNavLink to="/notes">
-                          {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>
-                              我的筆記
-                            </MobileSpan>
-                          )}
-                        </StyledNavLink>
-                      </MobileNavItem>
-                      <MobileNavItem>
-                        <StyledNavLink to="/practice">
-                          {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>
-                              面試練習
-                            </MobileSpan>
-                          )}
-                        </StyledNavLink>
-                      </MobileNavItem>
-                      <MobileNavItem>
-                        <StyledNavLink to="/explore">
-                          {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>探索</MobileSpan>
-                          )}
-                        </StyledNavLink>
-                      </MobileNavItem>
-                      <MobileNavItem>
-                        <StyledNavLink to="/messages">
-                          {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>聊天室</MobileSpan>
-                          )}
-                        </StyledNavLink>
-                      </MobileNavItem>
+                      {tabs.map(tab => (
+                        <MobileNavItem key={tab[0]}>
+                          <StyledNavLink to={tab[0]}>
+                            {({ isActive }) => (
+                              <MobileSpan isActive={isActive}>
+                                {tab[1]}
+                              </MobileSpan>
+                            )}
+                          </StyledNavLink>
+                        </MobileNavItem>
+                      ))}
                       <MobileNavItem>
                         <StyledNavLink
                           to={`/profile/${currentUserId}?tab=setting`}
@@ -324,8 +289,8 @@ const Layout = () => {
     if (!currentUserId) return;
     const unsubscribe = firebase.listenUserProfileChange(
       currentUserId,
-      (data) => {
-        setUserInfo((prev) => {
+      data => {
+        setUserInfo(prev => {
           return { ...prev, ...data };
         });
       }

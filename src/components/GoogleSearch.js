@@ -1,5 +1,4 @@
 export const initMap = async (setValues, inputRef) => {
-  // const input = document.getElementById('autocomplete-input');
 
   const options = {
     fields: ['formatted_address'],
@@ -14,7 +13,6 @@ export const initMap = async (setValues, inputRef) => {
 
   autocomplete.addListener('place_changed', () => {
     const place = autocomplete.getPlace();
-    console.log(place);
     setValues(prev => {
       return { ...prev, address: place.formatted_address };
     });

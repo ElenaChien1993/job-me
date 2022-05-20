@@ -107,15 +107,11 @@ const getUniqueMatchedData = async (key, value, uid) => {
 
 const firebase = {
   async getUser(uid) {
-    try {
-      const docSnap = await getDoc(doc(db, 'users', uid));
-      if (docSnap.exists()) {
-        return docSnap;
-      } else {
-        new Error('查無此用戶');
-      }
-    } catch (err) {
-      console.log(err);
+    const docSnap = await getDoc(doc(db, 'users', uid));
+    if (docSnap.exists()) {
+      return docSnap;
+    } else {
+      new Error('查無此用戶');
     }
   },
   async getUserInfo(uid) {
@@ -125,15 +121,11 @@ const firebase = {
     return { display_name: name, photo_url: photo };
   },
   async getNote(uid, docId) {
-    try {
-      const docSnap = await getDoc(doc(db, 'users', uid, 'notes', docId));
-      if (docSnap.exists()) {
-        return docSnap;
-      } else {
-        new Error('查無此筆記記錄');
-      }
-    } catch (err) {
-      console.log(err);
+    const docSnap = await getDoc(doc(db, 'users', uid, 'notes', docId));
+    if (docSnap.exists()) {
+      return docSnap;
+    } else {
+      new Error('查無此筆記記錄');
     }
   },
   async getNoteDetails(noteId) {

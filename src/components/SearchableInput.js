@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Input } from '@chakra-ui/react';
 import styled from 'styled-components';
 
-import { device, color } from '../style/variable';
+import { color } from '../style/variable';
 
 const StyledInput = styled(Input)`
   && {

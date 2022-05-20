@@ -20,10 +20,8 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  @media ${device.mobileM} {
-    padding: 20px 0;
-    flex-direction: column;
-  }
+  padding: 20px 0;
+  flex-direction: column;
   @media ${device.tablet} {
     margin: 20px 0;
     padding: 30px 0;
@@ -34,9 +32,7 @@ const Container = styled.div`
 const LeftWrapper = styled.div`
   flex-direction: column;
   align-items: center;
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.tablet} {
     display: flex;
     border-right: 5px solid #c4c4c4;
@@ -47,9 +43,7 @@ const LeftWrapper = styled.div`
 const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  @media ${device.mobileM} {
-    width: 100%;
-  }
+  width: 100%;
   @media ${device.tablet} {
     margin-top: 0;
     padding-left: 50px;
@@ -80,9 +74,7 @@ const InputWrap = styled.div`
     line-height: 24px;
     font-weight: 500;
   }
-  @media ${device.mobileM} {
-    padding: 10px 0;
-  }
+  padding: 10px 0;
   @media ${device.tablet} {
     padding: 16px 0;
   }
@@ -118,10 +110,7 @@ const ProfileSetting = () => {
   return (
     <Container>
       <LeftWrapper>
-        <ProfileInfo
-          userInfo={userInfo}
-          currentUserId={currentUserId}
-        />
+        <ProfileInfo userInfo={userInfo} currentUserId={currentUserId} />
       </LeftWrapper>
       <RightWrapper>
         <SelectionWrapper>

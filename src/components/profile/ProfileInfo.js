@@ -33,11 +33,9 @@ const IconGroup = styled.div`
 const NameWrapper = styled.div`
   color: #000000;
   text-align: center;
-  @media ${device.mobileM} {
-    font-size: 24px;
-    line-height: 22px;
-    margin-top: 15px;
-  }
+  font-size: 24px;
+  line-height: 22px;
+  margin-top: 15px;
   @media ${device.tablet} {
     font-size: 42px;
     line-height: 65px;
@@ -49,9 +47,7 @@ const JobTitle = styled.div`
   color: #6c6c6c;
   margin-top: 10px;
   text-align: center;
-  @media ${device.mobileM} {
-    font-size: 18px;
-  }
+  font-size: 18px;
   @media ${device.tablet} {
     font-size: 24px;
   }
@@ -60,10 +56,8 @@ const JobTitle = styled.div`
 const About = styled.div`
   color: #6c6c6c;
   text-align: center;
-  @media ${device.mobileM} {
-    font-size: 16px;
-    margin-top: 5px;
-  }
+  font-size: 16px;
+  margin-top: 5px;
   @media ${device.tablet} {
     font-size: 18px;
     margin-top: 10px;
@@ -76,10 +70,8 @@ const Counts = styled.div`
   & p {
     font-size: 24px;
   }
-  @media ${device.mobileM} {
-    margin-top: 5px;
-    flex-direction: row;
-  }
+  margin-top: 5px;
+  flex-direction: row;
   @media ${device.tablet} {
     margin-top: 20px;
     flex-direction: column;
@@ -87,10 +79,8 @@ const Counts = styled.div`
 `;
 
 const Number = styled.div`
-  @media ${device.mobileM} {
-    font-size: 24px;
-    margin-right: 10px;
-  }
+  font-size: 24px;
+  margin-right: 10px;
   @media ${device.tablet} {
     font-size: 42px;
     margin-right: 0;
@@ -98,18 +88,14 @@ const Number = styled.div`
 `;
 
 const TabletMode = styled.div`
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.tablet} {
     display: block;
   }
 `;
 
 const MobileMode = styled.div`
-  @media ${device.mobileM} {
-    display: block;
-  }
+  display: block;
   @media ${device.tablet} {
     display: none;
   }

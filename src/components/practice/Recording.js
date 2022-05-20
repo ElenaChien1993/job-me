@@ -24,9 +24,7 @@ const ButtonsWrapper = styled.div`
   align-items: center;
   justify-content: space-around;
   margin: 30px 0;
-  @media ${device.mobileM} {
-    width: 100%;
-  }
+  width: 100%;
   @media ${device.tablet} {
     width: 50%;
   }

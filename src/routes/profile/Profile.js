@@ -14,7 +14,13 @@ const Profile = () => {
   }
 
   return (
-    <>{uid === currentUserId ? <MyProfile tab={tab} /> : <MemberProfile uid={uid} />}</>
+    <>
+      {uid === currentUserId ? (
+        <MyProfile tab={tab} />
+      ) : (
+        <MemberProfile uid={uid} />
+      )}
+    </>
   );
 };
 

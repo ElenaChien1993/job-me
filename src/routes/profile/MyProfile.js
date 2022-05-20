@@ -21,9 +21,7 @@ const Container = styled.div`
 
 const Upper = styled.div`
   background-color: ${color.third};
-  @media ${device.mobileM} {
-    height: 100px;
-  }
+  height: 100px;
   @media ${device.tablet} {
     height: 200px;
   }
@@ -38,9 +36,7 @@ const WebTitle = styled.div`
   padding-top: 50px;
   max-width: 1440px;
   margin: 0 auto;
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.tablet} {
     display: block;
   }
@@ -48,10 +44,8 @@ const WebTitle = styled.div`
 
 const StyledTabList = styled(TabList)`
   && {
-    @media ${device.mobileM} {
-      margin: 0 auto;
-      width: 90%;
-    }
+    margin: 0 auto;
+    width: 90%;
     @media ${device.tablet} {
       position: absolute;
       width: 100%;
@@ -67,21 +61,17 @@ const Bottom = styled.div`
   height: 100%;
   margin: 0 auto;
   max-width: 1152px;
-  @media ${device.mobileM} {
-    width: 90%;
-  }
+  width: 90%;
   @media ${device.laptop} {
     width: 80%;
   }
 `;
 
 const InfoWrapper = styled.div`
-  @media ${device.mobileM} {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transform: translate(0, -23%);
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate(0, -23%);
   @media ${device.tablet} {
     display: none;
   }

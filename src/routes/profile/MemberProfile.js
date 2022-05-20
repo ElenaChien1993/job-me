@@ -1,9 +1,10 @@
-import { Button, useDisclosure } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
-import styled from 'styled-components';
-import AlertModal from '../../components/AlertModal';
 
+import { Button, useDisclosure, useToast } from '@chakra-ui/react';
+import styled from 'styled-components';
+
+import AlertModal from '../../components/AlertModal';
 import ChatCorner from '../../components/messages/ChatCorner';
 import Loader from '../../components/Loader';
 import ProfileImage from '../../components/ProfileImage';
@@ -11,8 +12,6 @@ import { device, color } from '../../style/variable';
 import firebase from '../../utils/firebase';
 import useRWD from '../../hooks/useRWD';
 import NoteCardExplore from '../../components/NoteCardExplore';
-
-const Container = styled.div``;
 
 const Upper = styled.div`
   background-color: ${color.third};
@@ -130,6 +129,7 @@ const MemberProfile = React.memo(() => {
   const { currentUserId, setChatOpen, setActive } = useOutletContext();
   const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
   const navigate = useNavigate();
+  const toast = useToast();
   let params = useParams();
   const uid = params.uid;
 
@@ -137,11 +137,25 @@ const MemberProfile = React.memo(() => {
 
   useEffect(() => {
     if (!uid) return;
-    firebase.getUser(uid).then(doc => {
-      setInfo(doc.data());
-    });
+    firebase
+      .getUser(uid)
+      .then(doc => {
+        setInfo(doc.data());
+      })
+      .catch(err => {
+        toast({
+          title: '抱歉，發生無預期錯誤',
+          description: '將帶您回首頁',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top',
+        });
+        navigate('/notes');
+      });
+
     firebase.getPersonalPublicNotes(uid).then(data => setNotes(data));
-  }, [uid]);
+  }, [uid, toast, navigate]);
 
   const createChat = async () => {
     if (!currentUserId) {
@@ -166,7 +180,7 @@ const MemberProfile = React.memo(() => {
   if (!info) return <Loader />;
 
   return (
-    <Container>
+    <>
       <AlertModal
         isOpen={isOpen}
         onClose={onClose}
@@ -216,7 +230,7 @@ const MemberProfile = React.memo(() => {
         )}
       </InfoContainer>
       {currentUserId && <ChatCorner />}
-    </Container>
+    </>
   );
 });
 

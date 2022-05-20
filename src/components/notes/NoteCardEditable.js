@@ -24,12 +24,10 @@ const Container = styled.div`
   &:hover {
     transform: ${props => (props.hasHover ? 'translate(5px, 5px)' : '')};
   }
-  @media ${device.mobileM} {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 20px 40px 40px;
-  }
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px 40px 40px;
   @media ${device.laptop} {
     flex-direction: row;
     align-items: center;
@@ -50,9 +48,7 @@ const HeadWrapper = styled.div`
   align-items: center;
   font-size: 42px;
   font-weight: 700;
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.laptop} {
     display: flex;
   }
@@ -127,15 +123,13 @@ const StatusWrapper = styled.div`
 
 const TagsWrapper = styled.div`
   position: relative;
-  @media ${device.mobileM} {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 105px));
-    gap: 10px;
-    margin-left: 0;
-    margin-top: 10px;
-    justify-content: flex-start;
-  }
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 105px));
+  gap: 10px;
+  margin-left: 0;
+  margin-top: 10px;
+  justify-content: flex-start;
   @media ${device.laptop} {
     margin-top: 0;
     margin-left: auto;
@@ -160,10 +154,8 @@ const Tag = styled.div`
 
 const TagReminder = styled.div`
   position: absolute;
-  @media ${device.mobileM} {
-    left: 0;
-    bottom: -30px;
-  }
+  left: 0;
+  bottom: -30px;
   @media ${device.laptop} {
     left: auto;
     right: 0;
@@ -257,7 +249,9 @@ const NoteElement = React.memo(
                   value={note.status}
                   onBlur={() => onBlurSubmit('status')}
                 >
-                  <option style={{marginTop: '5px'}} value="未申請">未申請</option>
+                  <option style={{ marginTop: '5px' }} value="未申請">
+                    未申請
+                  </option>
                   <option value="已申請">已申請</option>
                   <option value="未錄取">未錄取</option>
                   <option value="已錄取">已錄取</option>

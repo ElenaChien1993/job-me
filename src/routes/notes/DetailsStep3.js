@@ -3,7 +3,6 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button, Input, useToast } from '@chakra-ui/react';
 
-import firebase from '../../utils/firebase';
 import AddField from '../../components/elements/AddField';
 
 const InputWrap = styled.div`
@@ -44,18 +43,7 @@ const ButtonGroup = styled.div`
   justify-content: space-between;
 `;
 
-const DetailsStep3 = ({
-  prevStep,
-  handleChange,
-  values,
-  setValues,
-  noteDataBrief,
-  noteDetails,
-}) => {
-  const { currentUserId, companies, jobTitles } = useOutletContext();
-  const navigate = useNavigate();
-  const toast = useToast();
-
+const DetailsStep3 = ({ prevStep, values, setValues, createNote }) => {
   const handleInputChange = i => e => {
     const updated = values.questions.map((q, index) =>
       index === i
@@ -69,46 +57,6 @@ const DetailsStep3 = ({
     setValues(prev => {
       return { ...prev, questions: updated };
     });
-  };
-
-  const createNote = async () => {
-    if (values.company_name === '' || values.job_title === '') {
-      toast({
-        title: '哎呀',
-        description: '公司名稱和應徵職稱為必填欄位',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-        position: 'top-right',
-      });
-      return;
-    }
-    const noteId = await firebase.createDoc(
-      `users/${currentUserId}/notes`,
-      {
-        ...noteDataBrief,
-        creator: currentUserId,
-      },
-      'note_id'
-    );
-    await firebase.increaseDataNumber(`users/${currentUserId}`, 'notes_qty');
-
-    await firebase.setNoteDetails(noteId, noteDetails);
-
-    if (
-      companies.map(company => company.name).indexOf(values.company_name) === -1
-    ) {
-      await firebase.createDoc(
-        'companies',
-        { name: values.company_name },
-        'id'
-      );
-    }
-    if (jobTitles.map(job => job.name).indexOf(values.job_title) === -1) {
-      await firebase.createDoc('job_titles', { name: values.job_title }, 'id');
-    }
-
-    navigate(`/notes/details/${noteId}`);
   };
 
   return (

@@ -27,9 +27,7 @@ const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  @media ${device.mobileM} {
-    flex-direction: column;
-  }
+  flex-direction: column;
   @media ${device.tablet} {
     flex-direction: row;
   }
@@ -44,9 +42,7 @@ const Question = styled.div`
   color: ${color.primary};
   margin-bottom: 10px;
   text-align: center;
-  @media ${device.mobileM} {
-    font-size: 28px;
-  }
+  font-size: 28px;
   @media ${device.tablet} {
     font-size: 34px;
   }
@@ -56,9 +52,7 @@ const Title = styled.div`
   font-weight: 700;
   color: ${color.primary};
   margin-bottom: 20px;
-  @media ${device.mobileM} {
-    font-size: 24px;
-  }
+  font-size: 24px;
   @media ${device.tablet} {
     font-size: 30px;
   }
@@ -90,12 +84,6 @@ const PracticeStart = () => {
     }
   }, []);
 
-  // useEffect(() => {
-  //   console.log('scroll')
-  //   if (!controllRef.current) return;
-  //   controllRef.current.scrollIntoView({ behavior: 'smooth' });
-  // }, [progress]);
-
   const goToProfile = () => {
     navigate(`/profile/${props.currentUserId}?tab=records`);
   };
@@ -107,9 +95,7 @@ const PracticeStart = () => {
         <StyledNoteBar brief={props.brief} />
       </TitleWrapper>
       {progress !== 'finished' && (
-        <Question>
-          {props.practiceQuestions[current]?.question}
-        </Question>
+        <Question>{props.practiceQuestions[current]?.question}</Question>
       )}
       {progress === 'before' && (
         <BeforeRecord

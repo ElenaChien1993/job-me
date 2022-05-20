@@ -12,9 +12,7 @@ import { useNavigate } from 'react-router-dom';
 const Container = styled.div`
   max-width: 1440px;
   margin: 0 auto 40px;
-  @media ${device.mobileM} {
-    padding: 0 5%;
-  }
+  padding: 0 5%;
   @media ${device.tablet} {
     padding: 0 10%;
   }
@@ -24,9 +22,7 @@ const Container = styled.div`
 `;
 
 const HeroWrapper = styled.div`
-  @media ${device.mobileM} {
-    margin: 40px 0;
-  }
+  margin: 40px 0;
   @media ${device.laptop} {
     display: flex;
     flex-direction: row-reverse;
