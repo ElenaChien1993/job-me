@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 import {
   Button,
@@ -80,6 +81,7 @@ const Preparation = ({
   handleMapArrayInputChange,
 }) => {
   const [isFilesEditing, setIsFilesEditing] = useState(false);
+  const { setError } = useOutletContext();
   const toast = useToast();
 
   const handleFilesSubmit = () => {
@@ -100,12 +102,17 @@ const Preparation = ({
       return;
     }
 
-    firebase.updateNoteDetails(noteId, {
-      job_link: details.job_link,
-      resume_link: details.resume_link,
-      attached_files: details.attached_files,
-    });
-    setIsFilesEditing(false);
+    try {
+      firebase.updateNoteDetails(noteId, {
+        job_link: details.job_link,
+        resume_link: details.resume_link,
+        attached_files: details.attached_files,
+      });
+      setIsFilesEditing(false);
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
+    }
   };
 
   return (

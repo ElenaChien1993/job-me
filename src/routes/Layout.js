@@ -13,6 +13,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
   DrawerBody,
+  useToast,
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
@@ -284,6 +285,10 @@ const Layout = () => {
   const [jobTitles, setJobTitles] = useState(null);
   const [databaseRooms, setDatabaseRooms] = useState([]);
   const [unreadTotal, setUnreadTotal] = useState(0);
+  const [error, setError] = useState(null);
+
+  const toast = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -320,6 +325,24 @@ const Layout = () => {
     setUnreadTotal(unreadQty);
   }, [databaseRooms, setUnreadTotal, currentUserId]);
 
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: `抱歉，${error.message}`,
+        description: '將自動帶您回首頁',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+        position: error.type === 0 ? 'top' : 'top-right',
+      });
+      if (error.type === 0) {
+        navigate('/notes');
+      }
+    }
+
+    return () => setError(null);
+  }, [error, navigate, toast]);
+
   const props = {
     currentUserId,
     userInfo,
@@ -335,6 +358,7 @@ const Layout = () => {
     setUnreadTotal,
     databaseRooms,
     setDatabaseRooms,
+    setError,
   };
 
   return (

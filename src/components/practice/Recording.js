@@ -67,7 +67,7 @@ const Recording = ({
   });
   const [isLoading, setIsLoading] = useState(false);
   const { company_name, job_title } = brief;
-  const { currentUserId } = useOutletContext();
+  const { currentUserId, setError } = useOutletContext();
   const toast = useToast();
 
   useEffect(() => {
@@ -84,18 +84,22 @@ const Recording = ({
   }, [error, toast]);
 
   const getDownloadURL = async (type, id) => {
-    const fileBlob = await fetch(mediaBlobUrl).then(r => r.blob());
-    const path = `${
-      type === 0 ? 'audios' : 'videos'
-    }/${currentUserId}/${company_name}｜${job_title}/${
-      practiceQuestions[current].question
-    }-${id}`;
+    try {
+      const fileBlob = await fetch(mediaBlobUrl).then(r => r.blob());
+      const path = `${
+        type === 0 ? 'audios' : 'videos'
+      }/${currentUserId}/${company_name}｜${job_title}/${
+        practiceQuestions[current].question
+      }-${id}`;
 
-    const url = await firebase.uploadFile(path, fileBlob).then(() => {
-      return firebase.getDownloadURL(path);
-    });
-
-    return url;
+      const url = await firebase.uploadFile(path, fileBlob).then(() => {
+        return firebase.getDownloadURL(path);
+      });
+      return url;
+    } catch (err) {
+      console.log(err);
+      setError({ type: 1, message: '上傳資料發生錯誤，請稍後再試' });
+    }
   };
 
   const handleSave = async type => {
@@ -106,33 +110,27 @@ const Recording = ({
       record_name: practiceQuestions[current].question,
       record_job: `${company_name}｜${job_title}`,
     };
-    firebase
-      .createDoc(`users/${currentUserId}/records`, recordData, 'record_id')
-      .then(async id => {
-        try {
-          const url = await getDownloadURL(type, id);
-          firebase.updateRecord(currentUserId, id, { link: url });
-          setIsLoading(false);
-          toast({
-            title: '成功！',
-            description: '已將檔案存在您的個人檔案中',
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-            position: 'top-right',
-          });
-        } catch (error) {
-          console.log(error);
-          toast({
-            title: '哎呀',
-            description: '上傳檔案時發生錯誤，請稍後再試',
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-            position: 'top-right',
-          });
-        }
+    try {
+      const id = await firebase.createDoc(
+        `users/${currentUserId}/records`,
+        recordData,
+        'record_id'
+      );
+      const url = await getDownloadURL(type, id);
+      await firebase.updateRecord(currentUserId, id, { link: url });
+      setIsLoading(false);
+      toast({
+        title: '成功！',
+        description: '已將檔案存在您的個人檔案中',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right',
       });
+    } catch (err) {
+      console.log(err);
+      setError({ type: 1, message: '儲存資料發生錯誤，請稍後再試' });
+    }
   };
 
   const goNext = () => {

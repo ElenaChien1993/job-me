@@ -36,7 +36,7 @@ import {
   deleteObject,
 } from 'firebase/storage';
 
-import helper from '../hooks/helper';
+import helper from './helper';
 import useFormatedTime from '../hooks/useFormatedTime';
 import useRelativeTime from '../hooks/useRelativeTime';
 
@@ -101,7 +101,7 @@ const getUniqueMatchedData = async (key, value, uid) => {
   querySnapshot.forEach(doc => {
     data.push(doc.data());
   });
-  const uniqueMembers = helper.findUnique(data);
+  const uniqueMembers = helper.fillterItemWithDuplicateCreator(data);
   return uniqueMembers;
 };
 
@@ -111,7 +111,7 @@ const firebase = {
     if (docSnap.exists()) {
       return docSnap;
     } else {
-      new Error('查無此用戶');
+      throw new Error('查無此用戶');
     }
   },
   async getUserInfo(uid) {
@@ -125,7 +125,7 @@ const firebase = {
     if (docSnap.exists()) {
       return docSnap;
     } else {
-      new Error('查無此筆記記錄');
+      throw new Error('查無此筆記記錄');
     }
   },
   async getNoteDetails(noteId) {
@@ -214,49 +214,25 @@ const firebase = {
     });
   },
   async updateUserInfo(uid, data) {
-    try {
-      await updateDoc(doc(db, 'users', uid), data);
-    } catch (err) {
-      console.log(err);
-    }
+    await updateDoc(doc(db, 'users', uid), data);
   },
   async updateRecord(uid, recordId, data) {
     const newDocRef = doc(db, `users/${uid}/records/${recordId}`);
-    try {
-      await updateDoc(newDocRef, data);
-    } catch (err) {
-      console.log(err);
-    }
+    await updateDoc(newDocRef, data);
   },
   async updateNoteBrief(uid, noteId, data) {
-    try {
-      await updateDoc(doc(db, 'users', uid, 'notes', noteId), data);
-    } catch (err) {
-      console.log(err);
-    }
+    await updateDoc(doc(db, 'users', uid, 'notes', noteId), data);
   },
   async increaseDataNumber(path, key) {
-    try {
-      await updateDoc(doc(db, path), {
-        [key]: increment(1),
-      });
-    } catch (err) {
-      console.log(err);
-    }
+    await updateDoc(doc(db, path), {
+      [key]: increment(1),
+    });
   },
   async updateNoteDetails(noteId, data) {
-    try {
-      await updateDoc(doc(db, 'details', noteId), data);
-    } catch (err) {
-      console.log(err);
-    }
+    await updateDoc(doc(db, 'details', noteId), data);
   },
   async updateRoom(roomId, data) {
-    try {
-      await updateDoc(doc(db, 'chatrooms', roomId), data);
-    } catch (err) {
-      console.log(err);
-    }
+    await updateDoc(doc(db, 'chatrooms', roomId), data);
   },
   listenUserProfileChange(uid, callback) {
     return onSnapshot(doc(db, 'users', uid), doc => {
@@ -328,56 +304,32 @@ const firebase = {
   },
   async createDoc(path, data, key) {
     const newDocRef = doc(collection(db, path));
-    try {
-      await setDoc(newDocRef, { ...data, [key]: newDocRef.id });
-      return newDocRef.id;
-    } catch (err) {
-      console.log(err);
-    }
+    await setDoc(newDocRef, { ...data, [key]: newDocRef.id });
+    return newDocRef.id;
   },
   async setNoteDetails(noteId, data) {
-    try {
-      await setDoc(doc(db, 'details', noteId), data);
-    } catch (err) {
-      console.log(err);
-    }
+    await setDoc(doc(db, 'details', noteId), data);
   },
   async setNewUser(uid, value, url) {
-    try {
-      await setDoc(doc(db, 'users', uid), {
-        display_name: value,
-        photo_url: url || '',
-      });
-    } catch (err) {
-      console.log(err);
-    }
+    await setDoc(doc(db, 'users', uid), {
+      display_name: value,
+      photo_url: url || '',
+    });
   },
   async deleteData(path) {
-    try {
-      await deleteDoc(doc(db, path));
-    } catch (err) {
-      console.log(err);
-    }
+    await deleteDoc(doc(db, path));
   },
   async deleteFile(path) {
     const fileRef = ref(storage, path);
-    try {
-      deleteObject(fileRef);
-    } catch (error) {
-      console.log(error);
-    }
+    deleteObject(fileRef);
   },
   async uploadFile(path, file) {
     const fileRef = ref(storage, path);
     await uploadBytes(fileRef, file);
   },
   async getDownloadURL(path) {
-    try {
-      const url = await getDownloadURL(ref(storage, path));
-      return url;
-    } catch (error) {
-      console.log(error);
-    }
+    const url = await getDownloadURL(ref(storage, path));
+    return url;
   },
   async checkIsRoomExist(ids) {
     const myRooms = query(
@@ -404,12 +356,8 @@ const firebase = {
       latest_sender: data.uid,
       unread_qty: increment(1),
     };
-    try {
-      await this.updateRoom(roomId, content);
-      await this.createDoc(`chatrooms/${roomId}/messages`, data, 'id');
-    } catch (err) {
-      console.log(err);
-    }
+    await this.updateRoom(roomId, content);
+    await this.createDoc(`chatrooms/${roomId}/messages`, data, 'id');
   },
   checklogin(callback) {
     onAuthStateChanged(auth, callback);

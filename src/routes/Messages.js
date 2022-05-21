@@ -176,7 +176,7 @@ const Messages = () => {
   const bottomRef = useRef();
   const emojisRef = useRef();
   const isSendingRef = useRef(false);
-  const { currentUserId, active, setActive, databaseRooms } =
+  const { currentUserId, active, setActive, databaseRooms, setError } =
     useOutletContext();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -204,9 +204,14 @@ const Messages = () => {
       create_at: firebase.Timestamp.fromDate(new Date()),
       type: type,
     };
-    await firebase.sendMessage(active.id, MessageData);
-    setText('');
-    bottomRef.current.scrollIntoView({ behavior: 'auto' });
+    try {
+      await firebase.sendMessage(active.id, MessageData);
+      setText('');
+      bottomRef.current.scrollIntoView({ behavior: 'auto' });
+    } catch (err) {
+      console.log(err);
+      setError({ type: 1, message: '傳送訊息失敗，請稍後再試' });
+    }
   };
 
   const handleEnter = async (e, value, type) => {
@@ -315,7 +320,8 @@ const Messages = () => {
                 <EmptyText>
                   尚無聊天室紀錄
                   <br />
-                  要不要去<span onClick={() => navigate('/explore')}>探索</span>和其他會員交流一下？
+                  要不要去<span onClick={() => navigate('/explore')}>探索</span>
+                  和其他會員交流一下？
                 </EmptyText>
               ) : (
                 <EmptyText>請選取聊天室</EmptyText>

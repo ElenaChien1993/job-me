@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 import {
   Editor,
@@ -69,6 +70,7 @@ const EditorArea = ({ noteId, details, objectKey, isPublic }) => {
           convertFromRaw(JSON.parse(details[objectKey]))
         )
   );
+  const { setError } = useOutletContext();
   const editorRef = useRef();
 
   const handleKeyCommand = (command, editorState) => {
@@ -102,11 +104,16 @@ const EditorArea = ({ noteId, details, objectKey, isPublic }) => {
     setEditorState(editorState);
   };
 
-  const onBlur = () => {
+  const onBlur = async () => {
     const contentState = editorState.getCurrentContent();
-    firebase.updateNoteDetails(noteId, {
-      [objectKey]: JSON.stringify(convertToRaw(contentState)),
-    });
+    try {
+      await firebase.updateNoteDetails(noteId, {
+        [objectKey]: JSON.stringify(convertToRaw(contentState)),
+      });
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
+    }
   };
 
   return (

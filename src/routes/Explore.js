@@ -157,7 +157,7 @@ const Explore = () => {
   const [databaseNotes, setDatabaseNotes] = useState(null);
   const [renderNotes, setRenderNotes] = useState(null);
   const [term, setTerm] = useState('');
-  const suggestions = ['工程師', '91APP', 'iOS', 'Android'];
+  const suggestions = ['工程師', '行銷', 'iOS', 'Android'];
 
   useEffect(() => {
     const fetchNotes = async () => {

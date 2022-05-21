@@ -1,3 +1,4 @@
+import { useOutletContext } from 'react-router-dom';
 import { CloseButton } from '@chakra-ui/react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
@@ -39,6 +40,8 @@ const CheckboxInput = ({
   submitRef,
   handleMapArrayInputChange,
 }) => {
+  const { setError } = useOutletContext();
+
   const getCheckboxChangedValue = (index, objectKey) => {
     const updatedChecked = details[objectKey].map((item, i) =>
       index === i
@@ -51,9 +54,14 @@ const CheckboxInput = ({
     return updatedChecked;
   };
 
-  const handleCheckboxChange = (itemIndex, objectKey) => {
+  const handleCheckboxChange = async (itemIndex, objectKey) => {
     const updatedChecked = getCheckboxChangedValue(itemIndex, objectKey);
-    firebase.updateNoteDetails(noteId, { [objectKey]: updatedChecked });
+    try {
+      await firebase.updateNoteDetails(noteId, { [objectKey]: updatedChecked });
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
+    }
   };
 
   return (

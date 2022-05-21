@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 
-import { Button, useDisclosure, useToast } from '@chakra-ui/react';
+import { Button, useDisclosure } from '@chakra-ui/react';
 import styled from 'styled-components';
 
 import AlertModal from '../../components/AlertModal';
@@ -115,7 +115,7 @@ const ContentGrid = styled.ol`
   @media ${device.mobileM} {
     padding: 0 20px;
   }
-  @media ${device.table} {
+  @media ${device.tablet} {
     padding: 0 32px;
   }
   @media ${device.laptop} {
@@ -126,10 +126,10 @@ const ContentGrid = styled.ol`
 const MemberProfile = React.memo(() => {
   const [info, setInfo] = useState(null);
   const [notes, setNotes] = useState(null);
-  const { currentUserId, setChatOpen, setActive } = useOutletContext();
+  const { currentUserId, setChatOpen, setActive, setError } =
+    useOutletContext();
   const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
   const navigate = useNavigate();
-  const toast = useToast();
   let params = useParams();
   const uid = params.uid;
 
@@ -137,25 +137,18 @@ const MemberProfile = React.memo(() => {
 
   useEffect(() => {
     if (!uid) return;
-    firebase
-      .getUser(uid)
-      .then(doc => {
-        setInfo(doc.data());
-      })
-      .catch(err => {
-        toast({
-          title: '抱歉，發生無預期錯誤',
-          description: '將帶您回首頁',
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-          position: 'top',
-        });
-        navigate('/notes');
-      });
+    const getUserInfo = async () => {
+      try {
+        const info = await firebase.getUser(uid);
+        setInfo(info.data());
+      } catch (err) {
+        setError({ type: 0, message: err.message });
+      }
+    };
 
+    getUserInfo();
     firebase.getPersonalPublicNotes(uid).then(data => setNotes(data));
-  }, [uid, toast, navigate]);
+  }, [uid, setError]);
 
   const createChat = async () => {
     if (!currentUserId) {

@@ -177,7 +177,7 @@ const NotePublic = () => {
   const [brief, setBrief] = useState();
   const [details, setDetails] = useState();
   const [info, setInfo] = useState();
-  const { currentUserId } = useOutletContext();
+  const { currentUserId, setError } = useOutletContext();
   let params = useParams();
   const noteId = params.noteId;
   const uid = params.uid;
@@ -197,20 +197,21 @@ const NotePublic = () => {
           'views'
         );
       }
-
-      firebase.getNote(uid, noteId).then(snap => {
-        setBrief(snap.data());
-      });
-      firebase.getNoteDetails(noteId).then(snap => {
-        setDetails(snap.data());
-      });
-      firebase.getUser(uid).then(doc => {
-        setInfo(doc.data());
-      });
+      try {
+        const brief = await firebase.getNote(uid, noteId);
+        setBrief(brief.data());
+        const details = await firebase.getNoteDetails(noteId);
+        setDetails(details.data());
+        const user = await firebase.getUser(uid);
+        setInfo(user.data());
+      } catch (error) {
+        console.log(error);
+        setError({ type: 0, message: '讀取資料發生錯誤' });
+      }
     };
 
     fetch();
-  }, [uid, noteId, currentUserId]);
+  }, [uid, noteId, currentUserId, setError]);
 
   const goToProfile = id => {
     window.open(`/profile/${id}?tab=setting`, '_blank');

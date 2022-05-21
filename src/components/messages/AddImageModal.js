@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import {
   Modal,
   ModalOverlay,
@@ -33,6 +34,7 @@ const ImageWrapper = styled.div`
 const AddImageModal = ({ isOpen, onClose, room, send }) => {
   const [image, setImage] = useState({ preview: '', raw: '' });
   const [isLoading, setIsLoading] = useState(false);
+  const { setError } = useOutletContext();
   const hiddenInputRef = useRef();
   const toast = useToast();
 
@@ -63,18 +65,23 @@ const AddImageModal = ({ isOpen, onClose, room, send }) => {
 
     onClose();
     setIsLoading(true);
-    const path = `chatrooms/${room.id}/${uuid()}`;
-    const url = await firebase.uploadFile(path, image.raw).then(() => {
-      return firebase.getDownloadURL(path);
-    });
+    try {
+      const path = `chatrooms/${room.id}/${uuid()}`;
+      const url = await firebase.uploadFile(path, image.raw).then(() => {
+        return firebase.getDownloadURL(path);
+      });
 
-    await send(url, 1);
-    setIsLoading(false);
+      await send(url, 1);
+      setIsLoading(false);
 
-    setImage({
-      preview: '',
-      raw: '',
-    });
+      setImage({
+        preview: '',
+        raw: '',
+      });
+    } catch (err) {
+      console.log(err);
+      setError({ type: 1, message: '上傳資料發生錯誤，請稍後再試' });
+    }
   };
 
   return (

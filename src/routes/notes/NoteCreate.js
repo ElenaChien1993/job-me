@@ -148,8 +148,14 @@ const NoteCreate = () => {
   const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
   const navigate = useNavigate();
   const toast = useToast();
-  const { currentUserId, companies, setCompanies, jobTitles, setJobTitles } =
-    useOutletContext();
+  const {
+    currentUserId,
+    companies,
+    setCompanies,
+    jobTitles,
+    setJobTitles,
+    setError,
+  } = useOutletContext();
 
   useEffect(() => {
     if (companies) return;
@@ -219,32 +225,42 @@ const NoteCreate = () => {
       });
       return;
     }
-    const noteId = await firebase.createDoc(
-      `users/${currentUserId}/notes`,
-      {
-        ...noteDataBrief,
-        creator: currentUserId,
-      },
-      'note_id'
-    );
-    await firebase.increaseDataNumber(`users/${currentUserId}`, 'notes_qty');
-
-    await firebase.setNoteDetails(noteId, noteDetails);
-
-    if (
-      companies.map(company => company.name).indexOf(values.company_name) === -1
-    ) {
-      await firebase.createDoc(
-        'companies',
-        { name: values.company_name },
-        'id'
+    try {
+      const noteId = await firebase.createDoc(
+        `users/${currentUserId}/notes`,
+        {
+          ...noteDataBrief,
+          creator: currentUserId,
+        },
+        'note_id'
       );
-    }
-    if (jobTitles.map(job => job.name).indexOf(values.job_title) === -1) {
-      await firebase.createDoc('job_titles', { name: values.job_title }, 'id');
-    }
+      await firebase.increaseDataNumber(`users/${currentUserId}`, 'notes_qty');
 
-    navigate(`/notes/details/${noteId}`);
+      await firebase.setNoteDetails(noteId, noteDetails);
+
+      if (
+        companies.map(company => company.name).indexOf(values.company_name) ===
+        -1
+      ) {
+        await firebase.createDoc(
+          'companies',
+          { name: values.company_name },
+          'id'
+        );
+      }
+      if (jobTitles.map(job => job.name).indexOf(values.job_title) === -1) {
+        await firebase.createDoc(
+          'job_titles',
+          { name: values.job_title },
+          'id'
+        );
+      }
+
+      navigate(`/notes/details/${noteId}`);
+    } catch (err) {
+      console.log(err);
+      setError({ type: 1, message: '建立資料發生錯誤，請稍後再試' });
+    }
   };
 
   const props = {

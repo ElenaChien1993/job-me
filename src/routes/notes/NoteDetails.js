@@ -79,7 +79,7 @@ const NoteDetails = () => {
   const [recommend, setRecommend] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const submitRef = useRef();
-  const { currentUserId } = useOutletContext();
+  const { currentUserId, setError } = useOutletContext();
 
   const { onOpen, isOpen, onClose } = useDisclosure({ id: 'recommend' });
   let params = useParams();
@@ -93,19 +93,23 @@ const NoteDetails = () => {
   ];
 
   useEffect(() => {
-    firebase.getNote(currentUserId, noteId).then(snap => {
-      setBrief(snap.data());
-    });
-    firebase.getNoteDetails(noteId).then(snap => {
-      setDetails(snap.data());
-    });
-    const unsubscribe = firebase.listenDetailsChange(noteId, doc => {
-      setDetails(doc.data());
-      console.log('database changed', doc.data());
-    });
+    let unsubscribe;
+    const fetchNotes = async () => {
+      try {
+        const brief = await firebase.getNote(currentUserId, noteId);
+        setBrief(brief.data());
+        unsubscribe = firebase.listenDetailsChange(noteId, doc => {
+          setDetails(doc.data());
+        });
+      } catch (error) {
+        console.log(error);
+        setError({ type: 0, message: '讀取資料發生錯誤' });
+      }
+    };
 
+    fetchNotes();
     return () => unsubscribe();
-  }, [currentUserId, noteId, setDetails]);
+  }, [currentUserId, noteId, setDetails, setError]);
 
   useEffect(() => {
     if (!submitRef.current) return;
@@ -137,7 +141,12 @@ const NoteDetails = () => {
   };
 
   const onBlurSubmit = objectKey => {
-    firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
+    try {
+      firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
+    }
   };
 
   const handleDelete = (i, objectKey) => {
@@ -145,18 +154,29 @@ const NoteDetails = () => {
     setDetails(prev => {
       return { ...prev, [objectKey]: newData };
     });
-    firebase.updateNoteDetails(noteId, { [objectKey]: newData });
+    try {
+      firebase.updateNoteDetails(noteId, { [objectKey]: newData });
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
+    }
   };
 
   const showConnectModal = async () => {
     setIsLoading(true);
     onOpen();
-    const members = await firebase.getRecommendedUsers(
-      brief.company_name,
-      brief.job_title,
-      currentUserId
-    );
-    setRecommend(members);
+    try {
+      const members = await firebase.getRecommendedUsers(
+        brief.company_name,
+        brief.job_title,
+        currentUserId
+      );
+      setRecommend(members);
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '讀取資料發生錯誤，請稍後再試' });
+      onClose();
+    }
     setIsLoading(false);
   };
 

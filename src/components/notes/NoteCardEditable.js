@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useOutletContext } from 'react-router-dom';
 
 import {
   Input,
@@ -173,9 +173,15 @@ const NoteElement = React.memo(
   ({ uid, noteId, note, setNote, editable, isPublic }) => {
     const [isEditing, setIsEditing] = useState(false);
     const { pathname } = useLocation();
+    const { setError } = useOutletContext();
 
     const onBlurSubmit = objectKey => {
-      firebase.updateNoteBrief(uid, noteId, { [objectKey]: note[objectKey] });
+      try {
+        firebase.updateNoteBrief(uid, noteId, { [objectKey]: note[objectKey] });
+      } catch (error) {
+        console.log(error);
+        setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
+      }
     };
 
     const handleStatusChange = e => {
@@ -191,9 +197,14 @@ const NoteElement = React.memo(
       });
     };
 
-    const handleTagsSubmit = () => {
-      firebase.updateNoteBrief(uid, noteId, { tags: note.tags });
-      setIsEditing(false);
+    const handleTagsSubmit = async () => {
+      try {
+        await firebase.updateNoteBrief(uid, noteId, { tags: note.tags });
+        setIsEditing(false);
+      } catch (error) {
+        console.log(error);
+        setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
+      }
     };
 
     return (

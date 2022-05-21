@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import {
   IconButton,
   Menu,
@@ -106,6 +107,7 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const hiddenInputRef = useRef();
   const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
+  const { setError } = useOutletContext();
   const toast = useToast();
 
   const handleChooseFile = e => {
@@ -123,11 +125,12 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
 
   const handleUpload = async () => {
     setIsLoading(true);
-    const path = `profile/${currentUserId}`;
-    const url = await firebase.uploadFile(path, image.raw).then(() => {
-      return firebase.getDownloadURL(path);
-    });
-    firebase.updateUserInfo(currentUserId, { photo_url: url }).then(() => {
+    try {
+      const path = `profile/${currentUserId}`;
+      const url = await firebase.uploadFile(path, image.raw).then(() => {
+        return firebase.getDownloadURL(path);
+      });
+      await firebase.updateUserInfo(currentUserId, { photo_url: url });
       setIsLoading(false);
       toast({
         title: '成功',
@@ -137,11 +140,12 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
         isClosable: true,
         position: 'top-right',
       });
-    });
-    setImage({
-      preview: '',
-      raw: '',
-    });
+      setImage({ preview: '', raw: '' });
+    } catch (err) {
+      setIsLoading(false);
+      console.log(err);
+      setError({ type: 1, message: '上傳照片發生錯誤，請稍後再試' });
+    }
   };
 
   const handleCancel = () => {
@@ -151,17 +155,16 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
     });
   };
 
-  const handleDelete = () => {
-    if (
-      userInfo.photo_url.includes('googleusercontent') ||
-      userInfo.photo_url.includes('facebook')
-    ) {
-      firebase.updateUserInfo(currentUserId, { photo_url: null });
-      return;
-    }
-    const path = `profile/${currentUserId}`;
-    firebase.deleteFile(path).then(() => {
-      firebase.updateUserInfo(currentUserId, { photo_url: null });
+  const handleDelete = async () => {
+    try {
+      if (
+        !userInfo.photo_url.includes('googleusercontent') &&
+        !userInfo.photo_url.includes('facebook')
+      ) {
+        const path = `profile/${currentUserId}`;
+        await firebase.deleteFile(path);
+      }
+      await firebase.updateUserInfo(currentUserId, { photo_url: null });
       toast({
         title: '成功',
         description: '照片已刪除',
@@ -170,7 +173,10 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
         isClosable: true,
         position: 'top-right',
       });
-    });
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '刪除資料發生錯誤，請稍後再試' });
+    }
   };
 
   return (

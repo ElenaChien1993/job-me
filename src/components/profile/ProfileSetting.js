@@ -92,17 +92,22 @@ const ProfileSetting = () => {
     title: '',
     about_me: '',
   });
-  const { userInfo, currentUserId } = useOutletContext();
+  const { userInfo, currentUserId, setError } = useOutletContext();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const entries = Object.entries(values);
     const filtered = entries.filter(entry => entry[1] !== '');
     const filteredObject = Object.fromEntries(filtered);
-    firebase.updateUserInfo(currentUserId, filteredObject);
-    if (filteredObject.display_name) {
-      firebase.updateUser(filteredObject.display_name);
+    try {
+      await firebase.updateUserInfo(currentUserId, filteredObject);
+      if (filteredObject.display_name) {
+        firebase.updateUser(filteredObject.display_name);
+      }
+      setValues({ display_name: '', title: '', about_me: '' });
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
     }
-    setValues({ display_name: '', title: '', about_me: '' });
   };
 
   if (!userInfo) return <Loader />;
