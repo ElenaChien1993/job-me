@@ -3,6 +3,7 @@ import { Button, Icon, Select, useToast } from '@chakra-ui/react';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { MdTimer } from 'react-icons/md';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import SwitchElement from '../elements/Switch';
 import { device, color } from '../../style/variable';
@@ -129,6 +130,14 @@ const BeforeRecord = ({
       </Button>
     </>
   );
+};
+
+BeforeRecord.propTypes = {
+  setRecordType: PropTypes.func.isRequired,
+  recordType: PropTypes.string.isRequired,
+  timer: PropTypes.number,
+  setTimer: PropTypes.func.isRequired,
+  setProgress: PropTypes.func.isRequired,
 };
 
 export default BeforeRecord;

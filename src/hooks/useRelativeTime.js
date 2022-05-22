@@ -1,17 +1,18 @@
 import { formatRelative } from 'date-fns';
 import { zhTW } from 'date-fns/locale';
+import PropTypes from 'prop-types';
 
-const useRelativeTime = (room) => {
+const useRelativeTime = room => {
   if (room.latest.timestamp === '') return;
   const formatRelativeLocale = {
     lastWeek: "M'月'd'日'",
     yesterday: "'昨天'",
-    today: "p",
+    today: 'p',
     tomorrow: "'morgen um' LT",
     nextWeek: "dddd 'um' LT",
     other: 'L LT', // Difference: Add time to the date
   };
-  
+
   const locale = {
     ...zhTW,
     formatRelative: token => formatRelativeLocale[token],
@@ -23,6 +24,12 @@ const useRelativeTime = (room) => {
     { locale }
   );
   return timeRelative;
+};
+
+useRelativeTime.propTypes = {
+  room: PropTypes.shape({
+    latest: PropTypes.object,
+  }).isRequired,
 };
 
 export default useRelativeTime;

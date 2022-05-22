@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Button, Input, Textarea } from '@chakra-ui/react';
+import PropTypes from 'prop-types';
 
 import AddField from '../../components/elements/AddField';
 import { device, color } from '../../style/variable';
@@ -265,6 +266,19 @@ const DetailsStep1 = ({
       </ButtonGroup>
     </>
   );
+};
+
+DetailsStep1.propTypes = {
+  nextStep: PropTypes.func.isRequired,
+  prevStep: PropTypes.func.isRequired,
+  handleChange: PropTypes.func.isRequired,
+  values: PropTypes.shape({
+    product: PropTypes.string,
+    salary: PropTypes.object,
+    responsibilities: PropTypes.array,
+    requirements: PropTypes.array,
+  }).isRequired,
+  setValues: PropTypes.func.isRequired,
 };
 
 export default DetailsStep1;

@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 import firebase from '../../utils/firebase';
 import ChatReceived from '../elements/ChatReceived';
@@ -105,6 +106,17 @@ const ChatContent = ({ room, rootRef, bottomRef, messages, setMessages }) => {
       </div>
     </>
   );
+};
+
+ChatContent.propTypes = {
+  room: PropTypes.shape({
+    id: PropTypes.string,
+    members: PropTypes.object,
+  }).isRequired,
+  rootRef: PropTypes.object,
+  bottomRef: PropTypes.object,
+  messages: PropTypes.object.isRequired,
+  setMessages: PropTypes.func.isRequired,
 };
 
 export default ChatContent;

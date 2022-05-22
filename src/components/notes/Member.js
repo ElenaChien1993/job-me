@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@chakra-ui/react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import { device, color } from '../../style/variable';
 import ProfileImage from '../ProfileImage';
@@ -93,6 +94,15 @@ const Member = ({ note }) => {
       </Button>
     </Container>
   );
+};
+
+Member.propTypes = {
+  note: PropTypes.shape({
+    creator_info: PropTypes.object,
+    company_name: PropTypes.string,
+    job_title: PropTypes.string,
+    creator: PropTypes.string,
+  }).isRequired,
 };
 
 export default Member;

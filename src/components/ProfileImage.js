@@ -1,21 +1,21 @@
 import styled from 'styled-components';
 import Avatar from 'boring-avatars';
+import PropTypes from 'prop-types';
 
 import { color } from '../style/variable';
 
 const ImageWrapper = styled.div`
-  min-width: ${(props) => props.size}px;
-  min-height: ${(props) => props.size}px;
-  border-radius: ${(props) => props.size / 2}px;
-  border: ${(props) =>
-    props.hasBorder ? `5px solid ${color.primary}` : 'none'};
-  margin-right: ${(props) => props.marginRight}px;
+  min-width: ${props => props.size}px;
+  min-height: ${props => props.size}px;
+  border-radius: ${props => props.size / 2}px;
+  border: ${props => (props.hasBorder ? `5px solid ${color.primary}` : 'none')};
+  margin-right: ${props => props.marginRight}px;
   overflow: hidden;
 `;
 
 const StyledImg = styled.img`
-  width: ${(props) => props.size}px;
-  height: ${(props) => props.size}px;
+  width: ${props => props.size}px;
+  height: ${props => props.size}px;
   object-fit: cover;
 `;
 
@@ -39,6 +39,17 @@ const ProfileImage = ({ user, size, hasBorder, marginRight, preview }) => {
       )}
     </ImageWrapper>
   );
+};
+
+ProfileImage.propTypes = {
+  user: PropTypes.shape({
+    photo_url: PropTypes.string,
+    display_name: PropTypes.string,
+  }).isRequired,
+  size: PropTypes.number.isRequired,
+  hasBorder: PropTypes.bool,
+  marginRight: PropTypes.number,
+  preview: PropTypes.string,
 };
 
 export default ProfileImage;

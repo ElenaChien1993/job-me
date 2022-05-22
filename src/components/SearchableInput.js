@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Input } from '@chakra-ui/react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import { color } from '../style/variable';
 
@@ -76,6 +77,14 @@ const RenderList = ({ data, value, setValue, toggle, setToggle }) => {
   return null;
 };
 
+RenderList.propTypes = {
+  data: PropTypes.array,
+  value: PropTypes.string,
+  setValue: PropTypes.func,
+  toggle: PropTypes.bool.isRequired,
+  setToggle: PropTypes.func,
+};
+
 const SearchableInput = ({ value, setValue, data }) => {
   const [toggle, setToggle] = useState(true);
 
@@ -97,6 +106,12 @@ const SearchableInput = ({ value, setValue, data }) => {
       />
     </>
   );
+};
+
+SearchableInput.propTypes = {
+  data: PropTypes.array,
+  value: PropTypes.string,
+  setValue: PropTypes.func,
 };
 
 export default SearchableInput;

@@ -145,9 +145,8 @@ const Nav = ({ userInfo, currentUserId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleLogout = () => {
-    firebase.signOut().then(() => {
-      navigate('/login', { state: { from: { pathname: '/notes' } } });
-    });
+    firebase.signOut();
+    navigate('/login', { state: { from: { pathname: '/notes' } } });
   };
 
   const handleLogIn = () => {

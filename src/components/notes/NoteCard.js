@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { IconButton, useDisclosure } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import firebase from '../../utils/firebase';
 import NoteElement from './NoteCardEditable';
@@ -74,6 +75,16 @@ const Note = ({
       )}
     </Container>
   );
+};
+
+Note.propTypes = {
+  note: PropTypes.shape({
+    note_id: PropTypes.string,
+  }).isRequired,
+  currentUserId: PropTypes.string,
+  databaseNotes: PropTypes.array,
+  setRenderNotes: PropTypes.func,
+  setDatabaseNotes: PropTypes.func,
 };
 
 export default Note;

@@ -1,5 +1,6 @@
-export const initMap = async (setValues, inputRef) => {
+import PropTypes from 'prop-types';
 
+export const initMap = async (setValues, inputRef) => {
   const options = {
     fields: ['formatted_address'],
     strictBounds: false,
@@ -17,4 +18,9 @@ export const initMap = async (setValues, inputRef) => {
       return { ...prev, address: place.formatted_address };
     });
   });
+};
+
+initMap.propTypes = {
+  setValues: PropTypes.func,
+  inputRef: PropTypes.object,
 };

@@ -1,7 +1,6 @@
-import { useNavigate, useOutletContext } from 'react-router-dom';
-
 import styled from 'styled-components';
-import { Button, Input, useToast } from '@chakra-ui/react';
+import { Button, Input } from '@chakra-ui/react';
+import PropTypes from 'prop-types';
 
 import AddField from '../../components/elements/AddField';
 
@@ -106,6 +105,15 @@ const DetailsStep3 = ({ prevStep, values, setValues, createNote }) => {
       </ButtonGroup>
     </>
   );
+};
+
+DetailsStep3.propTypes = {
+  prevStep: PropTypes.func.isRequired,
+  values: PropTypes.shape({
+    questions: PropTypes.array,
+  }).isRequired,
+  setValues: PropTypes.func.isRequired,
+  createNote: PropTypes.func.isRequired,
 };
 
 export default DetailsStep3;

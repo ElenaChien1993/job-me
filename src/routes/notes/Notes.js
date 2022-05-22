@@ -66,6 +66,7 @@ const Notes = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!currentUserId) return;
     firebase.getWholeCollection(`users/${currentUserId}/notes`).then(data => {
       setDatabaseNotes(data);
       setRenderNotes(data);
@@ -142,7 +143,10 @@ const Notes = () => {
         ) : (
           <NoNote>
             <p>尚未建立過筆記，請點擊右上方按鈕開始建立</p>
-            <p>或是前往<span onClick={() => navigate('/explore')}>探索</span>查看其他會員的公開筆記</p>
+            <p>
+              或是前往<span onClick={() => navigate('/explore')}>探索</span>
+              查看其他會員的公開筆記
+            </p>
           </NoNote>
         )}
       </NotesWrapper>

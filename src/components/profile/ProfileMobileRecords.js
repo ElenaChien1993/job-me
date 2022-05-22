@@ -4,6 +4,7 @@ import { useOutletContext } from 'react-router-dom';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { FaMicrophone, FaFilm } from 'react-icons/fa';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import firebase from '../../utils/firebase';
 import RecordAccordion from '../elements/RecordAccordion';
@@ -102,6 +103,10 @@ const ProfileMobileRecords = ({ onOpen }) => {
       </LeftWrapper>
     </>
   );
+};
+
+ProfileMobileRecords.propTypes = {
+  onOpen: PropTypes.func.isRequired,
 };
 
 export default ProfileMobileRecords;
