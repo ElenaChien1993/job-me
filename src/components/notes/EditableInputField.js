@@ -7,6 +7,7 @@ import {
   EditableInput,
   EditableTextarea,
 } from '@chakra-ui/react';
+import PropTypes from 'prop-types';
 
 const EditableInputField = ({
   value,
@@ -44,6 +45,14 @@ const EditableInputField = ({
       />
     </Editable>
   );
+};
+
+EditableInputField.propTypes = {
+  value: PropTypes.string.isRequired,
+  onSubmitCallback: PropTypes.func.isRequired,
+  callbackArgs: PropTypes.object.isRequired,
+  i: PropTypes.number.isRequired,
+  submitRef: PropTypes.object.isRequired,
 };
 
 export default EditableInputField;

@@ -12,6 +12,7 @@ import {
 } from 'react-icons/vsc';
 import { MdOutlineSave, MdNavigateNext, MdTimer } from 'react-icons/md';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import { Audio, Video } from '../elements/MediaRecorder';
 import CountDown from '../elements/CountDown';
@@ -287,6 +288,19 @@ const Recording = ({
       )}
     </>
   );
+};
+
+Recording.propTypes = {
+  timer: PropTypes.number,
+  brief: PropTypes.shape({
+    company_name: PropTypes.string,
+    job_title: PropTypes.string,
+  }).isRequired,
+  practiceQuestions: PropTypes.array.isRequired,
+  current: PropTypes.number.isRequired,
+  recordType: PropTypes.string.isRequired,
+  setCurrent: PropTypes.func.isRequired,
+  setProgress: PropTypes.func.isRequired,
 };
 
 export default Recording;

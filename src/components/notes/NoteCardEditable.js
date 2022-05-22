@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { EditIcon, CheckCircleIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import firebase from '../../utils/firebase';
 import { device, color } from '../../style/variable';
@@ -345,5 +346,20 @@ const NoteElement = React.memo(
     );
   }
 );
+
+NoteElement.propTypes = {
+  uid: PropTypes.string,
+  noteId: PropTypes.string,
+  note: PropTypes.shape({
+    tags: PropTypes.array,
+    company_name: PropTypes.string,
+    job_title: PropTypes.string,
+    status: PropTypes.string,
+    address: PropTypes.string,
+  }).isRequired,
+  setNote: PropTypes.func,
+  editable: PropTypes.bool,
+  isPublic: PropTypes.bool,
+};
 
 export default NoteElement;

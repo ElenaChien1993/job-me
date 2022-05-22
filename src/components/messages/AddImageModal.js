@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { v4 as uuid } from 'uuid';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import firebase from '../../utils/firebase';
 import Loader from '../Loader';
@@ -142,6 +143,15 @@ const AddImageModal = ({ isOpen, onClose, room, send }) => {
       {isLoading && <Loader isLoading={isLoading} hasShadow />}
     </>
   );
+};
+
+AddImageModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  room: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }),
+  send: PropTypes.func.isRequired,
 };
 
 export default AddImageModal;

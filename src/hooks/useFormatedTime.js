@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 const useFormatedTime = date => {
   const timeString = `${new Date(date).toLocaleDateString(undefined, {
     month: 'numeric',
@@ -9,6 +11,10 @@ const useFormatedTime = date => {
   })}`;
 
   return timeString;
+};
+
+useFormatedTime.propTypes = {
+  date: PropTypes.number.isRequired,
 };
 
 export default useFormatedTime;

@@ -18,6 +18,7 @@ import { FaMicrophone, FaFilm } from 'react-icons/fa';
 import { RiFileUnknowLine } from 'react-icons/ri';
 import { MdSaveAlt } from 'react-icons/md';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import ChatCorner from '../messages/ChatCorner';
 import firebase from '../../utils/firebase';
@@ -369,6 +370,10 @@ const ProfileRecords = ({ isMobile }) => {
       <ChatCorner />
     </Container>
   );
+};
+
+ProfileRecords.propTypes = {
+  isMobile: PropTypes.bool,
 };
 
 export default ProfileRecords;

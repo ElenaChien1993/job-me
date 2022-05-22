@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import firebase from '../../utils/firebase';
 import ProfileImage from '../ProfileImage';
@@ -253,6 +254,17 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
       </Counts>
     </>
   );
+};
+
+ProfileInfo.propTypes = {
+  userInfo: PropTypes.shape({
+    photo_url: PropTypes.string,
+    display_name: PropTypes.string,
+    title: PropTypes.string,
+    about_me: PropTypes.string,
+    notes_qty: PropTypes.number,
+  }).isRequired,
+  currentUserId: PropTypes.string.isRequired,
 };
 
 export default ProfileInfo;

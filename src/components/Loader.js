@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
+
 import { ReactComponent as LoaderSvg } from '../images/loader.svg';
 
 const Container = styled.div`
@@ -29,6 +31,11 @@ const Loader = ({ isLoading, hasShadow }) => {
       )}
     </>
   );
+};
+
+Loader.propTypes = {
+  isLoading: PropTypes.bool,
+  hasShadow: PropTypes.bool,
 };
 
 export default Loader;

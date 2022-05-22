@@ -8,6 +8,7 @@ import {
   AlertDialogOverlay,
   Button,
 } from '@chakra-ui/react';
+import PropTypes from 'prop-types';
 
 const AlertModal = ({
   isOpen,
@@ -53,6 +54,15 @@ const AlertModal = ({
       </AlertDialogOverlay>
     </AlertDialog>
   );
+};
+
+AlertModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  header: PropTypes.string,
+  content: PropTypes.string,
+  actionText: PropTypes.string,
+  action: PropTypes.func,
 };
 
 export default AlertModal;

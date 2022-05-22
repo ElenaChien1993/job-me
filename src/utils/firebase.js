@@ -76,7 +76,7 @@ const getCompleteRoomsData = async (rooms, uid) => {
     rooms.map(async room => {
       const timeRelative = useRelativeTime(room);
       const friendId = room.members.filter(id => id !== uid);
-      const userData = await firebase.getUserInfo(friendId[0]);
+      const userData = await firebase.getUserInfo(...friendId);
       return {
         ...room,
         members: userData,
@@ -107,6 +107,7 @@ const getUniqueMatchedData = async (key, value, uid) => {
 
 const firebase = {
   async getUser(uid) {
+    if (!uid) return;
     const docSnap = await getDoc(doc(db, 'users', uid));
     if (docSnap.exists()) {
       return docSnap;

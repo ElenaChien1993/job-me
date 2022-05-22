@@ -10,6 +10,7 @@ import {
   Spinner,
   Flex,
 } from '@chakra-ui/react';
+import PropTypes from 'prop-types';
 
 import Member from './Member';
 import SearchMembers from './SearchMembers';
@@ -66,6 +67,13 @@ const RecommendModal = ({ isOpen, onClose, recommend, isLoading }) => {
       </Modal>
     </>
   );
+};
+
+RecommendModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  recommend: PropTypes.array,
+  isLoading: PropTypes.bool,
 };
 
 export default RecommendModal;
