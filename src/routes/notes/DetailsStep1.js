@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Button, Input, Textarea } from '@chakra-ui/react';
+
 import AddField from '../../components/elements/AddField';
-import { device, color} from '../../style/variable';
+import { device, color } from '../../style/variable';
 
 const InputWrap = styled.div`
   display: flex;
@@ -67,10 +68,8 @@ const TagButton = styled.label`
   border: 1px solid #667080;
   text-align: center;
   padding-top: 5px;
-  @media ${device.mobileM} {
-    width: 70px;
-    margin-right: 5px;
-  }
+  width: 70px;
+  margin-right: 5px;
   @media ${device.tablet} {
     width: 90px;
     margin-right: 15px;
@@ -144,19 +143,6 @@ const DetailsStep1 = ({
 
     setValues(prev => {
       return { ...prev, requirements: updatedChecked };
-    });
-  };
-
-  const handleAddField = e => {
-    e.preventDefault();
-    setValues(prev => {
-      return {
-        ...prev,
-        requirements: [
-          ...prev.requirements,
-          { is_qualified: false, description: '' },
-        ],
-      };
     });
   };
 

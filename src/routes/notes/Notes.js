@@ -5,8 +5,8 @@ import { Search2Icon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import firebase from '../../utils/firebase';
-import Note from '../../components/NoteCard';
-import ChatCorner from '../../components/ChatCorner';
+import Note from '../../components/notes/NoteCard';
+import ChatCorner from '../../components/messages/ChatCorner';
 import { color, device } from '../../style/variable';
 import Loader from '../../components/Loader';
 
@@ -66,7 +66,7 @@ const Notes = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    firebase.getNotes(currentUserId).then(data => {
+    firebase.getWholeCollection(`users/${currentUserId}/notes`).then(data => {
       setDatabaseNotes(data);
       setRenderNotes(data);
     });

@@ -1,8 +1,10 @@
-import { Button } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+
+import { Button } from '@chakra-ui/react';
 import styled from 'styled-components';
-import { device, color } from '../style/variable';
-import ProfileImage from './ProfileImage';
+
+import { device, color } from '../../style/variable';
+import ProfileImage from '../ProfileImage';
 
 const Container = styled.div`
   display: flex;
@@ -10,11 +12,9 @@ const Container = styled.div`
   background: ${color.white};
   margin-bottom: 25px;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
-  @media ${device.mobileM} {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 20px 20px;
-  }
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px 20px;
   @media ${device.tablet} {
     align-items: center;
     flex-direction: row;
@@ -33,9 +33,7 @@ const ContentWrapper = styled.div`
 const MainContent = styled.div`
   display: flex;
   align-items: center;
-  @media ${device.mobileM} {
-    margin-bottom: 10px;
-  }
+  margin-bottom: 10px;
   @media ${device.tablet} {
     margin-bottom: 0;
   }

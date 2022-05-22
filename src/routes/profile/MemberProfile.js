@@ -1,20 +1,17 @@
-import { Button, useDisclosure } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
-import styled from 'styled-components';
-import AlertModal from '../../components/AlertModal';
 
-import ChatCorner from '../../components/ChatCorner';
+import { Button, useDisclosure } from '@chakra-ui/react';
+import styled from 'styled-components';
+
+import AlertModal from '../../components/AlertModal';
+import ChatCorner from '../../components/messages/ChatCorner';
 import Loader from '../../components/Loader';
 import ProfileImage from '../../components/ProfileImage';
 import { device, color } from '../../style/variable';
 import firebase from '../../utils/firebase';
 import useRWD from '../../hooks/useRWD';
 import NoteCardExplore from '../../components/NoteCardExplore';
-
-const Container = styled.div`
-  
-`;
 
 const Upper = styled.div`
   background-color: ${color.third};
@@ -118,7 +115,7 @@ const ContentGrid = styled.ol`
   @media ${device.mobileM} {
     padding: 0 20px;
   }
-  @media ${device.table} {
+  @media ${device.tablet} {
     padding: 0 32px;
   }
   @media ${device.laptop} {
@@ -129,7 +126,8 @@ const ContentGrid = styled.ol`
 const MemberProfile = React.memo(() => {
   const [info, setInfo] = useState(null);
   const [notes, setNotes] = useState(null);
-  const { currentUserId, setChatOpen, setActive } = useOutletContext();
+  const { currentUserId, setChatOpen, setActive, setError } =
+    useOutletContext();
   const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
   const navigate = useNavigate();
   let params = useParams();
@@ -139,11 +137,18 @@ const MemberProfile = React.memo(() => {
 
   useEffect(() => {
     if (!uid) return;
-    firebase.getUser(uid).then(doc => {
-      setInfo(doc.data());
-    });
+    const getUserInfo = async () => {
+      try {
+        const info = await firebase.getUser(uid);
+        setInfo(info.data());
+      } catch (err) {
+        setError({ type: 0, message: err.message });
+      }
+    };
+
+    getUserInfo();
     firebase.getPersonalPublicNotes(uid).then(data => setNotes(data));
-  }, [uid]);
+  }, [uid, setError]);
 
   const createChat = async () => {
     if (!currentUserId) {
@@ -159,18 +164,16 @@ const MemberProfile = React.memo(() => {
     const roomExist = await firebase.checkIsRoomExist(data.members);
     if (roomExist.length !== 0) {
       await setActive(...roomExist);
-      setChatOpen(true);
     } else {
-      firebase.setChatroom(data).then(() => {
-        setChatOpen(true);
-      });
+      await firebase.createDoc('chatrooms', data, 'id');
     }
+    setChatOpen(true);
   };
 
   if (!info) return <Loader />;
 
   return (
-    <Container>
+    <>
       <AlertModal
         isOpen={isOpen}
         onClose={onClose}
@@ -220,7 +223,7 @@ const MemberProfile = React.memo(() => {
         )}
       </InfoContainer>
       {currentUserId && <ChatCorner />}
-    </Container>
+    </>
   );
 });
 

@@ -31,10 +31,8 @@ import { device, color } from '../style/variable';
 const WebTitle = styled.div`
   color: ${color.primary};
   font-weight: bold;
-  @media ${device.mobileM} {
-    font-size: 34px;
-    margin-bottom: 20px;
-  }
+  font-size: 34px;
+  margin-bottom: 20px;
   @media ${device.tablet} {
     font-size: 50px;
     margin-bottom: 40px;
@@ -43,9 +41,7 @@ const WebTitle = styled.div`
 
 const ImageWrapper = styled.div`
   width: 90%;
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.tablet} {
     display: block;
   }
@@ -152,7 +148,7 @@ const Login = () => {
     try {
       const user = await firebase.register(values.email, values.password);
       firebase.updateUser(values.name);
-      firebase.signUp(user.uid, values.name);
+      firebase.setNewUser(user.uid, values.name);
       toast({
         title: '註冊成功！',
         status: 'success',
@@ -200,7 +196,6 @@ const Login = () => {
   const signInWithProvider = async provider => {
     try {
       await firebase.signInWithProvider(provider);
-      console.log('login');
       toast({
         title: '成功登入！',
         description: '已為您自動導向首頁',
@@ -211,6 +206,14 @@ const Login = () => {
       });
     } catch (error) {
       console.log(error.code, error.message);
+      toast({
+        title: '哎呀',
+        description: '發生無預期錯誤，請稍後再試',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
     }
   };
 

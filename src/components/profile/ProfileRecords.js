@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+
 import {
   Tabs,
   TabList,
@@ -15,26 +16,24 @@ import {
 } from '@chakra-ui/react';
 import { FaMicrophone, FaFilm } from 'react-icons/fa';
 import { RiFileUnknowLine } from 'react-icons/ri';
+import { MdSaveAlt } from 'react-icons/md';
 import styled from 'styled-components';
 
-import ChatCorner from './ChatCorner';
-import firebase from '../utils/firebase';
-import { MdSaveAlt } from 'react-icons/md';
-import { color, device } from '../style/variable';
+import ChatCorner from '../messages/ChatCorner';
+import firebase from '../../utils/firebase';
+import { color, device } from '../../style/variable';
 import ProfileMobileRecords from './ProfileMobileRecords';
-import AlertModal from './AlertModal';
-import Loader from './Loader';
+import AlertModal from '../AlertModal';
+import Loader from '../Loader';
 
 const Container = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
-  @media ${device.mobileM} {
-    padding: 20px 0 0;
-    margin-bottom: 40px;
-    flex-direction: column;
-    align-items: center;
-  }
+  padding: 20px 0 0;
+  margin-bottom: 40px;
+  flex-direction: column;
+  align-items: center;
   @media ${device.tablet} {
     margin: 0 0 20px;
     padding: 30px 0;
@@ -47,11 +46,9 @@ const LeftWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  @media ${device.mobileM} {
-    border-right: none;
-    padding-right: 0;
-    width: 100%;
-  }
+  border-right: none;
+  padding-right: 0;
+  width: 100%;
   @media ${device.tablet} {
     border-right: 5px solid #c4c4c4;
     padding-right: 20px;
@@ -62,11 +59,9 @@ const LeftWrapper = styled.div`
 const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  @media ${device.mobileM} {
-    width: 100%;
-    padding-left: 0;
-    margin-top: 20px;
-  }
+  width: 100%;
+  padding-left: 0;
+  margin-top: 20px;
   @media ${device.tablet} {
     width: 60%;
     padding-left: 50px;
@@ -101,9 +96,7 @@ const Record = styled.div`
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    @media ${device.mobileM} {
-      font-size: 16px;
-    }
+    font-size: 16px;
     @media ${device.tablet} {
       font-size: 18px;
     }
@@ -111,9 +104,7 @@ const Record = styled.div`
   & p {
     text-align: end;
     max-width: 20%;
-    @media ${device.mobileM} {
-      font-size: 14px;
-    }
+    font-size: 14px;
     @media ${device.tablet} {
       font-size: 16px;
     }
@@ -210,9 +201,10 @@ const ProfileRecords = ({ isMobile }) => {
       path = `videos/${currentUserId}/${activeVideo.record_job}/${activeVideo.record_name}-${activeVideo.record_id}`;
     }
     await firebase.deleteFile(path);
-    await firebase.deleteRecord(
-      currentUserId,
-      tabIndex === 0 ? activeAudio.record_id : activeVideo.record_id
+    await firebase.deleteData(
+      `users/${currentUserId}/records/${
+        tabIndex === 0 ? activeAudio.record_id : activeVideo.record_id
+      }`
     );
     toast({
       title: '成功',

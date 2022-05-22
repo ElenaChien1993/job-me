@@ -1,12 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
+
 import { IconButton, useDisclosure } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
-import firebase from '../utils/firebase';
+import firebase from '../../utils/firebase';
 import NoteElement from './NoteCardEditable';
-import { device } from '../style/variable';
-import AlertModal from './AlertModal';
+import AlertModal from '../AlertModal';
 
 const Container = styled.div`
   position: relative;
@@ -35,14 +35,14 @@ const Note = ({
   const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
   const { pathname } = useLocation();
 
-  const handleDeleteNote = () => {
-    firebase.deleteNote(currentUserId, note.note_id).then(() => {
-      const update = databaseNotes.filter(
-        item => item.note_id !== note.note_id
-      );
-      setDatabaseNotes(update);
-      setRenderNotes(update);
+  const handleDeleteNote = async () => {
+    await firebase.deleteData(`users/${currentUserId}/notes/${note.note_id}`);
+    await firebase.updateUserInfo(currentUserId, {
+      notes_qty: firebase.increment(-1),
     });
+    const update = databaseNotes.filter(item => item.note_id !== note.note_id);
+    setDatabaseNotes(update);
+    setRenderNotes(update);
   };
 
   return (

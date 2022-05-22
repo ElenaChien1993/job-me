@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import {
   Modal,
   ModalOverlay,
@@ -14,9 +15,9 @@ import {
 import { v4 as uuid } from 'uuid';
 import styled from 'styled-components';
 
-import firebase from '../utils/firebase';
-import Loader from './Loader';
-import { color } from '../style/variable';
+import firebase from '../../utils/firebase';
+import Loader from '../Loader';
+import { color } from '../../style/variable';
 
 const StyledImage = styled(Image)`
   cursor: pointer;
@@ -33,6 +34,7 @@ const ImageWrapper = styled.div`
 const AddImageModal = ({ isOpen, onClose, room, send }) => {
   const [image, setImage] = useState({ preview: '', raw: '' });
   const [isLoading, setIsLoading] = useState(false);
+  const { setError } = useOutletContext();
   const hiddenInputRef = useRef();
   const toast = useToast();
 
@@ -63,18 +65,23 @@ const AddImageModal = ({ isOpen, onClose, room, send }) => {
 
     onClose();
     setIsLoading(true);
-    const path = `chatrooms/${room.id}/${uuid()}`;
-    const url = await firebase.uploadFile(path, image.raw).then(() => {
-      return firebase.getDownloadURL(path);
-    });
+    try {
+      const path = `chatrooms/${room.id}/${uuid()}`;
+      const url = await firebase.uploadFile(path, image.raw).then(() => {
+        return firebase.getDownloadURL(path);
+      });
 
-    await send(url, 1);
-    setIsLoading(false);
+      await send(url, 1);
+      setIsLoading(false);
 
-    setImage({
-      preview: '',
-      raw: '',
-    });
+      setImage({
+        preview: '',
+        raw: '',
+      });
+    } catch (err) {
+      console.log(err);
+      setError({ type: 1, message: '上傳資料發生錯誤，請稍後再試' });
+    }
   };
 
   return (
@@ -104,7 +111,7 @@ const AddImageModal = ({ isOpen, onClose, room, send }) => {
                 boxSize={image.preview === '' ? '50px' : '200px'}
                 alt="upload"
                 src={image.preview}
-                fallbackSrc={require('../images/add-document.svg').default}
+                fallbackSrc={require('../../images/add-document.svg').default}
                 onClick={handleChooseFile}
               />
               <input

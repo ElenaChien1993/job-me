@@ -72,7 +72,6 @@ const RecordAccordion = ({
   setActiveRecord,
   onOpen,
 }) => {
-
   const handleDownload = async (url, name) => {
     const record = await fetch(url);
     const recordBlob = await record.blob();
@@ -160,6 +159,14 @@ const RecordAccordion = ({
       </RecordsList>
     </Accordion>
   );
+};
+
+RecordAccordion.propTypes = {
+  records: PropTypes.array,
+  tabIndex: PropTypes.number.isRequired,
+  activeRecord: PropTypes.object.isRequired,
+  setActiveRecord: PropTypes.func.isRequired,
+  onOpen: PropTypes.func.isRequired,
 };
 
 export default RecordAccordion;

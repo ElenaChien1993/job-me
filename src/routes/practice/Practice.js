@@ -1,10 +1,11 @@
-import { Search2Icon } from '@chakra-ui/icons';
-import { InputGroup, InputRightElement, Input } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+
+import { InputGroup, InputRightElement, Input } from '@chakra-ui/react';
+import { Search2Icon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
-import Note from '../../components/NoteCard';
+import Note from '../../components/notes/NoteCard';
 
 const Background = styled.div`
   margin: 30px auto 5%;

@@ -1,6 +1,6 @@
-import React from 'react';
 import { Image, CircularProgress } from '@chakra-ui/react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import ProfileImage from '../ProfileImage';
 import useFormatedTime from '../../hooks/useFormatedTime';
@@ -38,45 +38,64 @@ const DateText = styled.div`
   margin-bottom: 5px;
 `;
 
-const Text = React.forwardRef((props, ref) => {
-  return <Content ref={ref}>{props.text}</Content>;
-});
+const Text = ({ content }) => {
+  return <Content>{content}</Content>;
+};
 
-const ImageMessage = React.forwardRef((props, ref) => {
+Text.propTypes = {
+  content: PropTypes.string.isRequired,
+};
+
+const ImageMessage = ({ content }) => {
   return (
-    <div ref={ref}>
-      <Image
-        objectFit="contain"
-        alt="message"
-        src={props.url}
-        boxSize="100px"
-        fallback={<CircularProgress isIndeterminate color="green.300" />}
-      />
-    </div>
+    <Image
+      objectFit="contain"
+      alt="message"
+      src={content}
+      boxSize="100px"
+      fallback={<CircularProgress isIndeterminate color="green.300" />}
+    />
   );
-});
+};
 
-const MESSAGE_TYPE = props => ({
-  0: <Text text={props.message.text} ref={props.bottomRef} />,
-  1: <ImageMessage url={props.message.text} ref={props.bottomRef} />,
-});
+ImageMessage.propTypes = {
+  content: PropTypes.string.isRequired,
+};
 
-const ChatReceived = React.forwardRef((props, ref) => {
-  const timeString = useFormatedTime(props.message.create_at);
+const TYPE = {
+  0: Text,
+  1: ImageMessage,
+};
+
+const ChatReceived = ({ member, message, bottomRef }) => {
+  const timeString = useFormatedTime(message.create_at);
+
+  const Message = TYPE[message.type];
+
   return (
-    <Wrapper ref={ref}>
+    <Wrapper ref={bottomRef}>
       <ImageWrapper>
         <ProfileImage
-          user={props.member}
+          user={member}
           size={48}
           hasBorder={false}
           marginRight={16}
         />
       </ImageWrapper>
-      {MESSAGE_TYPE(props)[props.message.type]}
+      <Message content={message.text} />
       <DateText>{timeString}</DateText>
     </Wrapper>
   );
-});
+};
+
+ChatReceived.propTypes = {
+  member: PropTypes.object.isRequired,
+  message: PropTypes.shape({
+    create_at: PropTypes.number,
+    type: PropTypes.number,
+    text: PropTypes.string,
+  }).isRequired,
+  bottomRef: PropTypes.object.isRequired,
+};
 
 export default ChatReceived;

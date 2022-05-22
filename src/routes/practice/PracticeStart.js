@@ -1,6 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
+
 import { Button } from '@chakra-ui/react';
 import { CgProfile } from 'react-icons/cg';
 import Lottie from 'react-lottie-player';
@@ -8,8 +8,8 @@ import styled from 'styled-components';
 
 import BackButton from '../../components/elements/BackButton';
 import NoteBar from '../../components/elements/NoteBar';
-import BeforeRecord from '../../components/BeforeRecord';
-import Recording from '../../components/Recording';
+import BeforeRecord from '../../components/practice/BeforeRecord';
+import Recording from '../../components/practice/Recording';
 import finishJson from '../../images/finish.json';
 import { device, color } from '../../style/variable';
 
@@ -27,9 +27,7 @@ const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  @media ${device.mobileM} {
-    flex-direction: column;
-  }
+  flex-direction: column;
   @media ${device.tablet} {
     flex-direction: row;
   }
@@ -44,9 +42,7 @@ const Question = styled.div`
   color: ${color.primary};
   margin-bottom: 10px;
   text-align: center;
-  @media ${device.mobileM} {
-    font-size: 28px;
-  }
+  font-size: 28px;
   @media ${device.tablet} {
     font-size: 34px;
   }
@@ -56,9 +52,7 @@ const Title = styled.div`
   font-weight: 700;
   color: ${color.primary};
   margin-bottom: 20px;
-  @media ${device.mobileM} {
-    font-size: 24px;
-  }
+  font-size: 24px;
   @media ${device.tablet} {
     font-size: 30px;
   }
@@ -90,26 +84,18 @@ const PracticeStart = () => {
     }
   }, []);
 
-  // useEffect(() => {
-  //   console.log('scroll')
-  //   if (!controllRef.current) return;
-  //   controllRef.current.scrollIntoView({ behavior: 'smooth' });
-  // }, [progress]);
-
   const goToProfile = () => {
-    navigate(`/profile/${props.user.uid}?tab=records`);
+    navigate(`/profile/${props.currentUserId}?tab=records`);
   };
 
   return (
     <Container>
       <TitleWrapper>
-        <BackButton path="/practice" isStart />
+        <BackButton path="/practice" $isStart />
         <StyledNoteBar brief={props.brief} />
       </TitleWrapper>
       {progress !== 'finished' && (
-        <Question>
-          {props.practiceQuestions[current]?.question}
-        </Question>
+        <Question>{props.practiceQuestions[current]?.question}</Question>
       )}
       {progress === 'before' && (
         <BeforeRecord

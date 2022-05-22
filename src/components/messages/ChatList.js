@@ -4,17 +4,16 @@ import { useOutletContext } from 'react-router-dom';
 import { Search2Icon } from '@chakra-ui/icons';
 import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react';
 import styled, { ThemeProvider } from 'styled-components';
+import PropTypes from 'prop-types';
 
-import { device, color } from '../style/variable';
-import ProfileImage from './ProfileImage';
+import { device, color } from '../../style/variable';
+import ProfileImage from '../ProfileImage';
 
 const Container = styled.div`
   display: flex;
   width: 100%;
   overflow: scroll;
-  @media ${device.mobileM} {
-    flex-direction: row;
-  }
+  flex-direction: row;
   @media ${device.laptopL} {
     flex-direction: column;
     height: ${props => (props.theme.isCorner ? '82%' : '76%')};
@@ -26,22 +25,21 @@ const ChatWrapper = styled.div`
   display: flex;
   align-items: center;
   background-color: ${props => (props.isSelected ? 'white' : '')};
-  box-shadow: ${props => (props.isSelected ? '0 4px 16px rgb(91 96 103 / 8%)' : '')};
+  box-shadow: ${props =>
+    props.isSelected ? '0 4px 16px rgb(91 96 103 / 8%)' : ''};
   cursor: pointer;
   border-radius: 10px;
   &:hover {
     background-color: white;
     box-shadow: 0 4px 16px rgb(91 96 103 / 8%);
-    transition: all .2s ease-in;
+    transition: all 0.2s ease-in;
   }
-  @media ${device.mobileM} {
-    width: 90px;
-    min-width: 90px;
-    padding: 5px 3px;
-    margin: 5px 3px;
-    flex-direction: column;
-    justify-content: center;
-  }
+  width: 90px;
+  min-width: 90px;
+  padding: 5px 3px;
+  margin: 5px 3px;
+  flex-direction: column;
+  justify-content: center;
   @media ${device.laptopL} {
     width: auto;
     min-width: auto;
@@ -57,10 +55,8 @@ const BriefContent = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  @media ${device.mobileM} {
-    margin-left: 0;
-    width: 100%;
-  }
+  margin-left: 0;
+  width: 100%;
   @media ${device.laptopL} {
     margin-left: 13px;
     width: 100%;
@@ -73,10 +69,8 @@ const Name = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  @media ${device.mobileM} {
-    font-size: 16px;
-    margin: 5px auto;
-  }
+  font-size: 16px;
+  margin: 5px auto;
   @media ${device.laptopL} {
     font-size: ${props => (props.theme.isCorner ? '16px' : '20px')};
     margin: 0 0 5px;
@@ -91,9 +85,7 @@ const LatestMessage = styled.div`
   overflow: hidden;
   width: 90%;
   font-weight: ${props => (props.isRead ? '400' : '700')};
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.laptopL} {
     display: block;
   }
@@ -102,9 +94,7 @@ const LatestMessage = styled.div`
 const DateText = styled.div`
   font-size: 14px;
   color: #aeaeae;
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.laptopL} {
     display: ${props => (props.theme.isCorner ? 'none' : 'block')};
   }
@@ -122,14 +112,12 @@ const NewMessage = styled.div`
   text-align: center;
   font-weight: 700;
   display: ${props => (props.isRead ? 'none' : 'block')};
-  @media ${device.mobileM} {
-    height: 22px;
-    width: 22px;
-    border-radius: 11px;
-    font-size: 13px;
-    right: ${props => (props.theme.isCorner ? '17px' : '13px')};
-    top: ${props => (props.theme.isCorner ? '28px' : '38px')};
-  }
+  height: 22px;
+  width: 22px;
+  border-radius: 11px;
+  font-size: 13px;
+  right: ${props => (props.theme.isCorner ? '17px' : '13px')};
+  top: ${props => (props.theme.isCorner ? '28px' : '38px')};
   @media ${device.laptopL} {
     font-size: ${props => (props.theme.isCorner ? '13px' : '16px')};
     height: ${props => (props.theme.isCorner ? '22px' : '26px')};
@@ -141,12 +129,9 @@ const NewMessage = styled.div`
 `;
 
 const TitleWrapper = styled.div`
-  display: flex;
   flex-direction: column;
-  @media ${device.mobileM} {
-    display: ${props => (props.theme.isCorner ? 'none' : 'flex')};
-    padding: 15px 0 0 10px;
-  }
+  display: ${props => (props.theme.isCorner ? 'none' : 'flex')};
+  padding: 15px 0 0 10px;
   @media ${device.laptopL} {
     display: flex;
     padding: ${props =>
@@ -156,11 +141,8 @@ const TitleWrapper = styled.div`
 
 const Title = styled.div`
   font-weight: 600;
-  font-size: 24px;
   color: ${color.primary};
-  @media ${device.mobileM} {
-    font-size: 18px;
-  }
+  font-size: 18px;
   @media ${device.laptopL} {
     display: block;
     font-size: ${props => (props.theme.isCorner ? '18px' : '24px')};
@@ -170,10 +152,8 @@ const Title = styled.div`
 
 const SearchBar = styled.div`
   display: ${props => (props.theme.isCorner ? 'none' : 'block')};
-  @media ${device.mobileM} {
-    margin: 15px 0;
-    width: 99%;
-  }
+  margin: 15px 0;
+  width: 99%;
   @media ${device.laptopL} {
     margin: 0 0 30px;
     width: 94%;
@@ -308,5 +288,11 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
     </ThemeProvider>
   );
 });
+
+ChatList.propTypes = {
+  active: PropTypes.object,
+  setActive: PropTypes.func.isRequired,
+  isCorner: PropTypes.bool.isRequired,
+};
 
 export default ChatList;

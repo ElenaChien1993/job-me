@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useLocation, useOutletContext } from 'react-router-dom';
+
 import {
   Input,
   Editable,
@@ -7,12 +9,11 @@ import {
   Select,
   IconButton,
 } from '@chakra-ui/react';
-import { useLocation } from 'react-router-dom';
 import { EditIcon, CheckCircleIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
-import firebase from '../utils/firebase';
-import { device, color } from '../style/variable';
+import firebase from '../../utils/firebase';
+import { device, color } from '../../style/variable';
 
 const Container = styled.div`
   display: flex;
@@ -23,12 +24,10 @@ const Container = styled.div`
   &:hover {
     transform: ${props => (props.hasHover ? 'translate(5px, 5px)' : '')};
   }
-  @media ${device.mobileM} {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 20px 40px 40px;
-  }
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px 40px 40px;
   @media ${device.laptop} {
     flex-direction: row;
     align-items: center;
@@ -49,9 +48,7 @@ const HeadWrapper = styled.div`
   align-items: center;
   font-size: 42px;
   font-weight: 700;
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.laptop} {
     display: flex;
   }
@@ -126,15 +123,13 @@ const StatusWrapper = styled.div`
 
 const TagsWrapper = styled.div`
   position: relative;
-  @media ${device.mobileM} {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 105px));
-    gap: 10px;
-    margin-left: 0;
-    margin-top: 10px;
-    justify-content: flex-start;
-  }
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 105px));
+  gap: 10px;
+  margin-left: 0;
+  margin-top: 10px;
+  justify-content: flex-start;
   @media ${device.laptop} {
     margin-top: 0;
     margin-left: auto;
@@ -159,10 +154,8 @@ const Tag = styled.div`
 
 const TagReminder = styled.div`
   position: absolute;
-  @media ${device.mobileM} {
-    left: 0;
-    bottom: -30px;
-  }
+  left: 0;
+  bottom: -30px;
   @media ${device.laptop} {
     left: auto;
     right: 0;
@@ -180,9 +173,15 @@ const NoteElement = React.memo(
   ({ uid, noteId, note, setNote, editable, isPublic }) => {
     const [isEditing, setIsEditing] = useState(false);
     const { pathname } = useLocation();
+    const { setError } = useOutletContext();
 
     const onBlurSubmit = objectKey => {
-      firebase.updateNoteBrief(uid, noteId, { [objectKey]: note[objectKey] });
+      try {
+        firebase.updateNoteBrief(uid, noteId, { [objectKey]: note[objectKey] });
+      } catch (error) {
+        console.log(error);
+        setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
+      }
     };
 
     const handleStatusChange = e => {
@@ -198,9 +197,14 @@ const NoteElement = React.memo(
       });
     };
 
-    const handleTagsSubmit = () => {
-      firebase.updateNoteBrief(uid, noteId, { tags: note.tags });
-      setIsEditing(false);
+    const handleTagsSubmit = async () => {
+      try {
+        await firebase.updateNoteBrief(uid, noteId, { tags: note.tags });
+        setIsEditing(false);
+      } catch (error) {
+        console.log(error);
+        setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
+      }
     };
 
     return (
@@ -256,7 +260,9 @@ const NoteElement = React.memo(
                   value={note.status}
                   onBlur={() => onBlurSubmit('status')}
                 >
-                  <option style={{marginTop: '5px'}} value="未申請">未申請</option>
+                  <option style={{ marginTop: '5px' }} value="未申請">
+                    未申請
+                  </option>
                   <option value="已申請">已申請</option>
                   <option value="未錄取">未錄取</option>
                   <option value="已錄取">已錄取</option>

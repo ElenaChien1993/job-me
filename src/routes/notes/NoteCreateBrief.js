@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
+
 import {
   Input,
   IconButton,
@@ -11,12 +12,11 @@ import {
   PopoverHeader,
   PopoverBody,
   Button,
-  useToast,
 } from '@chakra-ui/react';
 import { QuestionIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
-import firebase from '../../utils/firebase';
 import SearchableInput from '../../components/SearchableInput';
 import { device, color } from '../../style/variable';
 import { initMap } from '../../components/GoogleSearch';
@@ -75,9 +75,7 @@ const TagButton = styled.label`
   border: 1px solid #667080;
   text-align: center;
   padding-top: 5px;
-  @media ${device.mobileM} {
-    font-size: 14px;
-  }
+  font-size: 14px;
   @media ${device.laptop} {
     font-size: 16px;
   }
@@ -139,18 +137,9 @@ const InfoPopup = () => {
 };
 
 const NoteCreateBrief = props => {
-  const {
-    nextStep,
-    handleChange,
-    values,
-    setValues,
-    noteDataBrief,
-    noteDetails,
-  } = props;
-  const { currentUserId, companies, setCompanies, jobTitles, setJobTitles } =
-    useOutletContext();
+  const { nextStep, handleChange, values, setValues, createNote } = props;
+  const { companies, jobTitles } = useOutletContext();
   const inputRef = useRef();
-  const navigate = useNavigate();
   const statusArray = [
     '未申請',
     '已申請',
@@ -159,18 +148,6 @@ const NoteCreateBrief = props => {
     '無聲卡',
     '等待中',
   ];
-  const toast = useToast();
-
-  useEffect(() => {
-    if (companies) return;
-    firebase.getWholeCollection('companies').then(data => {
-      setCompanies(data);
-    });
-    if (jobTitles) return;
-    firebase.getWholeCollection('job_titles').then(data => {
-      setJobTitles(data);
-    });
-  }, []);
 
   useEffect(() => {
     initMap(setValues, inputRef);
@@ -180,39 +157,6 @@ const NoteCreateBrief = props => {
     setValues(prev => {
       return { ...prev, is_share: !values.is_share };
     });
-  };
-
-  const createNote = async () => {
-    if (values.company_name === '' || values.job_title === '') {
-      toast({
-        title: '哎呀',
-        description: '公司名稱和應徵職稱為必填欄位',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-        position: 'top-right',
-      });
-      return;
-    }
-    const noteId = await firebase.setNoteBrief(currentUserId, {
-      ...noteDataBrief,
-      creator: currentUserId,
-    });
-    const notes = await firebase.getNotes(currentUserId);
-    firebase.updateUserInfo(currentUserId, { notes_qty: notes.length });
-
-    await firebase.setNoteDetails(noteId, noteDetails);
-
-    if (
-      companies.map(company => company.name).indexOf(values.company_name) === -1
-    ) {
-      await firebase.createDoc('companies', { name: values.company_name });
-    }
-    if (jobTitles.map(job => job.name).indexOf(values.job_title) === -1) {
-      await firebase.createDoc('job_titles', { name: values.job_title });
-    }
-
-    navigate(`/notes/details/${noteId}`);
   };
 
   const handleTagsChange = e => {
@@ -339,6 +283,15 @@ const NoteCreateBrief = props => {
       </ButtonGroup>
     </>
   );
+};
+
+NoteCreateBrief.propTypes = {
+  nextStep: PropTypes.func.isRequired,
+  handleChange: PropTypes.func.isRequired,
+  values: PropTypes.object.isRequired,
+  setValues: PropTypes.func.isRequired,
+  noteDataBrief: PropTypes.object.isRequired,
+  noteDetails: PropTypes.object.isRequired,
 };
 
 export default NoteCreateBrief;

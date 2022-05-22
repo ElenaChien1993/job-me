@@ -1,21 +1,18 @@
-import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+
 import { IconButton } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { IoChatbubbleEllipsesSharp } from 'react-icons/io5';
 import styled from 'styled-components';
 
-import Messages from '../routes/Messages';
-import { device, color } from '../style/variable';
-import firebase from '../utils/firebase';
+import Messages from '../../routes/Messages';
+import { device, color } from '../../style/variable';
 
 const IconWrapper = styled.div`
   position: fixed;
   z-index: 1;
   bottom: 7%;
-  @media ${device.mobileM} {
-    right: 10%;
-  }
+  right: 10%;
   @media ${device.tablet} {
     right: 7%;
   }
@@ -25,9 +22,7 @@ const MessageWrapper = styled.div`
   position: fixed;
   z-index: 1;
   bottom: 15%;
-  @media ${device.mobileM} {
-    right: 10%;
-  }
+  right: 10%;
   @media ${device.tablet} {
     right: 7%;
   }

@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+
 import {
   Button,
   ButtonGroup,
@@ -7,23 +8,20 @@ import {
   Input,
   Textarea,
 } from '@chakra-ui/react';
-
 import styled from 'styled-components';
 
-import firebase from '../utils/firebase';
-import Loader from '../components/Loader';
-import ChatCorner from './ChatCorner';
-import { device, color } from '../style/variable';
+import firebase from '../../utils/firebase';
+import Loader from '../Loader';
+import ChatCorner from '../messages/ChatCorner';
+import { device, color } from '../../style/variable';
 import ProfileInfo from './ProfileInfo';
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  @media ${device.mobileM} {
-    padding: 20px 0;
-    flex-direction: column;
-  }
+  padding: 20px 0;
+  flex-direction: column;
   @media ${device.tablet} {
     margin: 20px 0;
     padding: 30px 0;
@@ -34,9 +32,7 @@ const Container = styled.div`
 const LeftWrapper = styled.div`
   flex-direction: column;
   align-items: center;
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.tablet} {
     display: flex;
     border-right: 5px solid #c4c4c4;
@@ -47,9 +43,7 @@ const LeftWrapper = styled.div`
 const RightWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  @media ${device.mobileM} {
-    width: 100%;
-  }
+  width: 100%;
   @media ${device.tablet} {
     margin-top: 0;
     padding-left: 50px;
@@ -80,9 +74,7 @@ const InputWrap = styled.div`
     line-height: 24px;
     font-weight: 500;
   }
-  @media ${device.mobileM} {
-    padding: 10px 0;
-  }
+  padding: 10px 0;
   @media ${device.tablet} {
     padding: 16px 0;
   }
@@ -100,17 +92,22 @@ const ProfileSetting = () => {
     title: '',
     about_me: '',
   });
-  const { userInfo, currentUserId } = useOutletContext();
+  const { userInfo, currentUserId, setError } = useOutletContext();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const entries = Object.entries(values);
     const filtered = entries.filter(entry => entry[1] !== '');
     const filteredObject = Object.fromEntries(filtered);
-    firebase.updateUserInfo(currentUserId, filteredObject);
-    if (filteredObject.display_name) {
-      firebase.updateUser(filteredObject.display_name);
+    try {
+      await firebase.updateUserInfo(currentUserId, filteredObject);
+      if (filteredObject.display_name) {
+        firebase.updateUser(filteredObject.display_name);
+      }
+      setValues({ display_name: '', title: '', about_me: '' });
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
     }
-    setValues({ display_name: '', title: '', about_me: '' });
   };
 
   if (!userInfo) return <Loader />;
@@ -118,10 +115,7 @@ const ProfileSetting = () => {
   return (
     <Container>
       <LeftWrapper>
-        <ProfileInfo
-          userInfo={userInfo}
-          currentUserId={currentUserId}
-        />
+        <ProfileInfo userInfo={userInfo} currentUserId={currentUserId} />
       </LeftWrapper>
       <RightWrapper>
         <SelectionWrapper>

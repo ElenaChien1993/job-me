@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+
 import {
-  Button,
   Input,
   InputGroup,
   InputRightElement,
   useToast,
 } from '@chakra-ui/react';
+import { Search2Icon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
 import Member from './Member';
-import firebase from '../utils/firebase';
-import { Search2Icon } from '@chakra-ui/icons';
+import firebase from '../../utils/firebase';
 
 const Container = styled.div`
   display: flex;
@@ -108,7 +108,7 @@ const SearchMembers = () => {
   const [term, setTerm] = useState('');
   const [data, setData] = useState(null);
   const [toggle, setToggle] = useState(true);
-  const { currentUserId } = useOutletContext();
+  const { currentUserId, setError } = useOutletContext();
   const toast = useToast();
 
   useEffect(() => {
@@ -134,12 +134,17 @@ const SearchMembers = () => {
       });
       return;
     }
-    const result = await firebase.getRecommendedUsers(
-      value,
-      value,
-      currentUserId
-    );
-    setSearchResult(result);
+    try {
+      const result = await firebase.getRecommendedUsers(
+        value,
+        value,
+        currentUserId
+      );
+      setSearchResult(result);
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '讀取資料發生錯誤，請稍後再試' });
+    }
   };
 
   const onInputChange = value => {

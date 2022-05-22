@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, NavLink } from 'react-router-dom';
+
 import {
   Menu,
   MenuButton,
@@ -12,6 +13,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
   DrawerBody,
+  useToast,
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
@@ -56,9 +58,7 @@ const Logo = styled.img`
 const NavItem = styled.li`
   font-size: 16px;
   margin: 10px;
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.tablet} {
     display: block;
   }
@@ -72,9 +72,7 @@ const ImageWrapper = styled.div`
   overflow: hidden;
   margin-right: 20px;
   cursor: pointer;
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.tablet} {
     display: block;
   }
@@ -147,14 +145,9 @@ const Nav = ({ userInfo, currentUserId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleLogout = () => {
-    firebase
-      .signOut()
-      .then(() => {
-        navigate('/login', { state: { from: { pathname: '/notes' } } });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    firebase.signOut().then(() => {
+      navigate('/login', { state: { from: { pathname: '/notes' } } });
+    });
   };
 
   const handleLogIn = () => {
@@ -165,6 +158,13 @@ const Nav = ({ userInfo, currentUserId }) => {
     navigate(`/profile/${currentUserId}?tab=setting`);
   };
 
+  const tabs = [
+    ['/notes', '我的筆記'],
+    ['/practice', '面試練習'],
+    ['/explore', '探索'],
+    ['/messages', '聊天室'],
+  ];
+
   return (
     <>
       <StyledNav>
@@ -172,26 +172,13 @@ const Nav = ({ userInfo, currentUserId }) => {
           <Link to="/notes">
             <Logo alt="logo" src={logo} />
           </Link>
-          <NavItem>
-            <StyledNavLink to="/notes">
-              {({ isActive }) => <Span isActive={isActive}>我的筆記</Span>}
-            </StyledNavLink>
-          </NavItem>
-          <NavItem>
-            <StyledNavLink to="/practice">
-              {({ isActive }) => <Span isActive={isActive}>面試練習</Span>}
-            </StyledNavLink>
-          </NavItem>
-          <NavItem>
-            <StyledNavLink to="/explore">
-              {({ isActive }) => <Span isActive={isActive}>探索</Span>}
-            </StyledNavLink>
-          </NavItem>
-          <NavItem>
-            <StyledNavLink to="/messages">
-              {({ isActive }) => <Span isActive={isActive}>聊天室</Span>}
-            </StyledNavLink>
-          </NavItem>
+          {tabs.map(tab => (
+            <NavItem key={tab[0]}>
+              <StyledNavLink to={tab[0]}>
+                {({ isActive }) => <Span isActive={isActive}>{tab[1]}</Span>}
+              </StyledNavLink>
+            </NavItem>
+          ))}
           {currentUserId ? (
             <Menu>
               <MenuButton ml="auto">
@@ -247,44 +234,25 @@ const Nav = ({ userInfo, currentUserId }) => {
                   <DrawerCloseButton />
                   <DrawerBody>
                     <MobileUl>
+                      {tabs.map(tab => (
+                        <MobileNavItem key={tab[0]}>
+                          <StyledNavLink to={tab[0]}>
+                            {({ isActive }) => (
+                              <MobileSpan isActive={isActive}>
+                                {tab[1]}
+                              </MobileSpan>
+                            )}
+                          </StyledNavLink>
+                        </MobileNavItem>
+                      ))}
                       <MobileNavItem>
-                        <StyledNavLink to="/notes">
-                          {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>我的筆記</MobileSpan>
-                          )}
-                        </StyledNavLink>
-                      </MobileNavItem>
-                      <MobileNavItem>
-                        <StyledNavLink to="/practice">
-                          {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>
-                              面試練習
-                            </MobileSpan>
-                          )}
-                        </StyledNavLink>
-                      </MobileNavItem>
-                      <MobileNavItem>
-                        <StyledNavLink to="/explore">
+                        <StyledNavLink
+                          to={`/profile/${currentUserId}?tab=setting`}
+                        >
                           {({ isActive }) => (
                             <MobileSpan isActive={isActive}>
-                              探索
+                              個人資料
                             </MobileSpan>
-                          )}
-                        </StyledNavLink>
-                      </MobileNavItem>
-                      <MobileNavItem>
-                        <StyledNavLink to="/messages">
-                          {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>
-                              聊天室
-                            </MobileSpan>
-                          )}
-                        </StyledNavLink>
-                      </MobileNavItem>
-                      <MobileNavItem>
-                        <StyledNavLink to={`/profile/${currentUserId}?tab=setting`}>
-                          {({ isActive }) => (
-                            <MobileSpan isActive={isActive}>個人資料</MobileSpan>
                           )}
                         </StyledNavLink>
                       </MobileNavItem>
@@ -317,12 +285,20 @@ const Layout = () => {
   const [jobTitles, setJobTitles] = useState(null);
   const [databaseRooms, setDatabaseRooms] = useState([]);
   const [unreadTotal, setUnreadTotal] = useState(0);
+  const [error, setError] = useState(null);
+
+  const toast = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!currentUserId) return;
     const unsubscribe = firebase.listenUserProfileChange(
       currentUserId,
-      setUserInfo
+      data => {
+        setUserInfo(prev => {
+          return { ...prev, ...data };
+        });
+      }
     );
 
     return () => unsubscribe();
@@ -349,6 +325,24 @@ const Layout = () => {
     setUnreadTotal(unreadQty);
   }, [databaseRooms, setUnreadTotal, currentUserId]);
 
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: `抱歉，${error.message}`,
+        description: '將自動帶您回首頁',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+        position: error.type === 0 ? 'top' : 'top-right',
+      });
+      if (error.type === 0) {
+        navigate('/notes');
+      }
+    }
+
+    return () => setError(null);
+  }, [error, navigate, toast]);
+
   const props = {
     currentUserId,
     userInfo,
@@ -364,14 +358,12 @@ const Layout = () => {
     setUnreadTotal,
     databaseRooms,
     setDatabaseRooms,
+    setError,
   };
 
   return (
     <Container>
-      <Nav
-        userInfo={userInfo}
-        currentUserId={currentUserId}
-      />
+      <Nav userInfo={userInfo} currentUserId={currentUserId} />
       <ContentContainer>
         <Outlet context={props} />
       </ContentContainer>

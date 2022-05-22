@@ -1,40 +1,12 @@
 import {
   EditablePreview,
   useColorModeValue,
-  IconButton,
   Input,
-  useEditableControls,
-  ButtonGroup,
   Editable,
   Tooltip,
   EditableInput,
   EditableTextarea,
 } from '@chakra-ui/react';
-import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
-
-const EditableControls = () => {
-  const { isEditing, getSubmitButtonProps, getCancelButtonProps } =
-    useEditableControls();
-
-  return isEditing ? (
-    <ButtonGroup
-      justifyContent="end"
-      size="sm"
-      // position="absolute"
-      right={0}
-      top="-4px"
-      zIndex={3}
-      spacing={2}
-      mt={2}
-    >
-      <IconButton icon={<CheckIcon />} {...getSubmitButtonProps()} />
-      <IconButton
-        icon={<CloseIcon boxSize={3} />}
-        {...getCancelButtonProps()}
-      />
-    </ButtonGroup>
-  ) : null;
-};
 
 const EditableInputField = ({
   value,
@@ -70,7 +42,6 @@ const EditableInputField = ({
         pl={0}
         as={callbackArgs.subKey === 'answer' ? EditableTextarea : EditableInput}
       />
-      {/* <EditableControls /> */}
     </Editable>
   );
 };

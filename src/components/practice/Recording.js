@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
+
 import { useReactMediaRecorder } from 'react-media-recorder';
 import { Button, IconButton, Icon, Tooltip, useToast } from '@chakra-ui/react';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
@@ -10,21 +13,18 @@ import {
 import { MdOutlineSave, MdNavigateNext, MdTimer } from 'react-icons/md';
 import styled from 'styled-components';
 
-import { Audio, Video } from './elements/MediaRecorder';
-import CountDown from './elements/CountDown';
-import firebase from '../utils/firebase';
-import Loader from './Loader';
-import { useEffect, useState, useRef } from 'react';
-import { device, color } from '../style/variable';
+import { Audio, Video } from '../elements/MediaRecorder';
+import CountDown from '../elements/CountDown';
+import firebase from '../../utils/firebase';
+import Loader from '../Loader';
+import { device, color } from '../../style/variable';
 
 const ButtonsWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-around;
   margin: 30px 0;
-  @media ${device.mobileM} {
-    width: 100%;
-  }
+  width: 100%;
   @media ${device.tablet} {
     width: 50%;
   }
@@ -66,9 +66,8 @@ const Recording = ({
     echoCancellation: true,
   });
   const [isLoading, setIsLoading] = useState(false);
-  const controllRef = useRef();
   const { company_name, job_title } = brief;
-  const user = firebase.auth.currentUser;
+  const { currentUserId, setError } = useOutletContext();
   const toast = useToast();
 
   useEffect(() => {
@@ -85,18 +84,22 @@ const Recording = ({
   }, [error, toast]);
 
   const getDownloadURL = async (type, id) => {
-    const fileBlob = await fetch(mediaBlobUrl).then(r => r.blob());
-    const path = `${type === 0 ? 'audios' : 'videos'}/${
-      user.uid
-    }/${company_name}｜${job_title}/${
-      practiceQuestions[current].question
-    }-${id}`;
+    try {
+      const fileBlob = await fetch(mediaBlobUrl).then(r => r.blob());
+      const path = `${
+        type === 0 ? 'audios' : 'videos'
+      }/${currentUserId}/${company_name}｜${job_title}/${
+        practiceQuestions[current].question
+      }-${id}`;
 
-    const url = await firebase.uploadFile(path, fileBlob).then(() => {
-      return firebase.getDownloadURL(path);
-    });
-
-    return url;
+      const url = await firebase.uploadFile(path, fileBlob).then(() => {
+        return firebase.getDownloadURL(path);
+      });
+      return url;
+    } catch (err) {
+      console.log(err);
+      setError({ type: 1, message: '上傳資料發生錯誤，請稍後再試' });
+    }
   };
 
   const handleSave = async type => {
@@ -107,31 +110,27 @@ const Recording = ({
       record_name: practiceQuestions[current].question,
       record_job: `${company_name}｜${job_title}`,
     };
-    firebase.setRecord(user.uid, recordData).then(async id => {
-      try {
-        const url = await getDownloadURL(type, id);
-        firebase.updateRecord(user.uid, id, { link: url });
-        setIsLoading(false);
-        toast({
-          title: '成功！',
-          description: '已將檔案存在您的個人檔案中',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-          position: 'top-right',
-        });
-      } catch (error) {
-        console.log(error);
-        toast({
-          title: '哎呀',
-          description: '上傳檔案時發生錯誤，請稍後再試',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-          position: 'top-right',
-        });
-      }
-    });
+    try {
+      const id = await firebase.createDoc(
+        `users/${currentUserId}/records`,
+        recordData,
+        'record_id'
+      );
+      const url = await getDownloadURL(type, id);
+      await firebase.updateRecord(currentUserId, id, { link: url });
+      setIsLoading(false);
+      toast({
+        title: '成功！',
+        description: '已將檔案存在您的個人檔案中',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right',
+      });
+    } catch (err) {
+      console.log(err);
+      setError({ type: 1, message: '儲存資料發生錯誤，請稍後再試' });
+    }
   };
 
   const goNext = () => {

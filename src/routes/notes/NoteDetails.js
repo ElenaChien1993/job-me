@@ -1,10 +1,7 @@
-import { useParams, Link, useOutletContext } from 'react-router-dom';
 import React, { useEffect, useState, useRef } from 'react';
+import { useParams, Link, useOutletContext } from 'react-router-dom';
+
 import {
-  Editable,
-  EditableInput,
-  EditablePreview,
-  Select,
   IconButton,
   Button,
   useDisclosure,
@@ -13,36 +10,26 @@ import {
   Tab,
   TabPanels,
   TabPanel,
-  Divider,
   Tooltip,
-  useToast,
-  CloseButton,
 } from '@chakra-ui/react';
-import {
-  SmallCloseIcon,
-  EditIcon,
-  ChevronLeftIcon,
-  AtSignIcon,
-} from '@chakra-ui/icons';
+import { ChevronLeftIcon, AtSignIcon } from '@chakra-ui/icons';
 import { MdPreview } from 'react-icons/md';
 import styled from 'styled-components';
 
-import NoteElement from '../../components/NoteCardEditable';
+import NoteElement from '../../components/notes/NoteCardEditable';
 import firebase from '../../utils/firebase';
-import AddField from '../../components/elements/AddField';
-import EditFiles from '../../components/elements/EditFiles';
-import EditorArea from '../../components/elements/Editor';
-import RecommendModal from '../../components/RecommendModal';
-import EditableInputField from '../../components/EditableInputField';
-import ChatCorner from '../../components/ChatCorner';
+import RecommendModal from '../../components/notes/RecommendModal';
+import ChatCorner from '../../components/messages/ChatCorner';
 import { device, color } from '../../style/variable';
+import CompanyInfo from '../../components/notes/CompanyInfo';
+import JobDetails from '../../components/notes/JobDetails';
+import Preparation from '../../components/notes/Preparation';
+import PersonalThought from '../../components/notes/PersonalThought';
 
 const Background = styled.div`
   margin: 30px auto 0;
   max-width: 1000px;
-  @media ${device.mobileM} {
-    width: 90%;
-  }
+  width: 90%;
   @media ${device.tablet} {
     width: 80%;
   }
@@ -55,9 +42,7 @@ const Container = styled.div`
   background: ${color.white};
   margin-bottom: 60px;
   position: relative;
-  @media ${device.mobileM} {
-    padding: 20px 20px 0;
-  }
+  padding: 20px 20px 0;
   @media ${device.tablet} {
     padding: 20px 40px 0;
   }
@@ -70,17 +55,9 @@ const PublicButtons = styled.div`
     position: static;
     justify-content: flex-end;
   }
-  @media ${device.tablet} {
-  }
   position: absolute;
   right: 40px;
   top: 32px;
-`;
-
-const DeleteButton = styled(CloseButton)`
-  && {
-    margin-left: auto;
-  }
 `;
 
 const ButtonWrapper = styled.div`
@@ -90,188 +67,54 @@ const ButtonWrapper = styled.div`
   margin-bottom: 20px;
 `;
 
-const FieldWrapper = styled.div`
-  width: 100%;
-  margin: 0 auto;
-  margin-bottom: 20px;
-  position: relative;
-`;
-
-const TitleSection = styled.div`
-  position: relative;
-`;
-
-const Title = styled.p`
-  font-size: 18px;
-  font-weight: 500;
-  margin-bottom: 10px;
-  color: ${color.primary};
-  z-index: 1;
-  position: relative;
-`;
-
-const TitleBack = styled.div`
-  height: 13px;
-  position: absolute;
-  top: 18px;
-  left: 0;
-  background-color: rgba(243, 173, 95, 0.5);
-  z-index: 0;
-  width: 100%;
-`;
-
-const SalaryText = styled.div`
-  font-size: 16px;
-  margin: 0 10px;
-`;
-
-const Content = styled.div`
-  font-size: 16px;
-`;
-
-const ListWrapper = styled.div`
-  width: 100%;
-`;
-
-const Dot = styled.div`
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
-  background-color: ${color.primary};
-`;
-
-const ListItem = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const QuestionCard = styled.div`
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  border-radius: 15px;
-  background-color: rgba(243, 173, 95, 0.5);
-  position: relative;
-`;
-
-const CustomDeleteButton = styled(CloseButton)`
-  && {
-    position: absolute;
-    right: 8px;
-    top: 8px;
-  }
-`;
-
-const CheckBoxWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const CheckBox = styled.input`
-  height: 16px;
-  width: 16px;
-  cursor: pointer;
-`;
-
 const Line = styled.div`
   width: 100%;
   height: 5px;
   background-color: ${color.primary};
 `;
 
-const StyledLink = styled.a`
-  margin-left: 10px;
-  color: black;
-  text-decoration: underline;
-`;
-
-const StyledListItem = styled.div`
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-`;
-
-const TitleWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 15px;
-`;
-
-const StyledSalaryWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const StyledEditable = styled(Editable)`
-  && {
-    min-width: 12%;
-    margin-right: 10px;
-  }
-`;
-
-const QuestionCardsWrapper = styled.div`
-  display: grid;
-  gap: 15px;
-  @media ${device.mobileM} {
-    grid-template-columns: 1fr;
-  }
-  @media ${device.laptop} {
-    grid-template-columns: 1fr 1fr;
-  }
-`;
-
-const QuestionTitle = styled.div`
-  & .chakra-editable__preview {
-    font-weight: 700;
-    font-size: 18px;
-  }
-`;
-
 const NoteDetails = () => {
   const [brief, setBrief] = useState();
   const [details, setDetails] = useState();
-  const [isFilesEditing, setIsFilesEditing] = useState(false);
   const [recommend, setRecommend] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { currentUserId } = useOutletContext();
   const submitRef = useRef();
-  const toast = useToast();
+  const { currentUserId, setError } = useOutletContext();
 
   const { onOpen, isOpen, onClose } = useDisclosure({ id: 'recommend' });
   let params = useParams();
   const noteId = params.noteId;
 
   const tabs = ['公司資訊', '工作內容', '面試準備', '筆記心得'];
+  const sections = [
+    ['面試前筆記區', 'before_note'],
+    ['面試中筆記區', 'ing_note'],
+    ['面試後心得區', 'after_note'],
+  ];
 
   useEffect(() => {
-    firebase.getNote(currentUserId, noteId).then(snap => {
-      setBrief(snap.data());
-    });
-    firebase.getNoteDetails(noteId).then(snap => {
-      setDetails(snap.data());
-    });
-    const unsubscribe = firebase.listenDetailsChange(noteId, doc => {
-      setDetails(doc.data());
-      console.log('database changed', doc.data());
-    });
+    let unsubscribe;
+    const fetchNotes = async () => {
+      try {
+        const brief = await firebase.getNote(currentUserId, noteId);
+        setBrief(brief.data());
+        unsubscribe = firebase.listenDetailsChange(noteId, doc => {
+          setDetails(doc.data());
+        });
+      } catch (error) {
+        console.log(error);
+        setError({ type: 0, message: '讀取資料發生錯誤' });
+      }
+    };
 
-    return unsubscribe;
-  }, [currentUserId, noteId]);
+    fetchNotes();
+    return () => unsubscribe();
+  }, [currentUserId, noteId, setDetails, setError]);
 
   useEffect(() => {
     if (!submitRef.current) return;
     onBlurSubmit(submitRef.current.key);
   }, [submitRef.current]);
-
-  // ------- Helper Function
-  const getArrayChangedValue = (value, index, objectKey) => {
-    const update = details[objectKey].map((item, i) =>
-      index === i ? value : item
-    );
-    return update;
-  };
 
   const getObjectInArrayChangedValue = (value, index, objectKey, targetKey) => {
     const update = details[objectKey].map((item, i) =>
@@ -285,31 +128,6 @@ const NoteDetails = () => {
     return update;
   };
 
-  const getCheckboxChangedValue = (index, objectKey) => {
-    const updatedChecked = details[objectKey].map((item, i) =>
-      index === i
-        ? {
-            ...item,
-            is_qualified: !item.is_qualified,
-          }
-        : item
-    );
-    return updatedChecked;
-  };
-
-  const onBlurSubmit = objectKey => {
-    firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
-  };
-
-  //-------- Handle Array of Strings
-  const handleArrayInputChange = (value, index, objectKey) => {
-    const update = getArrayChangedValue(value, index, objectKey);
-    setDetails(prev => {
-      return { ...prev, [objectKey]: update };
-    });
-  };
-
-  // ------- Handle Array of Maps
   const handleMapArrayInputChange = (value, index, objectKey, targetKey) => {
     const update = getObjectInArrayChangedValue(
       value,
@@ -322,11 +140,13 @@ const NoteDetails = () => {
     });
   };
 
-  // ------- Handle Checkbox
-  const handleCheckboxChange = (itemIndex, objectKey) => {
-    const updatedChecked = getCheckboxChangedValue(itemIndex, objectKey);
-
-    firebase.updateNoteDetails(noteId, { [objectKey]: updatedChecked });
+  const onBlurSubmit = objectKey => {
+    try {
+      firebase.updateNoteDetails(noteId, { [objectKey]: details[objectKey] });
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
+    }
   };
 
   const handleDelete = (i, objectKey) => {
@@ -334,50 +154,30 @@ const NoteDetails = () => {
     setDetails(prev => {
       return { ...prev, [objectKey]: newData };
     });
-    firebase.updateNoteDetails(noteId, { [objectKey]: newData });
-  };
-
-  const handleInputSalaryChange = (e, type) => {
-    setDetails(prev => {
-      return { ...prev, salary: { ...details.salary, [type]: e.target.value } };
-    });
-  };
-
-  const handleFilesSubmit = () => {
-    const regex =
-      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gm;
-
-    if (
-      (!details.job_link.match(regex) && details.job_link !== '') ||
-      (!details.resume_link.match(regex) && details.resume_link !== '')
-    ) {
-      toast({
-        title: '請填寫正確的 URL 格式',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-        position: 'top-right',
-      });
-      return;
+    try {
+      firebase.updateNoteDetails(noteId, { [objectKey]: newData });
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '更新資料發生錯誤，請稍後再試' });
     }
-
-    firebase.updateNoteDetails(noteId, {
-      job_link: details.job_link,
-      resume_link: details.resume_link,
-      attached_files: details.attached_files,
-    });
-    setIsFilesEditing(false);
   };
 
-  const showConnectModal = () => {
+  const showConnectModal = async () => {
     setIsLoading(true);
     onOpen();
-    firebase
-      .getRecommendedUsers(brief.company_name, brief.job_title, currentUserId)
-      .then(members => {
-        setRecommend(members);
-        setIsLoading(false);
-      });
+    try {
+      const members = await firebase.getRecommendedUsers(
+        brief.company_name,
+        brief.job_title,
+        currentUserId
+      );
+      setRecommend(members);
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '讀取資料發生錯誤，請稍後再試' });
+      onClose();
+    }
+    setIsLoading(false);
   };
 
   const openPreview = () => {
@@ -407,8 +207,7 @@ const NoteDetails = () => {
             size="sm"
             leftIcon={<ChevronLeftIcon />}
             variant="outline"
-            color="#00403B"
-            borderColor="#00403B"
+            colorScheme="brand"
           >
             回前頁
           </Button>
@@ -478,338 +277,44 @@ const NoteDetails = () => {
             <Line />
             <TabPanels>
               <TabPanel>
-                <FieldWrapper>
-                  <Title>公司主要產品 / 服務</Title>
-                  <Editable
-                    defaultValue={
-                      details.product === '' ? '尚未填寫資料' : details.product
-                    }
-                    onSubmit={() => onBlurSubmit('product')}
-                  >
-                    <EditablePreview />
-                    <EditableInput
-                      onChange={e =>
-                        setDetails(prev => {
-                          return { ...prev, product: e.target.value };
-                        })
-                      }
-                    />
-                  </Editable>
-                </FieldWrapper>
-                <FieldWrapper>
-                  <Title>薪資範圍</Title>
-                  <StyledSalaryWrapper>
-                    <StyledEditable
-                      defaultValue={
-                        details.salary.range === ''
-                          ? '尚未填寫資料'
-                          : details.salary.range
-                      }
-                      onSubmit={() => onBlurSubmit('salary')}
-                    >
-                      <EditablePreview />
-                      <EditableInput
-                        onChange={e => handleInputSalaryChange(e, 'range')}
-                      />
-                    </StyledEditable>
-                    <SalaryText> K </SalaryText>
-                    <Select
-                      variant="outline"
-                      isFullWidth={false}
-                      maxWidth="100px"
-                      onChange={e => handleInputSalaryChange(e, 'type')}
-                      onBlur={() => onBlurSubmit('salary')}
-                    >
-                      <option value="年薪">年薪</option>
-                      <option value="月薪">月薪</option>
-                    </Select>
-                  </StyledSalaryWrapper>
-                </FieldWrapper>
+                <CompanyInfo
+                  details={details}
+                  setDetails={setDetails}
+                  onBlurSubmit={onBlurSubmit}
+                />
               </TabPanel>
               <TabPanel>
-                <FieldWrapper>
-                  <TitleSection>
-                    <Title>工作內容</Title>
-                    <TitleBack />
-                  </TitleSection>
-                  <ListWrapper>
-                    {details.responsibilities.map((item, i) => {
-                      return (
-                        <ListItem key={item}>
-                          <Dot />
-                          <EditableInputField
-                            value={item}
-                            onBlurSubmit={onBlurSubmit}
-                            onSubmitCallback={handleArrayInputChange}
-                            callbackArgs={{ objectKey: 'responsibilities' }}
-                            i={i}
-                            submitRef={submitRef}
-                          />
-                          <DeleteButton
-                            aria-label="delete item"
-                            icon={<SmallCloseIcon />}
-                            onClick={() => handleDelete(i, 'responsibilities')}
-                          />
-                        </ListItem>
-                      );
-                    })}
-                  </ListWrapper>
-                  <AddField
-                    setter={setDetails}
-                    objectKey="responsibilities"
-                    newValue={'新欄位，請點擊編輯'}
-                  />
-                </FieldWrapper>
-                <FieldWrapper>
-                  <TitleSection>
-                    <Title>必備技能</Title>
-                    <TitleBack />
-                  </TitleSection>
-                  <ListWrapper>
-                    {details.requirements.map((item, i) => {
-                      return (
-                        <CheckBoxWrapper key={item.description}>
-                          <CheckBox
-                            type="checkbox"
-                            checked={details.requirements[i].is_qualified}
-                            onChange={() =>
-                              handleCheckboxChange(i, 'requirements')
-                            }
-                          />
-                          <EditableInputField
-                            value={item.description}
-                            onBlurSubmit={onBlurSubmit}
-                            onSubmitCallback={handleMapArrayInputChange}
-                            callbackArgs={{
-                              objectKey: 'requirements',
-                              subKey: 'description',
-                            }}
-                            i={i}
-                            submitRef={submitRef}
-                          />
-                          <DeleteButton
-                            aria-label="delete item"
-                            icon={<SmallCloseIcon />}
-                            onClick={() => handleDelete(i, 'requirements')}
-                          />
-                        </CheckBoxWrapper>
-                      );
-                    })}
-                  </ListWrapper>
-                  <AddField
-                    setter={setDetails}
-                    objectKey="requirements"
-                    newValue={{
-                      description: '新欄位，請點擊編輯',
-                      is_qualified: false,
-                    }}
-                  />
-                </FieldWrapper>
-                <FieldWrapper>
-                  <TitleSection>
-                    <Title>加分項目</Title>
-                    <TitleBack />
-                  </TitleSection>
-                  <ListWrapper>
-                    {details.bonus.map((item, i) => {
-                      return (
-                        <CheckBoxWrapper key={item.description}>
-                          <CheckBox
-                            type="checkbox"
-                            checked={details.bonus[i].is_qualified}
-                            onChange={() => handleCheckboxChange(i, 'bonus')}
-                          />
-                          <EditableInputField
-                            value={item.description}
-                            onBlurSubmit={onBlurSubmit}
-                            onSubmitCallback={handleMapArrayInputChange}
-                            callbackArgs={{
-                              objectKey: 'bonus',
-                              subKey: 'description',
-                            }}
-                            i={i}
-                            submitRef={submitRef}
-                          />
-                          <DeleteButton
-                            aria-label="delete item"
-                            icon={<SmallCloseIcon />}
-                            onClick={() => handleDelete(i, 'bonus')}
-                          />
-                        </CheckBoxWrapper>
-                      );
-                    })}
-                  </ListWrapper>
-                  <AddField
-                    setter={setDetails}
-                    objectKey="bonus"
-                    newValue={{
-                      description: '新欄位，請點擊編輯',
-                      is_qualified: false,
-                    }}
-                  />
-                </FieldWrapper>
+                <JobDetails
+                  details={details}
+                  setDetails={setDetails}
+                  noteId={noteId}
+                  onBlurSubmit={onBlurSubmit}
+                  handleDelete={handleDelete}
+                  submitRef={submitRef}
+                  handleMapArrayInputChange={handleMapArrayInputChange}
+                />
               </TabPanel>
               <TabPanel>
-                <FieldWrapper>
-                  <TitleWrapper>
-                    <Title>相關準備資料連結</Title>
-                    {!isFilesEditing ? (
-                      <IconButton
-                        colorScheme="brand"
-                        size="sm"
-                        onClick={() => setIsFilesEditing(true)}
-                        icon={<EditIcon />}
-                      />
-                    ) : (
-                      <Button
-                        colorScheme="brand"
-                        size="sm"
-                        onClick={handleFilesSubmit}
-                      >
-                        儲存
-                      </Button>
-                    )}
-                  </TitleWrapper>
-                  {!isFilesEditing ? (
-                    <Content>
-                      {details.job_link !== '' && (
-                        <StyledListItem>
-                          <Dot />
-                          <StyledLink href={details.job_link} target="_blank">
-                            職缺連結
-                          </StyledLink>
-                        </StyledListItem>
-                      )}
-                      {details.resume_link !== '' && (
-                        <StyledListItem>
-                          <Dot />
-                          <StyledLink
-                            href={details.resume_link}
-                            target="_blank"
-                          >
-                            我的履歷連結
-                          </StyledLink>
-                        </StyledListItem>
-                      )}
-                      {details.attached_files.map((file, i) => {
-                        return (
-                          <React.Fragment key={file.file_link}>
-                            {file.file_link !== '' && (
-                              <StyledListItem key={file.file_link}>
-                                <Dot />
-                                <StyledLink
-                                  href={file.file_link}
-                                  target="_blank"
-                                >
-                                  {file.file_name}
-                                </StyledLink>
-                              </StyledListItem>
-                            )}
-                          </React.Fragment>
-                        );
-                      })}
-                    </Content>
-                  ) : (
-                    <>
-                      <EditFiles details={details} setDetails={setDetails} />
-                      <AddField
-                        setter={setDetails}
-                        objectKey="attached_files"
-                        newValue={{
-                          file_name: '請輸入檔案名稱',
-                          file_link: '請輸入檔案連結',
-                        }}
-                      />
-                    </>
-                  )}
-                </FieldWrapper>
-                <FieldWrapper>
-                  <Title>面試題目猜題</Title>
-                  <QuestionCardsWrapper>
-                    {details.questions.map((q, i) => {
-                      return (
-                        <QuestionCard key={q.question + i}>
-                          <QuestionTitle>
-                            <EditableInputField
-                              style={{ fontWeight: '700' }}
-                              value={q.question}
-                              onBlurSubmit={onBlurSubmit}
-                              onSubmitCallback={handleMapArrayInputChange}
-                              callbackArgs={{
-                                objectKey: 'questions',
-                                subKey: 'question',
-                              }}
-                              i={i}
-                              submitRef={submitRef}
-                            />
-                          </QuestionTitle>
-                          <Divider />
-                          <CustomDeleteButton
-                            aria-label="delete item"
-                            icon={<SmallCloseIcon />}
-                            onClick={() => handleDelete(i, 'questions')}
-                          />
-                          <EditableInputField
-                            value={q.answer}
-                            onBlurSubmit={onBlurSubmit}
-                            onSubmitCallback={handleMapArrayInputChange}
-                            callbackArgs={{
-                              objectKey: 'questions',
-                              subKey: 'answer',
-                            }}
-                            i={i}
-                            submitRef={submitRef}
-                          />
-                        </QuestionCard>
-                      );
-                    })}
-                    <AddField
-                      setter={setDetails}
-                      objectKey="questions"
-                      newValue={{
-                        question: '新欄位，請點擊編輯',
-                        answer: '請輸入練習回答',
-                      }}
-                    />
-                  </QuestionCardsWrapper>
-                </FieldWrapper>
+                <Preparation
+                  details={details}
+                  setDetails={setDetails}
+                  noteId={noteId}
+                  onBlurSubmit={onBlurSubmit}
+                  handleDelete={handleDelete}
+                  submitRef={submitRef}
+                  handleMapArrayInputChange={handleMapArrayInputChange}
+                />
               </TabPanel>
               <TabPanel>
-                <FieldWrapper>
-                  <TitleSection>
-                    <Title>面試前筆記區</Title>
-                    <TitleBack />
-                  </TitleSection>
-                  <Content>
-                    <EditorArea
-                      noteId={noteId}
-                      details={details}
-                      objectKey="before_note"
-                    />
-                  </Content>
-                </FieldWrapper>
-                <FieldWrapper>
-                  <TitleSection>
-                    <Title>面試中筆記區</Title>
-                    <TitleBack />
-                  </TitleSection>
-                  <EditorArea
+                {sections.map(section => (
+                  <PersonalThought
+                    key={section[1]}
                     noteId={noteId}
                     details={details}
-                    objectKey="ing_note"
+                    titleText={section[0]}
+                    targetKey={section[1]}
                   />
-                </FieldWrapper>
-                <FieldWrapper>
-                  <TitleSection>
-                    <Title>面試後心得區</Title>
-                    <TitleBack />
-                  </TitleSection>
-                  <EditorArea
-                    noteId={noteId}
-                    details={details}
-                    objectKey="after_note"
-                  />
-                </FieldWrapper>
+                ))}
               </TabPanel>
             </TabPanels>
           </Tabs>

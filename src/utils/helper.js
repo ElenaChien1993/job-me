@@ -1,5 +1,5 @@
 const helper = {
-  findUnique(array) {
+  fillterItemWithDuplicateCreator(array) {
     const ids = array.map(item => item.creator);
     const uniqueIds = ids
       .map((item, index, array) => {

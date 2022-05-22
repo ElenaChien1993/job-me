@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 const Container = styled.div`
   font-size: 30px;
@@ -20,7 +22,7 @@ const CountDown = ({ timer, status, stopRecording }) => {
     const seconds = Math.floor((timerRef.current % minute) / second);
 
     if (timerRef.current <= 0) {
-      stopRecording()
+      stopRecording();
       clearInterval(intervalRef.current);
     } else {
       setTime({ minutes, seconds });
@@ -48,6 +50,12 @@ const CountDown = ({ timer, status, stopRecording }) => {
       <span>{time.seconds > 9 ? time.seconds : '0' + time.seconds}</span>
     </Container>
   );
+};
+
+CountDown.propTypes = {
+  timer: PropTypes.number.isRequired,
+  status: PropTypes.string.isRequired,
+  stopRecording: PropTypes.func.isRequired,
 };
 
 export default CountDown;

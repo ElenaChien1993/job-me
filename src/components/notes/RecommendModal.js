@@ -13,12 +13,18 @@ import {
 
 import Member from './Member';
 import SearchMembers from './SearchMembers';
-import {color} from '../style/variable';
+import { color } from '../../style/variable';
 
 const RecommendModal = ({ isOpen, onClose, recommend, isLoading }) => {
   return (
     <>
-      <Modal scrollBehavior="inside" size="xl" isOpen={isOpen} onClose={onClose} id="recommend">
+      <Modal
+        scrollBehavior="inside"
+        size="xl"
+        isOpen={isOpen}
+        onClose={onClose}
+        id="recommend"
+      >
         <ModalOverlay />
         <ModalContent bgColor={color.lightPink}>
           {isLoading ? (
@@ -35,12 +41,16 @@ const RecommendModal = ({ isOpen, onClose, recommend, isLoading }) => {
             </Flex>
           ) : (
             <>
-              <ModalHeader bgColor={color.primary} color="white" borderRadius="0.375rem 0.375rem 0 0">可以認識一下～</ModalHeader>
-              <ModalCloseButton color="white"/>
+              <ModalHeader
+                bgColor={color.primary}
+                color="white"
+                borderRadius="0.375rem 0.375rem 0 0"
+              >
+                可以認識一下～
+              </ModalHeader>
+              <ModalCloseButton color="white" />
               <ModalBody pt="30px">
-                {recommend.length === 0 && (
-                  <SearchMembers />
-                )}
+                {recommend.length === 0 && <SearchMembers />}
                 {recommend.map((member, i) => {
                   return <Member key={i} note={member} />;
                 })}

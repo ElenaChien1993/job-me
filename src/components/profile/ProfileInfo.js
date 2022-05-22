@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import {
   IconButton,
   Menu,
@@ -11,11 +12,11 @@ import {
 import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 
-import firebase from '../utils/firebase';
-import ProfileImage from './ProfileImage';
-import { device } from '../style/variable';
-import AlertModal from './AlertModal';
-import Loader from './Loader';
+import firebase from '../../utils/firebase';
+import ProfileImage from '../ProfileImage';
+import { device } from '../../style/variable';
+import AlertModal from '../AlertModal';
+import Loader from '../Loader';
 
 const ImageContainer = styled.div`
   position: relative;
@@ -33,11 +34,9 @@ const IconGroup = styled.div`
 const NameWrapper = styled.div`
   color: #000000;
   text-align: center;
-  @media ${device.mobileM} {
-    font-size: 24px;
-    line-height: 22px;
-    margin-top: 15px;
-  }
+  font-size: 24px;
+  line-height: 22px;
+  margin-top: 15px;
   @media ${device.tablet} {
     font-size: 42px;
     line-height: 65px;
@@ -49,9 +48,7 @@ const JobTitle = styled.div`
   color: #6c6c6c;
   margin-top: 10px;
   text-align: center;
-  @media ${device.mobileM} {
-    font-size: 18px;
-  }
+  font-size: 18px;
   @media ${device.tablet} {
     font-size: 24px;
   }
@@ -60,10 +57,8 @@ const JobTitle = styled.div`
 const About = styled.div`
   color: #6c6c6c;
   text-align: center;
-  @media ${device.mobileM} {
-    font-size: 16px;
-    margin-top: 5px;
-  }
+  font-size: 16px;
+  margin-top: 5px;
   @media ${device.tablet} {
     font-size: 18px;
     margin-top: 10px;
@@ -76,10 +71,8 @@ const Counts = styled.div`
   & p {
     font-size: 24px;
   }
-  @media ${device.mobileM} {
-    margin-top: 5px;
-    flex-direction: row;
-  }
+  margin-top: 5px;
+  flex-direction: row;
   @media ${device.tablet} {
     margin-top: 20px;
     flex-direction: column;
@@ -87,10 +80,8 @@ const Counts = styled.div`
 `;
 
 const Number = styled.div`
-  @media ${device.mobileM} {
-    font-size: 24px;
-    margin-right: 10px;
-  }
+  font-size: 24px;
+  margin-right: 10px;
   @media ${device.tablet} {
     font-size: 42px;
     margin-right: 0;
@@ -98,18 +89,14 @@ const Number = styled.div`
 `;
 
 const TabletMode = styled.div`
-  @media ${device.mobileM} {
-    display: none;
-  }
+  display: none;
   @media ${device.tablet} {
     display: block;
   }
 `;
 
 const MobileMode = styled.div`
-  @media ${device.mobileM} {
-    display: block;
-  }
+  display: block;
   @media ${device.tablet} {
     display: none;
   }
@@ -120,6 +107,7 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const hiddenInputRef = useRef();
   const { isOpen, onOpen, onClose } = useDisclosure({ id: 'alert' });
+  const { setError } = useOutletContext();
   const toast = useToast();
 
   const handleChooseFile = e => {
@@ -137,11 +125,12 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
 
   const handleUpload = async () => {
     setIsLoading(true);
-    const path = `profile/${currentUserId}`;
-    const url = await firebase.uploadFile(path, image.raw).then(() => {
-      return firebase.getDownloadURL(path);
-    });
-    firebase.updateUserInfo(currentUserId, { photo_url: url }).then(() => {
+    try {
+      const path = `profile/${currentUserId}`;
+      const url = await firebase.uploadFile(path, image.raw).then(() => {
+        return firebase.getDownloadURL(path);
+      });
+      await firebase.updateUserInfo(currentUserId, { photo_url: url });
       setIsLoading(false);
       toast({
         title: '成功',
@@ -151,11 +140,12 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
         isClosable: true,
         position: 'top-right',
       });
-    });
-    setImage({
-      preview: '',
-      raw: '',
-    });
+      setImage({ preview: '', raw: '' });
+    } catch (err) {
+      setIsLoading(false);
+      console.log(err);
+      setError({ type: 1, message: '上傳照片發生錯誤，請稍後再試' });
+    }
   };
 
   const handleCancel = () => {
@@ -165,17 +155,16 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
     });
   };
 
-  const handleDelete = () => {
-    if (
-      userInfo.photo_url.includes('googleusercontent') ||
-      userInfo.photo_url.includes('facebook')
-    ) {
-      firebase.updateUserInfo(currentUserId, { photo_url: null });
-      return;
-    }
-    const path = `profile/${currentUserId}`;
-    firebase.deleteFile(path).then(() => {
-      firebase.updateUserInfo(currentUserId, { photo_url: null });
+  const handleDelete = async () => {
+    try {
+      if (
+        !userInfo.photo_url.includes('googleusercontent') &&
+        !userInfo.photo_url.includes('facebook')
+      ) {
+        const path = `profile/${currentUserId}`;
+        await firebase.deleteFile(path);
+      }
+      await firebase.updateUserInfo(currentUserId, { photo_url: null });
       toast({
         title: '成功',
         description: '照片已刪除',
@@ -184,7 +173,10 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
         isClosable: true,
         position: 'top-right',
       });
-    });
+    } catch (error) {
+      console.log(error);
+      setError({ type: 1, message: '刪除資料發生錯誤，請稍後再試' });
+    }
   };
 
   return (

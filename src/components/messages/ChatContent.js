@@ -1,18 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
-import firebase from '../utils/firebase';
-import ChatReceived from './elements/ChatReceived';
-import ChatSent from './elements/ChatSent';
+import firebase from '../../utils/firebase';
+import ChatReceived from '../elements/ChatReceived';
+import ChatSent from '../elements/ChatSent';
 
-const ChatContent = ({
-  room,
-  rootRef,
-  isCorner,
-  bottomRef,
-  messages,
-  setMessages,
-}) => {
+const ChatContent = ({ room, rootRef, bottomRef, messages, setMessages }) => {
   const firstMessageRef = useRef();
   const observeTargetRef = useRef();
   const firstRenderRef = useRef(true);
@@ -24,8 +17,15 @@ const ChatContent = ({
   useEffect(() => {
     const unsubscribe = firebase.listenMessagesChange(
       room,
-      setMessages,
-      currentUserId
+      currentUserId,
+      data => {
+        setMessages(prev => {
+          return {
+            ...prev,
+            [room.id]: data,
+          };
+        });
+      }
     );
 
     return () => unsubscribe();
@@ -45,7 +45,7 @@ const ChatContent = ({
           firstMessageRef.current
         );
         if (newMessages.length !== 0) {
-          setMessages((prev) => {
+          setMessages(prev => {
             return { ...prev, [room.id]: [...newMessages, ...prev[room.id]] };
           });
           if (newMessages.length < 20) {
@@ -64,14 +64,10 @@ const ChatContent = ({
     const target = observeTargetRef.current;
     const observer = new IntersectionObserver(callback, options);
     if (target) {
-      console.log('observe');
       observer.observe(target);
     }
-
   }, [rootRef, currentUserId, room, setMessages]);
 
-  console.log(bottomRef.current);
-  
   useEffect(() => {
     if (!messages[room.id] || !bottomRef.current) return;
     if (messages[room.id].length < 20) {
@@ -87,13 +83,12 @@ const ChatContent = ({
 
   return (
     <>
-      <div ref={observeTargetRef}></div>
+      <div ref={observeTargetRef} />
       <div style={{ paddingBottom: '10px' }}>
         {messages[room.id] &&
-          messages[room.id].map((message) =>
+          messages[room.id].map(message =>
             message.uid !== currentUserId ? (
               <ChatReceived
-                isCorner={isCorner}
                 member={room.members}
                 key={message.id}
                 message={message}

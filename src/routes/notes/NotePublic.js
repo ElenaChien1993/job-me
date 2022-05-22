@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react';
+import { useOutletContext, useParams } from 'react-router-dom';
+
 import {
   Icon,
   Tab,
@@ -8,25 +11,23 @@ import {
   Tag,
   TagLabel,
 } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
 import { AiFillEye } from 'react-icons/ai';
-import { useOutletContext, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
-import ChatCorner from '../../components/ChatCorner';
-import EditorArea from '../../components/elements/Editor';
+import ChatCorner from '../../components/messages/ChatCorner';
 import Loader from '../../components/Loader';
-import NoteElement from '../../components/NoteCardEditable';
+import NoteElement from '../../components/notes/NoteCardEditable';
 import ProfileImage from '../../components/ProfileImage';
 import { device, color } from '../../style/variable';
 import firebase from '../../utils/firebase';
+import CompanyInfo from '../../components/notes/CompanyInfo';
+import JobDetails from '../../components/notes/JobDetails';
+import PersonalThought from '../../components/notes/PersonalThought';
 
 const Background = styled.div`
   max-width: 1000px;
-  @media ${device.mobileM} {
-    margin: 30px auto 0;
-    width: 90%;
-  }
+  margin: 30px auto 0;
+  width: 90%;
   @media ${device.tablet} {
     width: 80%;
     margin: 30px auto 0;
@@ -41,12 +42,10 @@ const UpperContainer = styled.div`
   &:hover {
     filter: brightness(110%);
   }
-  @media ${device.mobileM} {
-    flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 10px;
-    padding: 15px 30px;
-  }
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  padding: 15px 30px;
   @media ${device.tablet} {
     flex-direction: row;
     margin-bottom: 25px;
@@ -57,10 +56,8 @@ const UpperContainer = styled.div`
 
 const Creator = styled.div`
   display: flex;
-  @media ${device.mobileM} {
-    margin-top: 10px;
-    align-items: center;
-  }
+  margin-top: 10px;
+  align-items: center;
   @media ${device.tablet} {
     margin-top: 0;
   }
@@ -72,10 +69,8 @@ const Name = styled.p`
   color: white;
   display: flex;
   color: white;
-  @media ${device.mobileM} {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+  flex-direction: column;
+  align-items: flex-start;
   @media ${device.tablet} {
     flex-direction: row;
     align-items: center;
@@ -95,9 +90,7 @@ const DetailsContainer = styled.div`
   background: ${color.white};
   margin-bottom: 60px;
   position: relative;
-  @media ${device.mobileM} {
-    padding: 20px 20px 0;
-  }
+  padding: 20px 20px 0;
   @media ${device.tablet} {
     padding: 20px 40px 0;
   }
@@ -123,28 +116,6 @@ const Title = styled.p`
   color: ${color.primary};
   z-index: 1;
   position: relative;
-`;
-
-const TitleSection = styled.div`
-  position: relative;
-`;
-
-const TitleBack = styled.div`
-  height: 13px;
-  position: absolute;
-  top: 16px;
-  left: 0;
-  background-color: ${color.third};
-  z-index: 0;
-  width: 100%;
-`;
-
-const Content = styled.div`
-  font-size: 1.1rem;
-`;
-
-const ListWrapper = styled.div`
-  width: 100%;
 `;
 
 const Dot = styled.div`
@@ -206,32 +177,41 @@ const NotePublic = () => {
   const [brief, setBrief] = useState();
   const [details, setDetails] = useState();
   const [info, setInfo] = useState();
-  const { currentUserId } = useOutletContext();
+  const { currentUserId, setError } = useOutletContext();
   let params = useParams();
   const noteId = params.noteId;
   const uid = params.uid;
 
   const tabs = ['公司資訊', '工作內容', '面試準備', '筆記心得'];
+  const sections = [
+    ['面試前筆記區', 'before_note'],
+    ['面試中筆記區', 'ing_note'],
+    ['面試後心得區', 'after_note'],
+  ];
 
   useEffect(() => {
     const fetch = async () => {
       if (currentUserId !== uid) {
-        await firebase.increaseViews(uid, noteId);
+        await firebase.increaseDataNumber(
+          `users/${uid}/notes/${noteId}`,
+          'views'
+        );
       }
-
-      firebase.getNote(uid, noteId).then(snap => {
-        setBrief(snap.data());
-      });
-      firebase.getNoteDetails(noteId).then(snap => {
-        setDetails(snap.data());
-      });
-      firebase.getUser(uid).then(doc => {
-        setInfo(doc.data());
-      });
+      try {
+        const brief = await firebase.getNote(uid, noteId);
+        setBrief(brief.data());
+        const details = await firebase.getNoteDetails(noteId);
+        setDetails(details.data());
+        const user = await firebase.getUser(uid);
+        setInfo(user.data());
+      } catch (error) {
+        console.log(error);
+        setError({ type: 0, message: '讀取資料發生錯誤' });
+      }
     };
 
     fetch();
-  }, [uid, noteId, currentUserId]);
+  }, [uid, noteId, currentUserId, setError]);
 
   const goToProfile = id => {
     window.open(`/profile/${id}?tab=setting`, '_blank');
@@ -284,78 +264,10 @@ const NotePublic = () => {
           <Line />
           <TabPanels>
             <TabPanel>
-              <FieldWrapper>
-                <Title>公司主要產品 / 服務</Title>
-                <Content>
-                  {details.product === '' ? '未填寫' : details.product}
-                </Content>
-              </FieldWrapper>
-              <FieldWrapper>
-                <Title>薪資範圍</Title>
-                <Content>
-                  {`${
-                    details.salary.range === ''
-                      ? '未填寫'
-                      : details.salary.range
-                  } K(千) ${details.salary.type}`}
-                </Content>
-              </FieldWrapper>
+              <CompanyInfo isPublic details={details} />
             </TabPanel>
             <TabPanel>
-              <FieldWrapper>
-                <TitleSection>
-                  <Title>工作內容</Title>
-                  <TitleBack />
-                </TitleSection>
-                <ListWrapper>
-                  {details.responsibilities.length === 0
-                    ? '未填寫'
-                    : details.responsibilities.map(item => {
-                        return (
-                          <ListItem key={item}>
-                            <Dot />
-                            <Content>{item}</Content>
-                          </ListItem>
-                        );
-                      })}
-                </ListWrapper>
-              </FieldWrapper>
-              <FieldWrapper>
-                <TitleSection>
-                  <Title>必備技能</Title>
-                  <TitleBack />
-                </TitleSection>
-                <ListWrapper>
-                  {details.requirements.length === 0
-                    ? '未填寫'
-                    : details.requirements.map(item => {
-                        return (
-                          <ListItem key={item.description}>
-                            <Dot />
-                            <Content>{item.description}</Content>
-                          </ListItem>
-                        );
-                      })}
-                </ListWrapper>
-              </FieldWrapper>
-              <FieldWrapper>
-                <TitleSection>
-                  <Title>加分項目</Title>
-                  <TitleBack />
-                </TitleSection>
-                <ListWrapper>
-                  {details.bonus.length === 0
-                    ? '未填寫'
-                    : details.bonus.map(item => {
-                        return (
-                          <ListItem key={item.description}>
-                            <Dot />
-                            <Content>{item.description}</Content>
-                          </ListItem>
-                        );
-                      })}
-                </ListWrapper>
-              </FieldWrapper>
+              <JobDetails isPublic details={details} />
             </TabPanel>
             <TabPanel>
               {details.job_link !== '' && (
@@ -385,42 +297,16 @@ const NotePublic = () => {
               </FieldWrapper>
             </TabPanel>
             <TabPanel>
-              <FieldWrapper>
-                <TitleSection>
-                  <Title>面試前筆記區</Title>
-                  <TitleBack />
-                </TitleSection>
-                <EditorArea
+              {sections.map(section => (
+                <PersonalThought
+                  key={section[1]}
                   isPublic
                   noteId={noteId}
                   details={details}
-                  objectKey="before_note"
+                  titleText={section[0]}
+                  targetKey={section[1]}
                 />
-              </FieldWrapper>
-              <FieldWrapper>
-                <TitleSection>
-                  <Title>面試中筆記區</Title>
-                  <TitleBack />
-                </TitleSection>
-                <EditorArea
-                  isPublic
-                  noteId={noteId}
-                  details={details}
-                  objectKey="ing_note"
-                />
-              </FieldWrapper>
-              <FieldWrapper>
-                <TitleSection>
-                  <Title>面試後心得區</Title>
-                  <TitleBack />
-                </TitleSection>
-                <EditorArea
-                  isPublic
-                  noteId={noteId}
-                  details={details}
-                  objectKey="after_note"
-                />
-              </FieldWrapper>
+              ))}
             </TabPanel>
           </TabPanels>
         </Tabs>

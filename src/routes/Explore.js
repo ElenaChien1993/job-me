@@ -11,7 +11,7 @@ import styled from 'styled-components';
 import firebase from '../utils/firebase';
 import { device, color } from '../style/variable';
 import image from '../images/explore.png';
-import ChatCorner from '../components/ChatCorner';
+import ChatCorner from '../components/messages/ChatCorner';
 import NoteCardExplore from '../components/NoteCardExplore';
 import Loader from '../components/Loader';
 
@@ -39,9 +39,7 @@ const ImageContainer = styled.div`
 
 const StyledImage = styled.img`
   object-fit: cover;
-  @media ${device.mobileM} {
-    height: 250px;
-  }
+  height: 250px;
   @media ${device.tablet} {
     height: 360px;
   }
@@ -77,7 +75,7 @@ const SmallText = styled.div`
   font-weight: 500;
   line-height: 22px;
   text-shadow: black 0.1em 0.1em 0.2em;
-  @media ${device.table} {
+  @media ${device.tablet} {
     font-size: 20px;
     font-weight: 400;
     line-height: 32px;
@@ -140,10 +138,8 @@ const ContentGrid = styled.ol`
   grid-gap: 36px;
   grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
   list-style: none;
-  @media ${device.mobileM} {
-    padding: 0 20px;
-  }
-  @media ${device.table} {
+  padding: 0 20px;
+  @media ${device.tablet} {
     padding: 0 32px;
   }
   @media ${device.laptop} {
@@ -161,14 +157,14 @@ const Explore = () => {
   const [databaseNotes, setDatabaseNotes] = useState(null);
   const [renderNotes, setRenderNotes] = useState(null);
   const [term, setTerm] = useState('');
-  const suggestions = ['工程師', '91APP', 'iOS', 'Android'];
+  const suggestions = ['工程師', '行銷', 'iOS', 'Android'];
 
   useEffect(() => {
     const fetchNotes = async () => {
       const data = await firebase.getPublicNotes();
       setDatabaseNotes(data);
     };
-    
+
     fetchNotes();
   }, []);
 

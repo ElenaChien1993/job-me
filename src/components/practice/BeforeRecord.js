@@ -4,17 +4,15 @@ import { ArrowForwardIcon } from '@chakra-ui/icons';
 import { MdTimer } from 'react-icons/md';
 import styled from 'styled-components';
 
-import SwitchElement from './elements/Switch';
-import { device, color } from '../style/variable';
+import SwitchElement from '../elements/Switch';
+import { device, color } from '../../style/variable';
 
 const PlayerWrapper = styled.div`
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  @media ${device.mobileM} {
-    font-size: 1.2rem;
-  }
+  font-size: 1.2rem;
   @media ${device.tablet} {
     font-size: 1.5rem;
   }
@@ -28,10 +26,8 @@ const TimerSettingWrapper = styled.div`
   border-radius: 20px;
   padding: 20px;
   background-color: ${color.white};
-  @media ${device.mobileM} {
-    width: 340px;
-    height: 180px;
-  }
+  width: 340px;
+  height: 180px;
   @media ${device.tablet} {
     width: 450px;
     height: 140px;
@@ -86,7 +82,12 @@ const BeforeRecord = ({
         {recordType === '錄音'
           ? '此次練習將以錄音方式進行'
           : '此次練習將以錄影方式進行'}
-        <Button mt="10px" colorScheme="brand" variant="ghost" onClick={toggleRecordType}>
+        <Button
+          mt="10px"
+          colorScheme="brand"
+          variant="ghost"
+          onClick={toggleRecordType}
+        >
           {recordType === '錄音' ? '切換為錄影' : '切換為錄音'}
         </Button>
       </PlayerWrapper>
@@ -97,7 +98,7 @@ const BeforeRecord = ({
             <Text>此題定時</Text>
             <Select
               mt="10px"
-              onChange={e => setTimer(e.target.value)}
+              onChange={e => setTimer(parseInt(e.target.value))}
               placeholder="請選擇計時時間"
               isRequired
               colorScheme="brand"

@@ -35,18 +35,18 @@ import {
   getDownloadURL,
   deleteObject,
 } from 'firebase/storage';
-import helper from '../hooks/helper';
-import useFormatedTime from '../hooks/useFormatedTime';
 
+import helper from './helper';
+import useFormatedTime from '../hooks/useFormatedTime';
 import useRelativeTime from '../hooks/useRelativeTime';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBO5LwocKFyWmosZiVyP0uCxNdNbOUYDho',
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: 'job-me-elena.firebaseapp.com',
   projectId: 'job-me-elena',
   storageBucket: 'job-me-elena.appspot.com',
   messagingSenderId: '360183641494',
-  appId: '1:360183641494:web:23988dcffbf71f26afd9b7',
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
   measurementId: 'G-1B3CGR7QSZ',
 };
 
@@ -57,195 +57,88 @@ const storage = getStorage(app);
 const providerGoogle = new GoogleAuthProvider();
 const providerFacebook = new FacebookAuthProvider();
 
-const firebase = {
-  updateUser(name) {
-    updateProfile(auth.currentUser, {
-      displayName: name,
+const changeReadStatus = async (roomId, uid) => {
+  const roomSnap = await getDoc(doc(db, 'chatrooms', roomId));
+  const lastSender = roomSnap.data().latest_sender;
+  if (uid === lastSender) return;
+  firebase.updateRoom(roomId, { receiver_has_read: true, unread_qty: 0 });
+};
+
+const changeTimeIntoMillis = (data, key) => {
+  const millisData = data.map(item => {
+    return { ...item, [key]: item[key].toMillis() };
+  });
+  return millisData;
+};
+
+const getCompleteRoomsData = async (rooms, uid) => {
+  const newRooms = await Promise.all(
+    rooms.map(async room => {
+      const timeRelative = useRelativeTime(room);
+      const friendId = room.members.filter(id => id !== uid);
+      const userData = await firebase.getUserInfo(friendId[0]);
+      return {
+        ...room,
+        members: userData,
+        latest: { ...room.latest, timestamp: timeRelative },
+      };
     })
-      .then(() => {
-        console.log('updated');
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  },
+  );
+
+  return newRooms;
+};
+
+const getUniqueMatchedData = async (key, value, uid) => {
+  const matchedMembers = query(
+    collectionGroup(db, 'notes'),
+    where(key, '==', value),
+    where('is_share', '==', true),
+    where('creator', '!=', uid),
+    limit(15)
+  );
+  const querySnapshot = await getDocs(matchedMembers);
+  let data = [];
+  querySnapshot.forEach(doc => {
+    data.push(doc.data());
+  });
+  const uniqueMembers = helper.fillterItemWithDuplicateCreator(data);
+  return uniqueMembers;
+};
+
+const firebase = {
   async getUser(uid) {
-    try {
-      const docSnap = await getDoc(doc(db, 'users', uid));
-      if (docSnap.exists()) {
-        return docSnap;
-      } else {
-        console.log('No such document!');
-      }
-    } catch (err) {
-      console.log(err);
+    const docSnap = await getDoc(doc(db, 'users', uid));
+    if (docSnap.exists()) {
+      return docSnap;
+    } else {
+      throw new Error('查無此用戶');
     }
   },
-  async updateUserInfo(uid, data) {
-    try {
-      await updateDoc(doc(db, 'users', uid), data);
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  listenUserProfileChange(uid, callback) {
-    return onSnapshot(doc(db, 'users', uid), doc => {
-      callback(prev => {
-        return { ...prev, ...doc.data() };
-      });
-    });
-  },
-  listenUserRecordsChange(uid, setAudioRecords, setVideoRecords) {
-    const q = query(
-      collection(db, 'users', uid, 'records'),
-      orderBy('date', 'desc')
-    );
-    return onSnapshot(q, async docs => {
-      let data = [];
-      docs.forEach(doc => {
-        data.push(doc.data());
-      });
-      const millisData = data.map(item => {
-        return { ...item, date: item.date.toMillis() };
-      });
-      const transformed = millisData.map(record => {
-        const timeString = useFormatedTime(record.date);
-        return { ...record, date: timeString };
-      });
-      const audios = transformed.filter(record => record.type === 0);
-      const videos = transformed.filter(record => record.type === 1);
-      setAudioRecords(audios);
-      setVideoRecords(videos);
-    });
+  async getUserInfo(uid) {
+    const docSnap = await this.getUser(uid);
+    const name = docSnap?.data().display_name || '未提供';
+    const photo = docSnap?.data().photo_url || '';
+    return { display_name: name, photo_url: photo };
   },
   async getNote(uid, docId) {
-    try {
-      const docSnap = await getDoc(doc(db, 'users', uid, 'notes', docId));
-      if (docSnap.exists()) {
-        return docSnap;
-      } else {
-        console.log('No such document!');
-      }
-    } catch (err) {
-      console.log(err);
+    const docSnap = await getDoc(doc(db, 'users', uid, 'notes', docId));
+    if (docSnap.exists()) {
+      return docSnap;
+    } else {
+      throw new Error('查無此筆記記錄');
     }
-  },
-  async getWholeCollection(category) {
-    const docsSnap = await getDocs(collection(db, category));
-    const data = [];
-    docsSnap.forEach(doc => {
-      data.push(doc.data());
-    });
-    return data;
-  },
-  async createDoc(category, data) {
-    const newDocRef = doc(collection(db, category));
-    try {
-      await setDoc(newDocRef, { ...data, id: newDocRef.id });
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  async setNoteBrief(uid, data) {
-    const newDocRef = doc(collection(db, `users/${uid}/notes`));
-    try {
-      await setDoc(newDocRef, { ...data, note_id: newDocRef.id });
-      return newDocRef.id;
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  async updateNoteBrief(uid, noteId, data) {
-    try {
-      await updateDoc(doc(db, 'users', uid, 'notes', noteId), data);
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  async increaseViews(uid, noteId) {
-    try {
-      await updateDoc(doc(db, 'users', uid, 'notes', noteId), {
-        views: increment(1),
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  async deleteNote(uid, noteId) {
-    try {
-      await deleteDoc(doc(db, 'users', uid, 'notes', noteId));
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  async getNotes(uid) {
-    const docSnaps = await getDocs(collection(db, `users/${uid}/notes`));
-    const notesArray = [];
-    docSnaps.forEach(doc => {
-      notesArray.push(doc.data());
-    });
-    return notesArray;
   },
   async getNoteDetails(noteId) {
     const docSnap = await getDoc(doc(db, 'details', noteId));
     return docSnap;
   },
-  async setNoteDetails(noteId, data) {
-    try {
-      await setDoc(doc(db, 'details', noteId), data);
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  async updateNoteDetails(noteId, data) {
-    try {
-      await updateDoc(doc(db, 'details', noteId), data);
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  listenDetailsChange(noteId, callback) {
-    return onSnapshot(doc(db, 'details', noteId), callback);
-  },
-  async setRecord(uid, data) {
-    const newDocRef = doc(collection(db, `users/${uid}/records`));
-    try {
-      await setDoc(newDocRef, { ...data, record_id: newDocRef.id });
-      return newDocRef.id;
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  async updateRecord(uid, recordId, data) {
-    const newDocRef = doc(db, `users/${uid}/records/${recordId}`);
-    try {
-      await updateDoc(newDocRef, data);
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  async deleteRecord(uid, recordId) {
-    try {
-      await deleteDoc(doc(db, 'users', uid, 'records', recordId));
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  checklogin(callback) {
-    onAuthStateChanged(auth, callback);
-  },
-  async signUp(uid, value, url) {
-    try {
-      await setDoc(doc(db, 'users', uid), {
-        display_name: value,
-        photo_url: url || '',
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  signOut() {
-    return signOut(auth);
+  async getWholeCollection(path) {
+    const docsSnap = await getDocs(collection(db, path));
+    const data = [];
+    docsSnap.forEach(doc => {
+      data.push(doc.data());
+    });
+    return data;
   },
   async getPublicNotes() {
     const publicNotes = query(
@@ -281,33 +174,12 @@ const firebase = {
     return notes;
   },
   async getRecommendedUsers(company, job, uid) {
-    const membersByCompany = query(
-      collectionGroup(db, 'notes'),
-      where('company_name', '==', company),
-      where('is_share', '==', true),
-      where('creator', '!=', uid),
-      limit(15)
+    const uniqueByCompany = await getUniqueMatchedData(
+      'company_name',
+      company,
+      uid
     );
-    const querySnapshot = await getDocs(membersByCompany);
-    let dataByCompany = [];
-    querySnapshot.forEach(doc => {
-      dataByCompany.push(doc.data());
-    });
-    const uniqueByCompany = helper.findUnique(dataByCompany);
-
-    const membersByJob = query(
-      collectionGroup(db, 'notes'),
-      where('job_title', '==', job),
-      where('is_share', '==', true),
-      where('creator', '!=', uid),
-      limit(15)
-    );
-    const Snapshots = await getDocs(membersByJob);
-    let dataByJob = [];
-    Snapshots.forEach(doc => {
-      dataByJob.push(doc.data());
-    });
-    const uniqueByJob = helper.findUnique(dataByJob);
+    const uniqueByJob = await getUniqueMatchedData('job_title', job, uid);
 
     const data = helper.compare(uniqueByCompany, uniqueByJob);
     const users = await Promise.all(
@@ -318,37 +190,146 @@ const firebase = {
     );
     return users;
   },
-  async uploadFile(path, file) {
-    const fileRef = ref(storage, path);
-    return uploadBytes(fileRef, file).then(() => {
-      console.log('Uploaded a blob or file!');
+  async getMoreMessages(roomId, message) {
+    if (!message) return;
+    const docSnaps = await getDocs(
+      query(
+        collection(db, `chatrooms/${roomId}/messages`),
+        where('create_at', '<', Timestamp.fromMillis(message.create_at)),
+        orderBy('create_at', 'desc'),
+        limit(20)
+      )
+    );
+    let data = [];
+    docSnaps.forEach(doc => {
+      data.push(doc.data());
     });
+    const millisData = changeTimeIntoMillis(data, 'create_at');
+    millisData.sort((a, b) => a.create_at - b.create_at);
+    return millisData;
+  },
+  updateUser(name) {
+    updateProfile(auth.currentUser, {
+      displayName: name,
+    });
+  },
+  async updateUserInfo(uid, data) {
+    await updateDoc(doc(db, 'users', uid), data);
+  },
+  async updateRecord(uid, recordId, data) {
+    const newDocRef = doc(db, `users/${uid}/records/${recordId}`);
+    await updateDoc(newDocRef, data);
+  },
+  async updateNoteBrief(uid, noteId, data) {
+    await updateDoc(doc(db, 'users', uid, 'notes', noteId), data);
+  },
+  async increaseDataNumber(path, key) {
+    await updateDoc(doc(db, path), {
+      [key]: increment(1),
+    });
+  },
+  async updateNoteDetails(noteId, data) {
+    await updateDoc(doc(db, 'details', noteId), data);
+  },
+  async updateRoom(roomId, data) {
+    await updateDoc(doc(db, 'chatrooms', roomId), data);
+  },
+  listenUserProfileChange(uid, callback) {
+    return onSnapshot(doc(db, 'users', uid), doc => {
+      callback(doc.data());
+    });
+  },
+  listenUserRecordsChange(uid, audioCallback, videoCallback) {
+    const q = query(
+      collection(db, 'users', uid, 'records'),
+      orderBy('date', 'desc')
+    );
+    return onSnapshot(q, async docs => {
+      let data = [];
+      docs.forEach(doc => {
+        data.push(doc.data());
+      });
+      const millisData = changeTimeIntoMillis(data, 'date');
+      const transformed = millisData.map(record => {
+        const timeString = useFormatedTime(record.date);
+        return { ...record, date: timeString };
+      });
+      let audios = [];
+      let videos = [];
+      transformed.forEach(record => {
+        if (record.type === 0) {
+          audios.push(record);
+        } else {
+          videos.push(record);
+        }
+      });
+      audioCallback(audios);
+      videoCallback(videos);
+    });
+  },
+  listenDetailsChange(noteId, callback) {
+    return onSnapshot(doc(db, 'details', noteId), callback);
+  },
+  listenRoomsChange(uid, callback) {
+    const q = query(
+      collection(db, 'chatrooms'),
+      where('members', 'array-contains', uid),
+      orderBy('latest.timestamp', 'desc')
+    );
+    return onSnapshot(q, async snapshot => {
+      let data = [];
+      snapshot.forEach(snap => {
+        data.push(snap.data());
+      });
+      const rooms = await getCompleteRoomsData(data, uid);
+      callback(rooms);
+    });
+  },
+  listenMessagesChange(room, uid, callback) {
+    const q = query(
+      collection(db, 'chatrooms', room.id, 'messages'),
+      orderBy('create_at', 'desc'),
+      limit(20)
+    );
+    return onSnapshot(q, async snapshot => {
+      let data = [];
+      snapshot.forEach(doc => {
+        data.push(doc.data());
+      });
+      const millisData = changeTimeIntoMillis(data, 'create_at');
+      millisData.sort((a, b) => a.create_at - b.create_at);
+      callback(millisData);
+      await changeReadStatus(room.id, uid);
+    });
+  },
+  async createDoc(path, data, key) {
+    const newDocRef = doc(collection(db, path));
+    await setDoc(newDocRef, { ...data, [key]: newDocRef.id });
+    return newDocRef.id;
+  },
+  async setNoteDetails(noteId, data) {
+    await setDoc(doc(db, 'details', noteId), data);
+  },
+  async setNewUser(uid, value, url) {
+    await setDoc(doc(db, 'users', uid), {
+      display_name: value,
+      photo_url: url || '',
+    });
+  },
+  async deleteData(path) {
+    await deleteDoc(doc(db, path));
   },
   async deleteFile(path) {
     const fileRef = ref(storage, path);
-    try {
-      deleteObject(fileRef);
-    } catch (error) {
-      console.log(error);
-    }
+    deleteObject(fileRef);
+  },
+  async uploadFile(path, file) {
+    const fileRef = ref(storage, path);
+    await uploadBytes(fileRef, file);
   },
   async getDownloadURL(path) {
-    return getDownloadURL(ref(storage, path))
-      .then(url => {
-        return url;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  },
-  async setChatroom(data) {
-    const newDocRef = doc(collection(db, 'chatrooms'));
-    try {
-      await setDoc(newDocRef, { ...data, id: newDocRef.id });
-      return newDocRef.id;
-    } catch (err) {
-      console.log(err);
-    }
+    const url = await getDownloadURL(ref(storage, path));
+    return url;
   },
   async checkIsRoomExist(ids) {
     const myRooms = query(
@@ -364,141 +345,25 @@ const firebase = {
     });
     return data;
   },
-  listenRoomsChange(uid, callback) {
-    const q = query(
-      collection(db, 'chatrooms'),
-      where('members', 'array-contains', uid),
-      orderBy('latest.timestamp', 'desc')
-    );
-    return onSnapshot(q, async snapshot => {
-      let data = [];
-      snapshot.forEach(snap => {
-        data.push(snap.data());
-      });
-      const rooms = await Promise.all(
-        data.map(async room => {
-          const timeRelative = useRelativeTime(room);
-          const friendId = room.members.filter(id => id !== uid);
-          const userData = await this.getUserInfo(friendId[0]);
-          return {
-            ...room,
-            members: userData,
-            latest: { ...room.latest, timestamp: timeRelative },
-          };
-        })
-      );
-      console.log('firebase', rooms)
-      callback(rooms);
-    });
-  },
-  async getUserInfo(uid) {
-    const docSnap = await getDoc(doc(db, 'users', uid));
-    const name = docSnap.data()?.display_name || '未提供';
-    const photo = docSnap.data()?.photo_url || '';
-    return { display_name: name, photo_url: photo };
-  },
-  async getMoreMessages(roomId, message) {
-    if (!message) return;
-    console.log('firebase', message);
-    const docSnaps = await getDocs(
-      query(
-        collection(db, `chatrooms/${roomId}/messages`),
-        where('create_at', '<', Timestamp.fromMillis(message.create_at)),
-        orderBy('create_at', 'desc'),
-        limit(20)
-      )
-    );
-    let data = [];
-    docSnaps.forEach(doc => {
-      data.push(doc.data());
-    });
-    const millisData = data.map(item => {
-      return { ...item, create_at: item.create_at.toMillis() };
-    });
-    millisData.sort((a, b) => a.create_at - b.create_at);
-    return millisData;
-  },
-  listenMessagesChange(room, callback, uid) {
-    const q = query(
-      collection(db, 'chatrooms', room.id, 'messages'),
-      orderBy('create_at', 'desc'),
-      limit(20)
-    );
-    return onSnapshot(
-      q,
-      async snapshot => {
-        let data = [];
-        snapshot.docChanges().forEach(change => {
-          if (change.type === 'added') {
-            data.push(change.doc.data());
-          }
-        });
-        const millisData = data.map(item => {
-          return { ...item, create_at: item.create_at.toMillis() };
-        });
-        millisData.sort((a, b) => a.create_at - b.create_at);
-        console.log(millisData);
-        callback(prev => {
-          if (!prev[room.id]) {
-            return {
-              ...prev,
-              [room.id]: millisData,
-            };
-          } else {
-            // 我這邊是先比較後來監聽拿到的 messages 是不是已經存在之前的 state 中
-            const stateIds = prev[room.id].map(item => item.id);
-            const dataIds = millisData.map(item => item.id);
-            const filteredIds = dataIds.filter(
-              id => stateIds.indexOf(id) === -1
-            );
-            if (filteredIds.length === 0) return prev;
-            const filteredData = millisData.filter(
-              message => filteredIds.indexOf(message.id) !== -1
-            );
-            return { ...prev, [room.id]: [...prev[room.id], ...filteredData] };
-          }
-        });
-        const roomSnap = await getDoc(doc(db, 'chatrooms', room.id));
-        const lastSender = roomSnap.data().latest_sender;
-        if (uid === lastSender) return;
-        this.updateRoom(room.id, { receiver_has_read: true, unread_qty: 0 });
-      },
-      error => {
-        console.error(error);
-      }
-    );
-  },
-  async checkUnreadQty(roomId) {
-    const docSnap = await getDoc(doc(db, 'chatrooms', roomId));
-    const unreadQty = docSnap.data().unread_qty || 0;
-    return unreadQty;
-  },
   async sendMessage(roomId, data) {
-    try {
-      const unreadQty = await this.checkUnreadQty(roomId);
-      console.log('unreadQty', unreadQty);
-      await updateDoc(doc(db, 'chatrooms', roomId), {
-        latest: {
-          timestamp: data.create_at,
-          message: data.text,
-          message_type: data.type,
-        },
-        receiver_has_read: false,
-        latest_sender: data.uid,
-        unread_qty: unreadQty + 1,
-      });
-      const newDocRef = doc(collection(db, 'chatrooms', roomId, 'messages'));
-      await setDoc(newDocRef, { ...data, id: newDocRef.id });
-    } catch (err) {
-      console.log(err);
-    }
+    const content = {
+      latest: {
+        timestamp: data.create_at,
+        message: data.text,
+        message_type: data.type,
+      },
+      receiver_has_read: false,
+      latest_sender: data.uid,
+      unread_qty: increment(1),
+    };
+    await this.updateRoom(roomId, content);
+    await this.createDoc(`chatrooms/${roomId}/messages`, data, 'id');
   },
-  async updateRoom(roomId, data) {
-    try {
-      await updateDoc(doc(db, 'chatrooms', roomId), data);
-    } catch (err) {
-      console.log(err);
-    }
+  checklogin(callback) {
+    onAuthStateChanged(auth, callback);
+  },
+  signOut() {
+    signOut(auth);
   },
   async register(email, password) {
     const userCredential = await createUserWithEmailAndPassword(
@@ -524,27 +389,12 @@ const firebase = {
     if (docSnap.exists()) {
       return;
     } else {
-      this.signUp(user.uid, user.displayName, user.photoURL);
+      this.setNewUser(user.uid, user.displayName, user.photoURL);
     }
   },
-  async updateUserInfoWithProvider(uid, name, photoUrl) {
-    try {
-      await updateDoc(doc(db, 'users', uid), {
-        display_name: name,
-        photo_url: photoUrl,
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  },
-  createUserWithEmailAndPassword,
   auth,
-  signInWithEmailAndPassword,
-  db,
-  doc,
-  setDoc,
-  onSnapshot,
   Timestamp,
+  increment,
 };
 
 export default firebase;

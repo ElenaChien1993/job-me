@@ -1,4 +1,6 @@
 import { useRadio, useRadioGroup, Box, HStack } from '@chakra-ui/react';
+import PropTypes from 'prop-types';
+
 import { color } from '../../style/variable';
 
 function RadioCard(props) {
@@ -32,7 +34,6 @@ function RadioCard(props) {
   );
 }
 
-// Step 2: Use the `useRadioGroup` hook to control a group of custom radios.
 const RadioGroup = ({ items, value, setter }) => {
   const options = items;
 
@@ -56,6 +57,12 @@ const RadioGroup = ({ items, value, setter }) => {
       })}
     </HStack>
   );
+};
+
+RadioGroup.propTypes = {
+  items: PropTypes.array.isRequired,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  setter: PropTypes.func.isRequired,
 };
 
 export default RadioGroup;
