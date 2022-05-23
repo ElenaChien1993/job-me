@@ -8,7 +8,7 @@ const useRelativeTime = room => {
     lastWeek: "M'月'd'日'",
     yesterday: "'昨天'",
     today: "p",
-    other: 'L LT', // Difference: Add time to the date
+    other: "M'月'd'日'", // Difference: Add time to the date
   };
 
   const locale = {
