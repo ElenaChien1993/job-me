@@ -13,8 +13,9 @@ const helper = {
     return final;
   },
   compare(array1, array2) {
-    if (array1.length === 0) return array2;
-    if (array2.length === 0) return array1;
+    if (!array1 && !array2) return [];
+    if (!array1 || array1.length === 0) return array2;
+    if (!array2 || array2.length === 0) return array1;
     const ids1 = array1.map(item => item.creator);
     const filtered = array2
       .map(item => item.creator)
