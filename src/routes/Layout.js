@@ -23,6 +23,8 @@ import PropTypes from 'prop-types';
 import firebase from '../utils/firebase';
 import logo from '../images/logo.png';
 import { device, color } from '../style/variable';
+import { useAuth } from '../contexts/AuthContext';
+import Loader from '../components/Loader';
 
 const Container = styled.div`
   height: auto;
@@ -157,6 +159,8 @@ const Nav = ({ userInfo, currentUserId }) => {
     navigate(`/profile/${currentUserId}?tab=setting`);
   };
 
+  console.log(userInfo);
+
   const tabs = [
     ['/notes', '我的筆記'],
     ['/practice', '面試練習'],
@@ -276,7 +280,7 @@ Nav.propTypes = {
 };
 
 const Layout = () => {
-  const currentUserId = firebase.auth.currentUser?.uid;
+  const { currentUserId, isLoading } = useAuth();
   const [userInfo, setUserInfo] = useState(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [active, setActive] = useState(null);
@@ -359,6 +363,8 @@ const Layout = () => {
     setDatabaseRooms,
     setError,
   };
+
+  if (isLoading) return <Loader isLoading={isLoading} />;
 
   return (
     <Container>
