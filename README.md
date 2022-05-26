@@ -1,0 +1,2 @@
+# <img width="30px" src="public/favicon.ico"/> JOB ME
+A place to keep your job hunting records, practice interviews via audio/video recorders and exchange experiences with others.<br/> Don’t know who to connect? No worries! The system will auto-recommend people that had similar career records!
