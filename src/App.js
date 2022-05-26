@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 
-import firebase from './utils/firebase';
 import Layout from './routes/Layout';
 import PrivateRoute from './routes/PrivateRoute';
 import Notes from './routes/notes/Notes';
@@ -15,13 +14,13 @@ import PracticeStart from './routes/practice/PracticeStart';
 import Profile from './routes/profile/Profile';
 import Messages from './routes/Messages';
 import GlobalStyle from './style/GlobalStyle';
-import Loader from './components/Loader';
 import Login from './routes/Login';
 import NotFound from './routes/NotFound';
 import NotePublic from './routes/notes/NotePublic';
 import { color } from './style/variable';
 import Explore from './routes/Explore';
 import Landing from './routes/Landing';
+import { useAuth } from './contexts/AuthContext';
 
 const breakpoints = {
   xs: '375px',
@@ -58,79 +57,63 @@ const theme = extendTheme({
 });
 
 const App = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLogIn, setIsLogIn] = useState(false);
-
-  useEffect(() => {
-    firebase.checklogin(user => {
-      if (user) {
-        setIsLogIn(true);
-      } else {
-        setIsLogIn(false);
-      }
-      setIsLoading(false);
-    });
-  }, []);
-
-  if (isLoading) return <Loader isLoading={isLoading} />;
+  const { isLogIn, setIsLogIn } = useAuth();
 
   return (
     <ChakraProvider theme={theme}>
       <BrowserRouter>
         <GlobalStyle />
-        {!isLoading && (
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route element={<PrivateRoute isLogIn={isLogIn} />}>
-                <Route index element={<Navigate to="/notes" />} />
-                <Route path="notes">
-                  <Route index element={<Notes />} />
-                  <Route path="details">
-                    <Route path=":noteId" element={<NoteDetails />} />
-                  </Route>
-                  <Route path="create" element={<NoteCreate />} />
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route element={<PrivateRoute isLogIn={isLogIn} />}>
+              <Route index element={<Navigate to="/notes" />} />
+              <Route path="notes">
+                <Route index element={<Notes />} />
+                <Route path="details">
+                  <Route path=":noteId" element={<NoteDetails />} />
                 </Route>
-
-                <Route path="practice" element={<PracticeParent />}>
-                  <Route index element={<Practice />} />
-                  <Route path="setting">
-                    <Route path=":noteId" element={<PracticeSetting />} />
-                  </Route>
-                  <Route path="start">
-                    <Route path=":noteId" element={<PracticeStart />} />
-                  </Route>
-                </Route>
-                <Route path="messages" element={<Messages />} />
+                <Route path="create" element={<NoteCreate />} />
               </Route>
 
-              <Route path="profile">
-                <Route path=":uid" element={<Profile />} />
-              </Route>
-
-              <Route path="public">
-                <Route path=":uid">
-                  <Route path=":noteId" element={<NotePublic />} />
+              <Route path="practice" element={<PracticeParent />}>
+                <Route index element={<Practice />} />
+                <Route path="setting">
+                  <Route path=":noteId" element={<PracticeSetting />} />
+                </Route>
+                <Route path="start">
+                  <Route path=":noteId" element={<PracticeStart />} />
                 </Route>
               </Route>
-
-              <Route path="explore" element={<Explore />} />
-
-              <Route path="product" element={<Landing />} />
-
-              <Route path="*" element={<NotFound />} />
+              <Route path="messages" element={<Messages />} />
             </Route>
-            <Route
-              path="login"
-              element={
-                isLogIn ? (
-                  <Navigate to="/notes" />
-                ) : (
-                  <Login setIsLogIn={setIsLogIn} />
-                )
-              }
-            />
-          </Routes>
-        )}
+
+            <Route path="profile">
+              <Route path=":uid" element={<Profile />} />
+            </Route>
+
+            <Route path="public">
+              <Route path=":uid">
+                <Route path=":noteId" element={<NotePublic />} />
+              </Route>
+            </Route>
+
+            <Route path="explore" element={<Explore />} />
+
+            <Route path="product" element={<Landing />} />
+
+            <Route path="*" element={<NotFound />} />
+          </Route>
+          <Route
+            path="login"
+            element={
+              isLogIn ? (
+                <Navigate to="/notes" />
+              ) : (
+                <Login setIsLogIn={setIsLogIn} />
+              )
+            }
+          />
+        </Routes>
       </BrowserRouter>
     </ChakraProvider>
   );
