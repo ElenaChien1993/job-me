@@ -19,7 +19,7 @@ const Container = styled.div`
   @media ${device.tablet} {
     align-items: center;
     flex-direction: row;
-    padding: 20px 40px;
+    padding: 20px 30px;
   }
 `;
 
@@ -27,7 +27,6 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  white-space: nowrap;
   overflow: hidden;
 `;
 
@@ -37,6 +36,7 @@ const MainContent = styled.div`
   margin-bottom: 10px;
   @media ${device.tablet} {
     margin-bottom: 0;
+    width: 75%;
   }
 `;
 
@@ -82,8 +82,8 @@ const Member = ({ note }) => {
         </ContentWrapper>
       </MainContent>
       <Button
-        size={['sm', null, null, 'md']}
-        fontSize={['14px', null, null, '18px']}
+        size='sm'
+        fontSize={['14px', null, null, '16px']}
         p={['5px', null, null, '10px']}
         variant="outline"
         ml="auto"
