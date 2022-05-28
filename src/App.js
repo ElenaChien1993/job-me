@@ -99,10 +99,9 @@ const App = () => {
 
             <Route path="explore" element={<Explore />} />
 
-            <Route path="product" element={<Landing />} />
-
             <Route path="*" element={<NotFound />} />
           </Route>
+          <Route path="product" element={<Landing />} />
           <Route
             path="login"
             element={
