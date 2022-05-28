@@ -13,6 +13,7 @@ const Container = styled.div`
   max-width: 1440px;
   margin: 0 auto 40px;
   padding: 0 5%;
+  background-color: ${color.backgroundGray};
   @media ${device.tablet} {
     padding: 0 10%;
   }
@@ -194,7 +195,7 @@ const Landing = () => {
             mt={['10px', null, null, null, '40px']}
             onClick={() => navigate('/notes')}
           >
-            免費註冊
+            開始使用
           </Button>
         </ContentText>
       </HeroWrapper>

@@ -1,5 +1,5 @@
 # <img width="30px" src="public/favicon.ico"/> JOB ME
-A place to keep your job hunting records, practice interviews via audio/video recorders and exchange experiences with others. Don’t know who to connect? No worries! The system will auto-recommend people that had similar career records!
+A place to keep your job hunting records, practice interviews via audio/video recorders, and exchange experiences with others. Don’t know who to connect with? No worries! The system will auto-recommend people that had similar career records!
 > [Live demo](https://job-me-elena.web.app/product)
 ## Table of Contents
 * [Introduction](#introduction)
@@ -9,9 +9,9 @@ A place to keep your job hunting records, practice interviews via audio/video re
 * [Future Improvment](#future-improvment)
 * [Contact](#contact)
 ## Introduction
-* Effortlessly create your personal job hunting records.
-* Practice interview with audio/video recorders.
-* Online chatroom with shortcut on the corner of the window to communicate with others.
+* Effortlessly create your job hunting records.
+* Practice interviews with audio/video recorders.
+* Online chatroom with a shortcut on the corner of the window to communicate with others.
 * The recommendation system help you find members who have similar career records to you.
 * Explore other's public job hunting records to find more future opportunities.
 ## Technologies Used
@@ -20,7 +20,7 @@ A place to keep your job hunting records, practice interviews via audio/video re
   * CSS
   * JavaScript
   * Firebase (Firestore / Storage / Auth)
-* Frameworks & Libraries
+* Frameworks & Frameworks related
   * React.js (Hooks)
   * React Router
   * prop-types
@@ -37,7 +37,6 @@ A place to keep your job hunting records, practice interviews via audio/video re
 * Others
   * API: Google Places API
   * tools: Figma / ESLint / Prettier
-  * Version Control: Git / GitHub
   * Unit Test: Jest
 ## User Flow
 
@@ -45,7 +44,7 @@ A place to keep your job hunting records, practice interviews via audio/video re
 
 ## Features
 ### Notes Page
-> - Implimented auto-complete functionality on company-name / job-title / address fields when creating notes.
+> - Implemented auto-complete functionality on company-name / job-title / address fields when creating notes.
 > - Applied click-to-edit method on details page.
 > - Hide/show your notes with others. Also can preview your note if it's public.
 > - Show recommendations of members to connect with by note.
@@ -53,7 +52,7 @@ A place to keep your job hunting records, practice interviews via audio/video re
 <img src="readme-demo/notes-page.gif"/>
 
 ### Practice Page
-> - Automatically Fetch your note's interview questions if there's any.
+> - Automatically fetch your note's interview questions if there's any.
 > - Set the quantity and questions, system will shuffle the order of the questions for you.
 > - Practice with audio or video recorder.
 > - Save your records in your account.
@@ -77,7 +76,7 @@ A place to keep your job hunting records, practice interviews via audio/video re
 ### Profile Page
 > - Edit your personal information.
 > - Upload / delete your profile picture.
-> - Review / download / delere your practice records.
+> - Review / download / delete your practice records.
 
 <img src="readme-demo/profile-page.gif"/>
 

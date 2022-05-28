@@ -168,6 +168,7 @@ const LATEST_MESSAGE_TYPE = props => ({
 
 const ChatList = React.memo(({ active, setActive, isCorner }) => {
   const [renderRooms, setRenderRooms] = useState([]);
+  const [term, setTerm] = useState('');
   const { currentUserId, databaseRooms } = useOutletContext();
   const rootRef = useRef();
   const observeTargetRef = useRef();
@@ -182,21 +183,21 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
     roomsQtyRef.current = renderRooms.length;
   }, [renderRooms]);
 
-  const handleSearch = e => {
-    const term = e.target.value;
-    if (!term) {
+  useEffect(() => {
+    if (term === '') {
       setRenderRooms(databaseRooms.slice(0, 6));
       return;
     }
+    const regex = new RegExp(term, 'gi');
     const filtered = databaseRooms.filter(room => {
-      const regex = new RegExp(term, 'gi');
       return room.members.display_name.match(regex);
     });
     setRenderRooms(filtered);
-  };
+  }, [term, databaseRooms]);
 
   useEffect(() => {
     const callback = ([entry]) => {
+      if (term !== '') return;
       if (firstRenderRef.current) {
         firstRenderRef.current = false;
         return;
@@ -226,7 +227,7 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
     return () => {
       observer.unobserve(target);
     };
-  }, [databaseRooms]);
+  }, [databaseRooms, term]);
 
   return (
     <ThemeProvider theme={{ isCorner }}>
@@ -243,7 +244,8 @@ const ChatList = React.memo(({ active, setActive, isCorner }) => {
               borderColor={color.primary}
               type="text"
               placeholder="Search people"
-              onChange={handleSearch}
+              value={term}
+              onChange={e => setTerm(e.target.value)}
             />
           </InputGroup>
         </SearchBar>
