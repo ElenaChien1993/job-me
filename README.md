@@ -44,44 +44,44 @@ A place to keep your job hunting records, practice interviews via audio/video re
 
 ## Features
 ### Notes Page
-> - Implemented auto-complete functionality on company-name / job-title / address fields when creating notes.
-> - Applied click-to-edit method on details page.
-> - Hide/show your notes with others. Also can preview your note if it's public.
-> - Show recommendations of members to connect with by note.
+- Implemented auto-complete functionality on company-name / job-title / address fields when creating notes.
+- Applied click-to-edit method on details page.
+- Hide/show your notes with others. Also can preview your note if it's public.
+- Show recommendations of members to connect with by note.
 
 <img src="readme-demo/notes-page.gif"/>
 
 ### Practice Page
-> - Automatically fetch your note's interview questions if there's any.
-> - Set the quantity and questions, system will shuffle the order of the questions for you.
-> - Practice with audio or video recorder.
-> - Save your records in your account.
+- Automatically fetch your note's interview questions if there's any.
+- Set the quantity and questions, system will shuffle the order of the questions for you.
+- Practice with audio or video recorder.
+- Save your records in your account.
 
 <img src="readme-demo/practice-page.gif"/>
 
 ### Explore Page
-> - Search companies or jobs that you're interested in.
-> - Explore other's public notes and exchange experiences.
+- Search companies or jobs that you're interested in.
+- Explore other's public notes and exchange experiences.
 
 <img src="readme-demo/explore-page.gif"/>
 
 ### Messages Page
-> - Can send text / images / emojis.
-> - Has unread messages indicator.
-> - Scroll down to load more history rooms in chatroom-list.
-> - Scroll up to load more history messages in chatrooms.
+- Can send text / images / emojis.
+- Has unread messages indicator.
+- Scroll down to load more history rooms in chatroom-list.
+- Scroll up to load more history messages in chatrooms.
 
 <img src="readme-demo/messages-page.gif"/>
 
 ### Profile Page
-> - Edit your personal information.
-> - Upload / delete your profile picture.
-> - Review / download / delete your practice records.
+- Edit your personal information.
+- Upload / delete your profile picture.
+- Review / download / delete your practice records.
 
 <img src="readme-demo/profile-page.gif"/>
 
 ### Responsive Web Design
-> - Improve user experience with RWD.
+- Improve user experience with RWD.
 
 <img src="readme-demo/mobile.gif"/>
 
