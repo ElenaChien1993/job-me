@@ -86,7 +86,7 @@ RenderList.propTypes = {
 };
 
 const SearchableInput = ({ value, setValue, data }) => {
-  const [toggle, setToggle] = useState(true);
+  const [toggle, setToggle] = useState(false);
 
   return (
     <>
