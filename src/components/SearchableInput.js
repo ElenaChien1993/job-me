@@ -5,12 +5,6 @@ import PropTypes from 'prop-types';
 
 import { color } from '../style/variable';
 
-const StyledInput = styled(Input)`
-  && {
-    border-radius: 10px;
-  }
-`;
-
 const StyledList = styled.div`
   width: 100%;
   background-color: whitesmoke;
@@ -85,17 +79,19 @@ RenderList.propTypes = {
   setToggle: PropTypes.func,
 };
 
-const SearchableInput = ({ value, setValue, data }) => {
+const SearchableInput = ({ firstInputRef, value, setValue, data }) => {
   const [toggle, setToggle] = useState(false);
 
   return (
     <>
-      <StyledInput
+      <Input
         onChange={e => {
           setValue(e.target.value);
           setToggle(true);
         }}
         value={value}
+        ref={firstInputRef}
+        borderRadius='10px'
       />
       <RenderList
         data={data}

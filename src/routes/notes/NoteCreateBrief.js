@@ -140,6 +140,7 @@ const NoteCreateBrief = props => {
   const { nextStep, handleChange, values, setValues, createNote } = props;
   const { companies, jobTitles } = useOutletContext();
   const inputRef = useRef();
+  const firstInputRef = useRef();
   const statusArray = [
     '未申請',
     '已申請',
@@ -152,6 +153,12 @@ const NoteCreateBrief = props => {
   useEffect(() => {
     initMap(setValues, inputRef);
   });
+
+  useEffect(() => {
+    console.log(firstInputRef.current)
+    if (!firstInputRef.current) return;
+    firstInputRef.current.focus();
+  }, []);
 
   const handleCheckboxChange = () => {
     setValues(prev => {
@@ -174,6 +181,7 @@ const NoteCreateBrief = props => {
             公司名稱 <span style={{ color: 'red' }}>*</span>
           </RequiredInput>
           <SearchableInput
+            firstInputRef={firstInputRef}
             value={values.company_name}
             setValue={value => {
               setValues(prev => {
