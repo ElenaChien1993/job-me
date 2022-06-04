@@ -246,8 +246,8 @@ const ProfileInfo = ({ userInfo, currentUserId }) => {
         </Menu>
       </ImageContainer>
       <NameWrapper>{userInfo && userInfo.display_name}</NameWrapper>
-      <JobTitle>{userInfo?.title || '尚未提供'}</JobTitle>
-      <About>{userInfo?.about_me || '尚未提供'}</About>
+      <JobTitle>{userInfo?.title || '尚未提供職稱'}</JobTitle>
+      <About>{userInfo?.about_me || '尚未提供自我介紹'}</About>
       <Counts>
         <Number>{userInfo?.notes_qty || 0}</Number>
         <p>Notes</p>
