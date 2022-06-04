@@ -14,7 +14,7 @@ const Container = styled.div`
   width: 100%;
   overflow: scroll;
   flex-direction: row;
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     flex-direction: column;
     height: ${({ theme }) => (theme.isCorner ? '82%' : '76%')};
   }
@@ -40,7 +40,7 @@ const ChatWrapper = styled.div`
   margin: 5px 3px;
   flex-direction: column;
   justify-content: center;
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     width: auto;
     min-width: auto;
     padding: ${({ theme }) => (theme.isCorner ? '8px 5px' : '10px 10px')};
@@ -57,7 +57,7 @@ const BriefContent = styled.div`
   overflow: hidden;
   margin-left: 0;
   width: 100%;
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     margin-left: 13px;
     width: 100%;
   }
@@ -71,7 +71,7 @@ const Name = styled.div`
   overflow: hidden;
   font-size: 16px;
   margin: 5px auto;
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     font-size: ${({ theme }) => (theme.isCorner ? '16px' : '20px')};
     margin: 0 0 5px;
   }
@@ -86,7 +86,7 @@ const LatestMessage = styled.div`
   width: 90%;
   font-weight: ${({ isRead }) => (isRead ? '400' : '700')};
   display: none;
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     display: block;
   }
 `;
@@ -95,7 +95,7 @@ const DateText = styled.div`
   font-size: 14px;
   color: #aeaeae;
   display: none;
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     display: ${({ theme }) => (theme.isCorner ? 'none' : 'block')};
   }
 `;
@@ -118,7 +118,7 @@ const NewMessage = styled.div`
   font-size: 13px;
   right: ${({ theme }) => (theme.isCorner ? '17px' : '13px')};
   top: ${({ theme }) => (theme.isCorner ? '28px' : '38px')};
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     font-size: ${({ theme }) => (theme.isCorner ? '13px' : '16px')};
     height: ${({ theme }) => (theme.isCorner ? '22px' : '26px')};
     width: ${({ theme }) => (theme.isCorner ? '22px' : '26px')};
@@ -132,7 +132,7 @@ const TitleWrapper = styled.div`
   flex-direction: column;
   display: ${({ theme }) => (theme.isCorner ? 'none' : 'flex')};
   padding: 15px 0 0 10px;
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     display: flex;
     padding: ${({ theme }) =>
       theme.isCorner ? '15px 0 0 20px' : '25px 0 0 25px'};
@@ -143,7 +143,7 @@ const Title = styled.div`
   font-weight: 600;
   color: ${color.primary};
   font-size: 18px;
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     display: block;
     font-size: ${({ theme }) => (theme.isCorner ? '18px' : '24px')};
     margin-bottom: 20px;
@@ -154,7 +154,7 @@ const SearchBar = styled.div`
   display: ${({ theme }) => (theme.isCorner ? 'none' : 'block')};
   margin: 15px 0;
   width: 99%;
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     margin: 0 0 30px;
     width: 94%;
   }

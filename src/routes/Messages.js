@@ -30,7 +30,7 @@ const Container = styled.div`
     width: ${({ theme }) => (theme.isCorner ? '300px' : '90%')};
     height: ${({ theme }) => (theme.isCorner ? '454px' : 'auto')};
   }
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     margin: ${({ theme }) => (theme.isCorner ? '' : '0 auto 70px')};
     top: ${({ theme }) => (theme.isCorner ? '' : '40px')};
     width: ${({ theme }) => (theme.isCorner ? '40vw' : '80%')};
@@ -47,7 +47,7 @@ const LeftWrapper = styled.div`
     width: 100%;
     padding: 0 10px;
   }
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     border-radius: 20px 0 0 20px;
     position: absolute;
     left: 0;
@@ -66,7 +66,7 @@ const RightWrapper = styled.div`
     margin-left: 0;
     height: 350px;
   }
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     width: 65%;
     height: 100%;
     margin-left: 35%;
@@ -82,7 +82,7 @@ const TopWrapper = styled.div`
   @media ${device.mobileM} {
     display: none;
   }
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     display: flex;
   }
 `;
@@ -98,7 +98,7 @@ const Content = styled.div`
   @media ${device.mobileM} {
     height: ${({ theme }) => (theme.isCorner ? '285px' : '410px')};
   }
-  @media ${device.laptopL} {
+  @media ${device.laptop} {
     height: ${({ theme }) => (theme.isCorner ? '272px' : '100%')};
   }
 `;
@@ -107,9 +107,9 @@ const BottomWrapper = styled.div`
   height: 64px;
   display: flex;
   align-items: center;
-  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.25);
   padding: 0 10px;
   border-radius: 0 0 20px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
 const MessageBar = styled(Input)`

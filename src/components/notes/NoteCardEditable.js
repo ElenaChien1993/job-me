@@ -193,8 +193,11 @@ const NoteElement = React.memo(
 
     const handleTagsChange = e => {
       const tagsArray = e.target.value.split(',', 5);
+      const filteredOutEmpty = tagsArray.filter(
+        item => item !== '' && item !== ' '
+      );
       setNote(prev => {
-        return { ...prev, tags: tagsArray };
+        return { ...prev, tags: filteredOutEmpty };
       });
     };
 
