@@ -114,9 +114,9 @@ const Login = () => {
     password: '',
   });
   const [isInvalid, setIsInvalid] = useState({
-    name: true,
-    email: true,
-    password: true,
+    name: false,
+    email: false,
+    password: false,
   });
   const navigate = useNavigate();
   const location = useLocation();
@@ -218,11 +218,26 @@ const Login = () => {
   };
 
   const handleChange = prop => event => {
+    if (prop === 'email') {
+      const regex =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      setIsInvalid(prev => {
+        return { ...prev, email: !event.target.value.match(regex) };
+      });
+    }
+    if (prop === 'password') {
+      const regex = /.{6,}/;
+      setIsInvalid(prev => {
+        return { ...prev, password: !event.target.value.match(regex) };
+      });
+    }
+    if (prop === 'name') {
+      setIsInvalid(prev => {
+        return { ...prev, name: event.target.value === '' };
+      });
+    }
     setValues(prev => {
       return { ...prev, [prop]: event.target.value };
-    });
-    setIsInvalid(prev => {
-      return { ...prev, [prop]: event.target.value === '' };
     });
   };
 

@@ -195,8 +195,8 @@ const MemberProfile = React.memo(() => {
           marginRight={0}
         />
         <NameWrapper>{info.display_name}</NameWrapper>
-        <JobTitle>{info.title || '尚未提供'}</JobTitle>
-        <About>{info.about_me || '尚未提供'}</About>
+        <JobTitle>{info.title || '尚未提供職稱'}</JobTitle>
+        <About>{info.about_me || '尚未提供自我介紹'}</About>
         <Button
           mt="20px"
           w="100px"

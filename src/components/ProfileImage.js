@@ -5,17 +5,17 @@ import PropTypes from 'prop-types';
 import { color } from '../style/variable';
 
 const ImageWrapper = styled.div`
-  min-width: ${props => props.size}px;
-  min-height: ${props => props.size}px;
-  border-radius: ${props => props.size / 2}px;
-  border: ${props => (props.hasBorder ? `5px solid ${color.primary}` : 'none')};
-  margin-right: ${props => props.marginRight}px;
+  min-width: ${({ size }) => size}px;
+  min-height: ${({ size }) => size}px;
+  border-radius: ${({ size }) => size / 2}px;
+  border: ${({ hasBorder }) => hasBorder ? `5px solid ${color.primary}` : 'none'};
+  margin-right: ${({ marginRight }) => marginRight}px;
   overflow: hidden;
 `;
 
 const StyledImg = styled.img`
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
+  width: ${({ size }) => size}px;
+  height: ${({ size }) => size}px;
   object-fit: cover;
 `;
 

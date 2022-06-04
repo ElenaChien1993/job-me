@@ -66,9 +66,9 @@ const RadioInput = styled.input`
 const TagButton = styled.label`
   width: 90px;
   height: 35px;
-  background: ${props => (props.checked ? color.primary : '#E3E3E3')};
+  background: ${({ checked }) => (checked ? color.primary : '#E3E3E3')};
   border-radius: 20px;
-  color: ${props => (props.checked ? 'white' : '#707070')};
+  color: ${({ checked }) => (checked ? 'white' : '#707070')};
   line-height: 22px;
   margin-right: 15px;
   cursor: pointer;
@@ -140,6 +140,7 @@ const NoteCreateBrief = props => {
   const { nextStep, handleChange, values, setValues, createNote } = props;
   const { companies, jobTitles } = useOutletContext();
   const inputRef = useRef();
+  const firstInputRef = useRef();
   const statusArray = [
     '未申請',
     '已申請',
@@ -152,6 +153,12 @@ const NoteCreateBrief = props => {
   useEffect(() => {
     initMap(setValues, inputRef);
   });
+
+  useEffect(() => {
+    console.log(firstInputRef.current)
+    if (!firstInputRef.current) return;
+    firstInputRef.current.focus();
+  }, []);
 
   const handleCheckboxChange = () => {
     setValues(prev => {
@@ -174,6 +181,7 @@ const NoteCreateBrief = props => {
             公司名稱 <span style={{ color: 'red' }}>*</span>
           </RequiredInput>
           <SearchableInput
+            firstInputRef={firstInputRef}
             value={values.company_name}
             setValue={value => {
               setValues(prev => {

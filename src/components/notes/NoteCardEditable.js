@@ -23,7 +23,7 @@ const Container = styled.div`
   margin-bottom: 25px;
   box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
   &:hover {
-    transform: ${props => (props.hasHover ? 'translate(5px, 5px)' : '')};
+    transform: ${({ hasHover }) => (hasHover ? 'translate(5px, 5px)' : '')};
   }
   flex-direction: column;
   align-items: flex-start;
@@ -193,8 +193,11 @@ const NoteElement = React.memo(
 
     const handleTagsChange = e => {
       const tagsArray = e.target.value.split(',', 5);
+      const filteredOutEmpty = tagsArray.filter(
+        item => item !== '' && item !== ' '
+      );
       setNote(prev => {
-        return { ...prev, tags: tagsArray };
+        return { ...prev, tags: filteredOutEmpty };
       });
     };
 
