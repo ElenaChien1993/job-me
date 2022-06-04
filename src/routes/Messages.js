@@ -22,19 +22,19 @@ const Container = styled.div`
   border-radius: 20px;
   position: relative;
   z-index: 3;
-  max-width: ${props => (props.theme.isCorner ? '800px' : '1152px')};
+  max-width: ${({ theme }) => (theme.isCorner ? '800px' : '1152px')};
   box-shadow: 4px 4px 4px rgb(0 0 0 / 25%);
   @media ${device.mobileM} {
-    margin: ${props => (props.theme.isCorner ? '' : '0 auto 40px')};
-    top: ${props => (props.theme.isCorner ? '' : '40px')};
-    width: ${props => (props.theme.isCorner ? '300px' : '90%')};
-    height: ${props => (props.theme.isCorner ? '454px' : 'auto')};
+    margin: ${({ theme }) => (theme.isCorner ? '' : '0 auto 40px')};
+    top: ${({ theme }) => (theme.isCorner ? '' : '40px')};
+    width: ${({ theme }) => (theme.isCorner ? '300px' : '90%')};
+    height: ${({ theme }) => (theme.isCorner ? '454px' : 'auto')};
   }
   @media ${device.laptopL} {
-    margin: ${props => (props.theme.isCorner ? '' : '0 auto 70px')};
-    top: ${props => (props.theme.isCorner ? '' : '40px')};
-    width: ${props => (props.theme.isCorner ? '40vw' : '80%')};
-    height: ${props => (props.theme.isCorner ? '400px' : '80vh')};
+    margin: ${({ theme }) => (theme.isCorner ? '' : '0 auto 70px')};
+    top: ${({ theme }) => (theme.isCorner ? '' : '40px')};
+    width: ${({ theme }) => (theme.isCorner ? '40vw' : '80%')};
+    height: ${({ theme }) => (theme.isCorner ? '400px' : '80vh')};
   }
 `;
 
@@ -96,10 +96,10 @@ const Name = styled.div`
 const Content = styled.div`
   overflow: scroll;
   @media ${device.mobileM} {
-    height: ${props => (props.theme.isCorner ? '285px' : '410px')};
+    height: ${({ theme }) => (theme.isCorner ? '285px' : '410px')};
   }
   @media ${device.laptopL} {
-    height: ${props => (props.theme.isCorner ? '272px' : '100%')};
+    height: ${({ theme }) => (theme.isCorner ? '272px' : '100%')};
   }
 `;
 

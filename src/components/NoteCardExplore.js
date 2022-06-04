@@ -26,7 +26,8 @@ const Footer = styled.div`
   align-items: center;
   border-top: 1px solid #f4f5f6;
   display: flex;
-  justify-content: ${props => (props.isProfile ? 'flex-end' : 'space-between')};
+  justify-content: ${({ isProfile }) =>
+    isProfile ? 'flex-end' : 'space-between'};
   margin-top: 12px;
   padding: 16px 16px 0;
 `;

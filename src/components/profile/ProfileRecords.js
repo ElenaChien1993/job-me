@@ -87,8 +87,8 @@ const Record = styled.div`
   padding-bottom: 10px;
   cursor: pointer;
   border-bottom: 1px solid #dbdbdb;
-  color: ${props => (props.isSelected ? 'black' : '#999999')};
-  font-weight: ${props => (props.isSelected ? '700' : '400')};
+  color: ${({ isSelected }) => (isSelected ? 'black' : '#999999')};
+  font-weight: ${({ isSelected }) => (isSelected ? '700' : '400')};
   &:hover {
     font-weight: 700;
     color: black;

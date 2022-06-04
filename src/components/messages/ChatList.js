@@ -16,7 +16,7 @@ const Container = styled.div`
   flex-direction: row;
   @media ${device.laptopL} {
     flex-direction: column;
-    height: ${props => (props.theme.isCorner ? '82%' : '76%')};
+    height: ${({ theme }) => (theme.isCorner ? '82%' : '76%')};
   }
 `;
 
@@ -24,9 +24,9 @@ const ChatWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  background-color: ${props => (props.isSelected ? 'white' : '')};
-  box-shadow: ${props =>
-    props.isSelected ? '0 4px 16px rgb(91 96 103 / 8%)' : ''};
+  background-color: ${({ isSelected }) => (isSelected ? 'white' : '')};
+  box-shadow: ${({ isSelected }) =>
+    isSelected ? '0 4px 16px rgb(91 96 103 / 8%)' : ''};
   cursor: pointer;
   border-radius: 10px;
   &:hover {
@@ -43,8 +43,8 @@ const ChatWrapper = styled.div`
   @media ${device.laptopL} {
     width: auto;
     min-width: auto;
-    padding: ${props => (props.theme.isCorner ? '8px 5px' : '10px 10px')};
-    margin: ${props => (props.theme.isCorner ? '2px 5px' : '5px 10px')};
+    padding: ${({ theme }) => (theme.isCorner ? '8px 5px' : '10px 10px')};
+    margin: ${({ theme }) => (theme.isCorner ? '2px 5px' : '5px 10px')};
     flex-direction: row;
   }
 `;
@@ -72,19 +72,19 @@ const Name = styled.div`
   font-size: 16px;
   margin: 5px auto;
   @media ${device.laptopL} {
-    font-size: ${props => (props.theme.isCorner ? '16px' : '20px')};
+    font-size: ${({ theme }) => (theme.isCorner ? '16px' : '20px')};
     margin: 0 0 5px;
   }
 `;
 
 const LatestMessage = styled.div`
   color: #4f5665;
-  font-size: ${props => (props.theme.isCorner ? '13px' : '16px')};
+  font-size: ${({ theme }) => (theme.isCorner ? '13px' : '16px')};
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   width: 90%;
-  font-weight: ${props => (props.isRead ? '400' : '700')};
+  font-weight: ${({ isRead }) => (isRead ? '400' : '700')};
   display: none;
   @media ${device.laptopL} {
     display: block;
@@ -96,7 +96,7 @@ const DateText = styled.div`
   color: #aeaeae;
   display: none;
   @media ${device.laptopL} {
-    display: ${props => (props.theme.isCorner ? 'none' : 'block')};
+    display: ${({ theme }) => (theme.isCorner ? 'none' : 'block')};
   }
 `;
 
@@ -111,31 +111,31 @@ const NewMessage = styled.div`
   color: white;
   text-align: center;
   font-weight: 700;
-  display: ${props => (props.isRead ? 'none' : 'block')};
+  display: ${({ isRead }) => (isRead ? 'none' : 'block')};
   height: 22px;
   width: 22px;
   border-radius: 11px;
   font-size: 13px;
-  right: ${props => (props.theme.isCorner ? '17px' : '13px')};
-  top: ${props => (props.theme.isCorner ? '28px' : '38px')};
+  right: ${({ theme }) => (theme.isCorner ? '17px' : '13px')};
+  top: ${({ theme }) => (theme.isCorner ? '28px' : '38px')};
   @media ${device.laptopL} {
-    font-size: ${props => (props.theme.isCorner ? '13px' : '16px')};
-    height: ${props => (props.theme.isCorner ? '22px' : '26px')};
-    width: ${props => (props.theme.isCorner ? '22px' : '26px')};
-    border-radius: ${props => (props.theme.isCorner ? '11px' : '13px')};
-    top: ${props => (props.theme.isCorner ? '22px' : '39px')};
-    right: ${props => (props.theme.isCorner ? '11px' : '25px')};
+    font-size: ${({ theme }) => (theme.isCorner ? '13px' : '16px')};
+    height: ${({ theme }) => (theme.isCorner ? '22px' : '26px')};
+    width: ${({ theme }) => (theme.isCorner ? '22px' : '26px')};
+    border-radius: ${({ theme }) => (theme.isCorner ? '11px' : '13px')};
+    top: ${({ theme }) => (theme.isCorner ? '22px' : '39px')};
+    right: ${({ theme }) => (theme.isCorner ? '11px' : '25px')};
   }
 `;
 
 const TitleWrapper = styled.div`
   flex-direction: column;
-  display: ${props => (props.theme.isCorner ? 'none' : 'flex')};
+  display: ${({ theme }) => (theme.isCorner ? 'none' : 'flex')};
   padding: 15px 0 0 10px;
   @media ${device.laptopL} {
     display: flex;
-    padding: ${props =>
-      props.theme.isCorner ? '15px 0 0 20px' : '25px 0 0 25px'};
+    padding: ${({ theme }) =>
+      theme.isCorner ? '15px 0 0 20px' : '25px 0 0 25px'};
   }
 `;
 
@@ -145,13 +145,13 @@ const Title = styled.div`
   font-size: 18px;
   @media ${device.laptopL} {
     display: block;
-    font-size: ${props => (props.theme.isCorner ? '18px' : '24px')};
+    font-size: ${({ theme }) => (theme.isCorner ? '18px' : '24px')};
     margin-bottom: 20px;
   }
 `;
 
 const SearchBar = styled.div`
-  display: ${props => (props.theme.isCorner ? 'none' : 'block')};
+  display: ${({ theme }) => (theme.isCorner ? 'none' : 'block')};
   margin: 15px 0;
   width: 99%;
   @media ${device.laptopL} {
@@ -163,7 +163,6 @@ const SearchBar = styled.div`
 const LATEST_MESSAGE_TYPE = props => ({
   0: props.latest.message,
   1: '傳送了一張照片',
-  default: '',
 });
 
 const ChatList = React.memo(({ active, setActive, isCorner }) => {

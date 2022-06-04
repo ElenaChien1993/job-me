@@ -115,8 +115,8 @@ const StyledNavLink = styled(NavLink)`
 `;
 
 const Span = styled.span`
-  color: ${props => (props.isActive ? 'white' : 'rgba(255, 255, 255, 0.7)')};
-  font-weight: ${props => (props.isActive ? '700' : '500')};
+  color: ${({ isActive }) => (isActive ? 'white' : 'rgba(255, 255, 255, 0.7)')};
+  font-weight: ${({ isActive }) => (isActive ? '700' : '500')};
   &:hover {
     color: white;
     font-weight: 700;
@@ -134,8 +134,8 @@ const MobileNavItem = styled.li`
 `;
 
 const MobileSpan = styled.span`
-  color: ${props => (props.isActive ? color.primary : '#999')};
-  font-weight: ${props => (props.isActive ? '700' : '500')};
+  color: ${({ isActive }) => (isActive ? color.primary : '#999')};
+  font-weight: ${({ isActive }) => (isActive ? '700' : '500')};
   &:hover {
     color: ${color.primary};
     font-weight: 700;
@@ -158,8 +158,6 @@ const Nav = ({ userInfo, currentUserId }) => {
   const goToProfile = () => {
     navigate(`/profile/${currentUserId}?tab=setting`);
   };
-
-  console.log(userInfo);
 
   const tabs = [
     ['/notes', '我的筆記'],

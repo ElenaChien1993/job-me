@@ -78,7 +78,7 @@ const OptionWrapper = styled.div`
 const StyledInput = styled(Input)`
   && {
     border-radius: 10px;
-    border-color: ${props => (props.$isValid ? 'black' : 'red')};
+    border-color: ${({ $isValid }) => ($isValid ? 'black' : 'red')};
   }
 `;
 

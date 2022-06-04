@@ -76,7 +76,7 @@ const RightWrapper = styled.div`
 `;
 
 const StyledIcon = styled(Icon)`
-  color: ${props => (props.$isComplete ? 'white' : '#6c6c6c')};
+  color: ${({ $isComplete }) => ($isComplete ? 'white' : '#6c6c6c')};
   width: 25px;
   height: 25px;
   margin-right: 5px;
@@ -90,7 +90,7 @@ const StyledIcon = styled(Icon)`
 `;
 
 const StepText = styled.p`
-  color: ${props => (props.$isComplete ? 'white' : '#6c6c6c')};
+  color: ${({ $isComplete }) => ($isComplete ? 'white' : '#6c6c6c')};
   font-size: 20px;
   font-weight: bold;
   cursor: default;
@@ -107,7 +107,7 @@ const StraightLine = styled.div`
   height: 30px;
   margin: 3px 0;
   margin-left: 16px;
-  background-color: ${props => (props.$isComplete ? 'white' : '#6c6c6c')};
+  background-color: ${({ $isComplete }) => ($isComplete ? 'white' : '#6c6c6c')};
   display: none;
   @media ${device.tablet} {
     display: block;

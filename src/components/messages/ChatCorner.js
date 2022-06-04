@@ -39,7 +39,7 @@ const NewMessage = styled.div`
   color: white;
   text-align: center;
   font-weight: 700;
-  display: ${props => (props.isRead ? 'none' : 'block')};
+  display: ${({ isRead }) => (isRead ? 'none' : 'block')};
 `;
 
 const ChatCorner = () => {

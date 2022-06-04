@@ -9,8 +9,8 @@ const Container = styled.div`
   bottom: 0px;
   left: 0px;
   right: 0px;
-  background: ${props =>
-    props.hasShadow ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255)'};
+  background: ${({ hasShadow }) =>
+    hasShadow ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255)'};
   z-index: 10;
 `;
 

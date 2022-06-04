@@ -29,8 +29,8 @@ const Record = styled.div`
   justify-content: space-between;
   padding: 0 10px;
   width: 90%;
-  color: ${props => (props.isSelected ? 'black' : '#999999')};
-  font-weight: ${props => (props.isSelected ? '700' : '400')};
+  color: ${({ isSelected }) => (isSelected ? 'black' : '#999999')};
+  font-weight: ${({ isSelected }) => (isSelected ? '700' : '400')};
   &:hover {
     font-weight: 700;
     color: black;
@@ -164,7 +164,7 @@ const RecordAccordion = ({
 RecordAccordion.propTypes = {
   records: PropTypes.array,
   tabIndex: PropTypes.number.isRequired,
-  activeRecord: PropTypes.object.isRequired,
+  activeRecord: PropTypes.object,
   setActiveRecord: PropTypes.func.isRequired,
   onOpen: PropTypes.func.isRequired,
 };

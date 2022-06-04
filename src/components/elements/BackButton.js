@@ -10,7 +10,7 @@ import AlertModal from '../AlertModal';
 
 const StyledButton = styled(Button)`
   && {
-    position: ${props => (props.$isStart ? 'static' : 'absolute')};
+    position: ${({ $isStart }) => ($isStart ? 'static' : 'absolute')};
     left: 0;
     top: 0;
     @media ${device.mobileM} {
@@ -18,7 +18,7 @@ const StyledButton = styled(Button)`
       margin-bottom: 10px;
     }
     @media ${device.tablet} {
-      position: ${props => (props.$isStart ? 'static' : 'absolute')};
+      position: ${({ $isStart }) => ($isStart ? 'static' : 'absolute')};
       margin-bottom: 0;
     }
   }

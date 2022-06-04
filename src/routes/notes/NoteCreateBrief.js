@@ -66,9 +66,9 @@ const RadioInput = styled.input`
 const TagButton = styled.label`
   width: 90px;
   height: 35px;
-  background: ${props => (props.checked ? color.primary : '#E3E3E3')};
+  background: ${({ checked }) => (checked ? color.primary : '#E3E3E3')};
   border-radius: 20px;
-  color: ${props => (props.checked ? 'white' : '#707070')};
+  color: ${({ checked }) => (checked ? 'white' : '#707070')};
   line-height: 22px;
   margin-right: 15px;
   cursor: pointer;
